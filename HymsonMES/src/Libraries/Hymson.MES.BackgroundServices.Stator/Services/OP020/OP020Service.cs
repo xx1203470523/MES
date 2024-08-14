@@ -121,6 +121,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             {
                 var barCode1 = opEntity.wire1_barcode;
                 var barCode2 = opEntity.wire2_barcode;
+                var time = opEntity.RDate;
 
                 // ID是否无效数据
                 var id = opEntity.ID.ParseToLong();
@@ -129,35 +130,37 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 IEnumerable<WireBarCodeEntity>? wireEntities = wireSFCEntities.Where(f => f.WireId == id);
 
                 // 如果条码1有效
+                List<WireBarCodeEntity> wireBarCodeEntities = new();
                 if (!StatorConst.IgnoreString.Contains(barCode1) && !string.IsNullOrWhiteSpace(barCode1) && !wireEntities.Any(a => a.WireBarCode == barCode1))
                 {
-                    summaryBo.AddWireBarCodeEntities.Add(new WireBarCodeEntity
+                    wireBarCodeEntities.Add(new WireBarCodeEntity
                     {
                         Id = $"{id}{barCode1}".ToLongID(),
                         WireId = id,
                         WireBarCode = barCode1,
                         SiteId = statorBo.SiteId,
                         CreatedOn = statorBo.Time,
-                        UpdatedOn = opEntity.RDate
+                        UpdatedOn = time
                     });
                 }
 
                 // 如果条码2有效
                 if (!StatorConst.IgnoreString.Contains(barCode2) && !string.IsNullOrWhiteSpace(barCode2) && !wireEntities.Any(a => a.WireBarCode == barCode2))
                 {
-                    summaryBo.AddWireBarCodeEntities.Add(new WireBarCodeEntity
+                    wireBarCodeEntities.Add(new WireBarCodeEntity
                     {
                         Id = $"{id}{barCode2}".ToLongID(),
                         WireId = id,
                         WireBarCode = barCode2,
                         SiteId = statorBo.SiteId,
                         CreatedOn = statorBo.Time,
-                        UpdatedOn = opEntity.RDate
+                        UpdatedOn = time
                     });
                 }
+                summaryBo.AddWireBarCodeEntities.AddRange(wireBarCodeEntities);
 
                 // 遍历条码
-                foreach (var wireBarCodeEntity in summaryBo.AddWireBarCodeEntities)
+                foreach (var wireBarCodeEntity in wireBarCodeEntities)
                 {
                     // 条码ID
                     var manuSFCStepId = IdGenProvider.Instance.CreateId();
@@ -206,44 +209,45 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
 
                     // 如果是不合格
                     var isOk = opEntity.Result == "OK";
-                    if (isOk) continue;
-
-                    // 插入不良记录
-                    summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
+                    if (!isOk)
                     {
-                        Id = manuBadRecordId,
-                        FoundBadOperationId = statorBo.ProcedureId,
-                        OutflowOperationId = statorBo.ProcedureId,
-                        UnqualifiedId = 0,
-                        SFC = barCode,
-                        SfcInfoId = 0,
-                        SfcStepId = manuSFCStepId,
-                        Qty = 1,
-                        Status = ProductBadRecordStatusEnum.Open,
-                        Source = ProductBadRecordSourceEnum.EquipmentReBad,
-                        Remark = "",
+                        // 插入不良记录
+                        summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
+                        {
+                            Id = manuBadRecordId,
+                            FoundBadOperationId = statorBo.ProcedureId,
+                            OutflowOperationId = statorBo.ProcedureId,
+                            UnqualifiedId = 0,
+                            SFC = barCode,
+                            SfcInfoId = 0,
+                            SfcStepId = manuSFCStepId,
+                            Qty = 1,
+                            Status = ProductBadRecordStatusEnum.Open,
+                            Source = ProductBadRecordSourceEnum.EquipmentReBad,
+                            Remark = "",
 
-                        SiteId = statorBo.SiteId,
-                        CreatedBy = statorBo.User,
-                        CreatedOn = statorBo.Time,
-                        UpdatedBy = StatorConst.USER,
-                        UpdatedOn = opEntity.RDate
-                    });
+                            SiteId = statorBo.SiteId,
+                            CreatedBy = statorBo.User,
+                            CreatedOn = statorBo.Time,
+                            UpdatedBy = StatorConst.USER,
+                            UpdatedOn = time
+                        });
 
-                    // 插入NG记录
-                    summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        BadRecordId = manuBadRecordId,
-                        UnqualifiedId = 0,
-                        NGCode = "未知",
+                        // 插入NG记录
+                        summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            BadRecordId = manuBadRecordId,
+                            UnqualifiedId = 0,
+                            NGCode = "未知",
 
-                        SiteId = statorBo.SiteId,
-                        CreatedBy = statorBo.User,
-                        CreatedOn = statorBo.Time,
-                        UpdatedBy = StatorConst.USER,
-                        UpdatedOn = opEntity.RDate
-                    });
+                            SiteId = statorBo.SiteId,
+                            CreatedBy = statorBo.User,
+                            CreatedOn = statorBo.Time,
+                            UpdatedBy = StatorConst.USER,
+                            UpdatedOn = time
+                        });
+                    }
                 }
 
                 // 如果没有需要解析的参数

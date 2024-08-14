@@ -35,7 +35,7 @@ namespace Hymson.MES.Data.Repositories.Stator
         public async Task<StatorWireRelationEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<WireBarCodeEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryFirstOrDefaultAsync<StatorWireRelationEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -50,18 +50,18 @@ namespace Hymson.MES.Data.Repositories.Stator
             sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId = @SiteId");
 
+            if (query.InnerIds != null && query.InnerIds.Any())
+            {
+                sqlBuilder.Where("InnerId IN @InnerIds");
+            }
+
             if (query.WireIds != null && query.WireIds.Any())
             {
                 sqlBuilder.Where("WireId IN @WireIds");
             }
 
-            if (query.WireBarCodes != null && query.WireBarCodes.Any())
-            {
-                sqlBuilder.Where("WireBarCode IN @WireBarCodes");
-            }
-
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<WireBarCodeEntity>(template.RawSql, query);
+            return await conn.QueryAsync<StatorWireRelationEntity>(template.RawSql, query);
         }
 
     }

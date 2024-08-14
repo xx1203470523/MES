@@ -6,6 +6,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Extension;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using IdGen;
 using System.Data;
 using static Dapper.SqlMapper;
 
@@ -118,6 +119,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var ids = dataTable.AsEnumerable().Select(s => $"{s[id_key]}").Distinct();
             var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, ids);
 
+            // 批量读取条码（定子铜线关系）
+            var statorWireRelationEntities = await _mainService.GetStatorWireRelationEntitiesAsync(statorBo.SiteId, ids);
+
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
             foreach (DataRow dr in dataTable.Rows)
@@ -129,11 +133,33 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 StatorBarCodeEntity? statorSFCEntity = statorSFCEntities.FirstOrDefault(f => f.InnerId == statorId);
                 if (statorSFCEntity == null) continue;
 
-                // TODO
-                /*
-                statorSFCEntity.WireID_1 = dr["ID_wire1"].ParseToLong();
-                statorSFCEntity.WireID_2 = dr["ID_wire2"].ParseToLong();
-                */
+                // 添加定子条码关系
+                var id_wire1 = dr["ID_wire1"].ParseToLong();
+                if (id_wire1 > 0)
+                {
+                    summaryBo.AddStatorWireRelationEntities.Add(new StatorWireRelationEntity
+                    {
+                        Id = $"{statorId}{id_wire1}".ToLongID(),
+                        InnerId = statorId,
+                        WireId = id_wire1,
+                        CreatedOn = statorBo.Time,
+                        Remark = $"{dr["index"]}",   // 这个ID是为了外层找到对应记录
+                        SiteId = statorBo.SiteId
+                    });
+                }
+                var id_wire2 = dr["ID_wire2"].ParseToLong();
+                if (id_wire2 > 0)
+                {
+                    summaryBo.AddStatorWireRelationEntities.Add(new StatorWireRelationEntity
+                    {
+                        Id = $"{statorId}{id_wire2}".ToLongID(),
+                        InnerId = statorId,
+                        WireId = id_wire2,
+                        CreatedOn = statorBo.Time,
+                        Remark = $"{dr["index"]}",   // 这个ID是为了外层找到对应记录
+                        SiteId = statorBo.SiteId
+                    });
+                }
 
                 statorSFCEntity.UpdatedOn = statorBo.Time;
                 summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
@@ -221,23 +247,66 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         UpdatedBy = StatorConst.USER,
                         UpdatedOn = time
                     });
+                }
 
-                    // 插入流转记录
-                    summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                // 插入流转记录
+                summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                {
+                    WorkOrderId = statorBo.WorkOrderId,
+                    ProductId = statorBo.ProductId,
+                    ProcedureId = statorBo.ProcedureId,
+                    ResourceId = null,
+                    SFC = statorSFCEntity.InnerBarCode,
+
+                    CirculationBarCode = barCode,
+                    CirculationWorkOrderId = statorBo.WorkOrderId,
+                    CirculationProductId = materialId,
+                    CirculationMainProductId = materialId,
+                    CirculationQty = StatorConst.QTY,
+                    CirculationType = SfcCirculationTypeEnum.Consume,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = statorBo.SiteId,
+                    CreatedBy = statorBo.User,
+                    CreatedOn = statorBo.Time,
+                    UpdatedBy = StatorConst.USER,
+                    UpdatedOn = time
+                });
+
+                // 如果是不合格
+                var isOk = $"{dr["Result"]}" == "OK";
+                if (!isOk)
+                {
+                    // 插入不良记录
+                    summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
                     {
-                        WorkOrderId = statorBo.WorkOrderId,
-                        ProductId = statorBo.ProductId,
-                        ProcedureId = statorBo.ProcedureId,
-                        ResourceId = null,
-                        SFC = statorSFCEntity.InnerBarCode,
+                        Id = manuBadRecordId,
+                        FoundBadOperationId = statorBo.ProcedureId,
+                        OutflowOperationId = statorBo.ProcedureId,
+                        UnqualifiedId = 0,
+                        SFC = barCode,
+                        SfcInfoId = 0,
+                        SfcStepId = manuSFCStepId,
+                        Qty = 1,
+                        Status = ProductBadRecordStatusEnum.Open,
+                        Source = ProductBadRecordSourceEnum.EquipmentReBad,
+                        Remark = "",
 
-                        CirculationBarCode = barCode,
-                        CirculationProductId = materialId,
-                        CirculationMainProductId = materialId,
-                        CirculationQty = StatorConst.QTY,
-                        CirculationType = SfcCirculationTypeEnum.Consume,
+                        SiteId = statorBo.SiteId,
+                        CreatedBy = statorBo.User,
+                        CreatedOn = statorBo.Time,
+                        UpdatedBy = StatorConst.USER,
+                        UpdatedOn = time
+                    });
 
+                    // 插入NG记录
+                    summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
+                    {
                         Id = IdGenProvider.Instance.CreateId(),
+                        BadRecordId = manuBadRecordId,
+                        UnqualifiedId = 0,
+                        NGCode = "未知",
+
                         SiteId = statorBo.SiteId,
                         CreatedBy = statorBo.User,
                         CreatedOn = statorBo.Time,
@@ -245,47 +314,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         UpdatedOn = time
                     });
                 }
-
-                // 如果是不合格
-                var isOk = $"{dr["Result"]}" == "OK";
-                if (isOk) continue;
-
-                // 插入不良记录
-                summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
-                {
-                    Id = manuBadRecordId,
-                    FoundBadOperationId = statorBo.ProcedureId,
-                    OutflowOperationId = statorBo.ProcedureId,
-                    UnqualifiedId = 0,
-                    SFC = barCode,
-                    SfcInfoId = 0,
-                    SfcStepId = manuSFCStepId,
-                    Qty = 1,
-                    Status = ProductBadRecordStatusEnum.Open,
-                    Source = ProductBadRecordSourceEnum.EquipmentReBad,
-                    Remark = "",
-
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = time
-                });
-
-                // 插入NG记录
-                summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    BadRecordId = manuBadRecordId,
-                    UnqualifiedId = 0,
-                    NGCode = "未知",
-
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = time
-                });
 
                 // 如果没有需要解析的参数
                 if (parameterCodes == null || !parameterCodes.Any()) continue;

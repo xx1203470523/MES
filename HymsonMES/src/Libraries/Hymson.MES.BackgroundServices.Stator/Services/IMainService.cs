@@ -108,6 +108,14 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <returns></returns>
         Task<IEnumerable<StatorBarCodeEntity>> GetStatorBarCodeEntitiesAsync(long siteId, IEnumerable<string> ids);
 
+        /// <summary>
+        /// 批量获取（定子铜线关系）
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<StatorWireRelationEntity>> GetStatorWireRelationEntitiesAsync(long siteId, IEnumerable<string> ids);
+
         #endregion
 
 

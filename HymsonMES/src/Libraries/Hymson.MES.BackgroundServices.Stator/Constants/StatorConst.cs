@@ -21,6 +21,11 @@
         public const string BARCODE_PREFIX = "CSCW188";
 
         /// <summary>
+        /// 起始时间
+        /// </summary>
+        public const string START_TIME = "2023-08-11 08:30:00";
+
+        /// <summary>
         /// 默认值
         /// </summary>
         public const string USER = "LMS";
@@ -33,7 +38,7 @@
         /// <summary>
         /// 忽略的字符串
         /// </summary>
-        public static string[] IgnoreString = new string[] { "-", "_", "NO_BARCODE", "ID_ERROR" };
+        public static string[] IgnoreString = new string[] { "-", "_", "No_Barcode", "NO_BARCODE", "ID_ERROR" };
 
     }
 }

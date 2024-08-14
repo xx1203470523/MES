@@ -11,14 +11,14 @@ namespace Hymson.MES.BackgroundServices.Stator
         public long? SiteId { get; set; }
 
         /// <summary>
+        /// Id（内定子）
+        /// </summary>
+        public IEnumerable<string>? InnerIds { get; set; }
+
+        /// <summary>
         /// Id（铜线）
         /// </summary>
         public IEnumerable<string>? WireIds { get; set; }
-
-        /// <summary>
-        /// 条码（铜线）
-        /// </summary>
-        public IEnumerable<string>? WireBarCodes { get; set; }
 
     }
 }

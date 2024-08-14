@@ -12,7 +12,7 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// <summary>
         /// 水位查询SQL
         /// </summary>
-        const string QuerySql = @"SELECT * FROM `{0}` WHERE `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
+        const string QuerySql = @"SELECT * FROM `{0}` WHERE RDate > '{1}' AND `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
 
         /// <summary>
         /// 构造函数
@@ -28,7 +28,7 @@ namespace Hymson.MES.BackgroundServices.Stator
         public async Task<IEnumerable<TEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query)
         {
             using var conn = GetStatorDbConnection();
-            return await conn.QueryAsync<TEntity>(string.Format(QuerySql, typeof(TEntity).Name), query);
+            return await conn.QueryAsync<TEntity>(string.Format(QuerySql, typeof(TEntity).Name, StatorConst.START_TIME), query);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Hymson.MES.BackgroundServices.Stator
         public async Task<IEnumerable<TEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query, string tableName)
         {
             using var conn = GetStatorDbConnection();
-            return await conn.QueryAsync<TEntity>(string.Format(QuerySql, tableName), query);
+            return await conn.QueryAsync<TEntity>(string.Format(QuerySql, tableName, StatorConst.START_TIME), query);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Hymson.MES.BackgroundServices.Stator
         public async Task<DataTable> GetDataTableByStartWaterMarkIdAsync(EntityByWaterMarkQuery query)
         {
             using var conn = GetStatorDbConnection();
-            using var reader = await conn.ExecuteReaderAsync(string.Format(QuerySql, typeof(TEntity).Name), query);
+            using var reader = await conn.ExecuteReaderAsync(string.Format(QuerySql, typeof(TEntity).Name, StatorConst.START_TIME), query);
 
             var dt = new DataTable { };
             dt.Load(reader);

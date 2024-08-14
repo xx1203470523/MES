@@ -38,7 +38,7 @@
         /// <summary>
         /// 槽盖纸编码
         /// </summary>
-        public long PaperTopLotBarcode { get; set; }
+        public string PaperTopLotBarcode { get; set; }
 
         /// <summary>
         /// 成品码

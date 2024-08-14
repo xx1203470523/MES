@@ -261,23 +261,66 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         UpdatedBy = StatorConst.USER,
                         UpdatedOn = time
                     });
+                }
 
-                    // 插入流转记录
-                    summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                // 插入流转记录
+                summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                {
+                    WorkOrderId = statorBo.WorkOrderId,
+                    ProductId = statorBo.ProductId,
+                    ProcedureId = statorBo.ProcedureId,
+                    ResourceId = null,
+                    SFC = statorSFCEntity.InnerBarCode,
+
+                    CirculationBarCode = barCode,
+                    CirculationWorkOrderId = statorBo.WorkOrderId,
+                    CirculationProductId = materialId,
+                    CirculationMainProductId = materialId,
+                    CirculationQty = StatorConst.QTY,
+                    CirculationType = SfcCirculationTypeEnum.Consume,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = statorBo.SiteId,
+                    CreatedBy = statorBo.User,
+                    CreatedOn = statorBo.Time,
+                    UpdatedBy = StatorConst.USER,
+                    UpdatedOn = time
+                });
+
+                // 如果是不合格
+                var isOk = opEntity.Result == "OK";
+                if (!isOk)
+                {
+                    // 插入不良记录
+                    summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
                     {
-                        WorkOrderId = statorBo.WorkOrderId,
-                        ProductId = statorBo.ProductId,
-                        ProcedureId = statorBo.ProcedureId,
-                        ResourceId = null,
-                        SFC = statorSFCEntity.InnerBarCode,
+                        Id = manuBadRecordId,
+                        FoundBadOperationId = statorBo.ProcedureId,
+                        OutflowOperationId = statorBo.ProcedureId,
+                        UnqualifiedId = 0,
+                        SFC = barCode,
+                        SfcInfoId = 0,
+                        SfcStepId = manuSFCStepId,
+                        Qty = 1,
+                        Status = ProductBadRecordStatusEnum.Open,
+                        Source = ProductBadRecordSourceEnum.EquipmentReBad,
+                        Remark = "",
 
-                        CirculationBarCode = barCode,
-                        CirculationProductId = materialId,
-                        CirculationMainProductId = materialId,
-                        CirculationQty = StatorConst.QTY,
-                        CirculationType = SfcCirculationTypeEnum.Consume,
+                        SiteId = statorBo.SiteId,
+                        CreatedBy = statorBo.User,
+                        CreatedOn = statorBo.Time,
+                        UpdatedBy = StatorConst.USER,
+                        UpdatedOn = time
+                    });
 
+                    // 插入NG记录
+                    summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
+                    {
                         Id = IdGenProvider.Instance.CreateId(),
+                        BadRecordId = manuBadRecordId,
+                        UnqualifiedId = 0,
+                        NGCode = "未知",
+
                         SiteId = statorBo.SiteId,
                         CreatedBy = statorBo.User,
                         CreatedOn = statorBo.Time,
@@ -285,47 +328,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         UpdatedOn = time
                     });
                 }
-
-                // 如果是不合格
-                var isOk = opEntity.Result == "OK";
-                if (isOk) continue;
-
-                // 插入不良记录
-                summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
-                {
-                    Id = manuBadRecordId,
-                    FoundBadOperationId = statorBo.ProcedureId,
-                    OutflowOperationId = statorBo.ProcedureId,
-                    UnqualifiedId = 0,
-                    SFC = barCode,
-                    SfcInfoId = 0,
-                    SfcStepId = manuSFCStepId,
-                    Qty = 1,
-                    Status = ProductBadRecordStatusEnum.Open,
-                    Source = ProductBadRecordSourceEnum.EquipmentReBad,
-                    Remark = "",
-
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = time
-                });
-
-                // 插入NG记录
-                summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    BadRecordId = manuBadRecordId,
-                    UnqualifiedId = 0,
-                    NGCode = "未知",
-
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = time
-                });
 
                 // 如果没有需要解析的参数
                 if (parameterCodes == null || !parameterCodes.Any()) continue;

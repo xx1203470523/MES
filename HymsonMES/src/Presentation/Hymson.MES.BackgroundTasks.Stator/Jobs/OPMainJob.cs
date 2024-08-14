@@ -71,7 +71,7 @@ namespace Hymson.MES.BackgroundTasks.Stator
             try
             {
                 // 顺序不要随意调整
-                var limitCount = 500;
+                var limitCount = 5000;
                 await LoopExecuteAsync(() => _op010Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op020Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op070Service.ExecuteAsync(limitCount));

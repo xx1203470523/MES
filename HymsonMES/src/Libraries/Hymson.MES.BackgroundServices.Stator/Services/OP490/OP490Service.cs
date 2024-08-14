@@ -89,9 +89,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="barCodes"></param>
         /// <param name="parameterCodes"></param>
         /// <returns></returns>
-        private async Task<StatorSummaryBo> ConvertDataListAsync<T>(IEnumerable<T> entities, IEnumerable<string> barCodes, IEnumerable<string>? parameterCodes = null) where T : BaseOPEntity
+        private async Task<StatorSummaryBo> ConvertDataListAsync(IEnumerable<OP490> entities, IEnumerable<string> barCodes, IEnumerable<string>? parameterCodes = null)
         {
-            var producreCode = $"{typeof(T).Name}";
+            var producreCode = $"{typeof(OP490).Name}";
 
             // 初始化对象
             var statorBo = await _mainService.GetStatorBaseConfigAsync(producreCode);
@@ -104,16 +104,18 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
 
             // 批量读取条码（定子）
             var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, entities.Select(s => s.ID).Distinct());
+            // TODO: 这个条码短了，无法查询到数据
 
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
             foreach (var opEntity in entities)
             {
-                var barCode = $"{opEntity.GetType().GetProperty("LaserBarcode")?.GetValue(opEntity)}";
-
                 // ID是否无效数据
                 var id = opEntity.ID.ParseToLong();
                 if (id == 0) continue;
+
+                var time = opEntity.RDate;
+                var barCode = opEntity.LaserBarcode;
 
                 StatorBarCodeEntity? statorSFCEntity = statorSFCEntities.FirstOrDefault(f => f.InnerId == id);
                 if (statorSFCEntity == null) continue;
@@ -149,7 +151,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         CreatedBy = statorBo.User,
                         CreatedOn = statorBo.Time,
                         UpdatedBy = StatorConst.USER,
-                        UpdatedOn = opEntity.RDate
+                        UpdatedOn = time
                     });
                 }
                 else
@@ -177,7 +179,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         CreatedBy = statorBo.User,
                         CreatedOn = statorBo.Time,
                         UpdatedBy = StatorConst.USER,
-                        UpdatedOn = opEntity.RDate
+                        UpdatedOn = time
                     });
                 }
                 else
@@ -214,50 +216,51 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
                     UpdatedBy = StatorConst.USER,
-                    UpdatedOn = opEntity.RDate
+                    UpdatedOn = time
                 };
                 summaryBo.ManuSfcStepEntities.Add(stepEntity);
 
                 // 如果是不合格
                 var isOk = opEntity.Result == "OK";
-                if (isOk) continue;
-
-                // 插入不良记录
-                summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
+                if (!isOk)
                 {
-                    Id = manuBadRecordId,
-                    FoundBadOperationId = statorBo.ProcedureId,
-                    OutflowOperationId = statorBo.ProcedureId,
-                    UnqualifiedId = 0,
-                    SFC = barCode,
-                    SfcInfoId = 0,
-                    SfcStepId = manuSFCStepId,
-                    Qty = 1,
-                    Status = ProductBadRecordStatusEnum.Open,
-                    Source = ProductBadRecordSourceEnum.EquipmentReBad,
-                    Remark = "",
+                    // 插入不良记录
+                    summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
+                    {
+                        Id = manuBadRecordId,
+                        FoundBadOperationId = statorBo.ProcedureId,
+                        OutflowOperationId = statorBo.ProcedureId,
+                        UnqualifiedId = 0,
+                        SFC = barCode,
+                        SfcInfoId = 0,
+                        SfcStepId = manuSFCStepId,
+                        Qty = 1,
+                        Status = ProductBadRecordStatusEnum.Open,
+                        Source = ProductBadRecordSourceEnum.EquipmentReBad,
+                        Remark = "",
 
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = opEntity.RDate
-                });
+                        SiteId = statorBo.SiteId,
+                        CreatedBy = statorBo.User,
+                        CreatedOn = statorBo.Time,
+                        UpdatedBy = StatorConst.USER,
+                        UpdatedOn = time
+                    });
 
-                // 插入NG记录
-                summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    BadRecordId = manuBadRecordId,
-                    UnqualifiedId = 0,
-                    NGCode = "未知",
+                    // 插入NG记录
+                    summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        BadRecordId = manuBadRecordId,
+                        UnqualifiedId = 0,
+                        NGCode = "未知",
 
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = opEntity.RDate
-                });
+                        SiteId = statorBo.SiteId,
+                        CreatedBy = statorBo.User,
+                        CreatedOn = statorBo.Time,
+                        UpdatedBy = StatorConst.USER,
+                        UpdatedOn = time
+                    });
+                }
 
                 // 如果没有需要解析的参数
                 if (parameterCodes == null || !parameterCodes.Any()) continue;
@@ -281,7 +284,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         ParameterId = param.Id,
                         ParameterValue = $"{paramValue}",
                         ParameterGroupId = 0,
-                        CollectionTime = opEntity.RDate ?? stepEntity.CreatedOn,
+                        CollectionTime = time ?? stepEntity.CreatedOn,
 
                         SiteId = stepEntity.SiteId,
                         CreatedBy = stepEntity.CreatedBy,
