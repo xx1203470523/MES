@@ -192,6 +192,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         public int VAR_DEBUG = 0;
 
         /// <summary>
+        /// 默认产品ID
+        /// </summary>
+        private readonly long DEFAULT_PRODUCT_ID = 51558093782310912;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ManuInOutBoundService(
@@ -979,7 +984,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
             else
             {
-                step.ProductId = 51558093782310912;
+                step.ProductId = DEFAULT_PRODUCT_ID;
                 VAR_DEBUG = 3;
             }
 
@@ -1080,11 +1085,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 //临时做法，不然没法追溯
                 if(model.ProductId == 0)
                 {
-                    model.ProductId = 51558093782310912;
+                    model.ProductId = DEFAULT_PRODUCT_ID;
                 }
                 if(model.CirculationProductId == 0)
                 {
-                    model.CirculationProductId = 51558093782310912;
+                    model.CirculationProductId = DEFAULT_PRODUCT_ID;
                 }
 
                 list.Add(model);
@@ -1302,7 +1307,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     continue;
                 }
                 //物料如果不为空，则直接取对应物料；如果为空，则取工单的型号
-                long ProductId = 0;
+                long ProductId = DEFAULT_PRODUCT_ID;
                 var curMaterial = mesMaterialList.Where(m => m.MaterialCode ==  item.MaterialCode).FirstOrDefault();
                 if(curMaterial != null)
                 {
@@ -1310,7 +1315,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 }
                 else
                 {
-                    ProductId = item.WorkOrder == null ? 0 : item.WorkOrder.ProductId;
+                    ProductId = item.WorkOrder == null ? DEFAULT_PRODUCT_ID : item.WorkOrder.ProductId;
                 }
                 var sfcEntity = new ManuSfcEntity()
                 {
