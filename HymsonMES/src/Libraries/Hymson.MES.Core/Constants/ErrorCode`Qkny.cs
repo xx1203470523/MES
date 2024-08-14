@@ -382,7 +382,7 @@ namespace Hymson.MES.Core.Constants
         /// 物料条码格式错误
         /// </summary>
         public const string MES45231 = "物料条码【{BarCode}】格式错误";
-        public const string MES45232 = "物料条码【{BarCode}】格式错误，第6段内容必须是数字且大于0";
+        public const string MES45232 = "物料条码【{BarCode}】格式错误，第7段内容必须是数字且大于0";
         public const string MES45233 = "物料【{MaterialCode}】基础信息不存在";
 
         #endregion

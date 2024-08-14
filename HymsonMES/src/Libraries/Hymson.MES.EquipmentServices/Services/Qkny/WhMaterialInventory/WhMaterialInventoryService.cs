@@ -117,12 +117,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
                 if (!item.IsRawMaterial) continue;
 
                 var arr = item.BarCode.Trim().Split(',');
-                if (arr.Length < 6)
+                if (arr.Length < 7)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES45231)).WithData("BarCode", item.BarCode);
                 }
 
-                if (!decimal.TryParse(arr[5], out decimal qty) || qty <= 0)
+                if (!decimal.TryParse(arr[6], out decimal qty) || qty <= 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES45232)).WithData("BarCode", item.BarCode);
                 }
