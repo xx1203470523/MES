@@ -172,11 +172,11 @@ namespace Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.Prod
                     WorkOrderCode = planWorkOrderEntity?.OrderCode ?? "",
                     ProductCode = procMaterialEntity?.MaterialCode ?? "",
                     ProductName = procMaterialEntity?.MaterialName ?? "",
-                    Qty = (item.ScrapQty ?? 0) + item.Qty,
-                    QualifiedQty = item.Qty,
-                    UnQualifiedQty = item.ScrapQty ?? 0,
+                    Qty = Math.Round((item.ScrapQty ?? 0) + item.Qty, 2),
+                    QualifiedQty = Math.Round(item.Qty, 2),
+                    UnQualifiedQty = Math.Round(item.ScrapQty ?? 0, 2),
                     Status = "",
-                 
+
                     PrintTime = HymsonClock.Now().ToString("yyyyMMddHHmm"),
                 };
 
