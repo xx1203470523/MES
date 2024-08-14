@@ -20,6 +20,6 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<WorkOrderControlExportResultDto> ExprotListAsync(ManuDowngradingDetailReportPagedQueryDto param);
+        Task<ManuDowngradingDetailExportResultDto> ExprotListAsync(ManuDowngradingDetailReportPagedQueryDto param);
     }
 }

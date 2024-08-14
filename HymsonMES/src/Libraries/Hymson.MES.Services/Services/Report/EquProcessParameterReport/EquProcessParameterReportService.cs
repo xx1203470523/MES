@@ -9,6 +9,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
@@ -190,7 +191,7 @@ namespace Hymson.MES.Services.Services.Report
         }
 
         /// <summary>
-        /// 根据查询条件导出物料数据
+        /// 根据查询条件导出设备过程参数
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
@@ -215,19 +216,19 @@ namespace Hymson.MES.Services.Services.Report
                 ParameterId = pagedQueryDto.ParameterId,
                 EquipmentId = pagedQueryDto.EquipmentId,
                 PageIndex = pagedQueryDto.PageIndex,
-                PageSize = 10000
-            };
+                PageSize = ReportExport.PageSize
+        };
             var pagedInfo = await _equipmentParameterRepository.GetParametesByEqumentIdEntitiesAsync(parameterQuery);
 
             List<EquProcessParameterExportDto> listDto = new List<EquProcessParameterExportDto>();
             if (pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("EquProcessParameter"), _localizationService.GetResource("EquProcessParameter"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("EquProcessParameterReport"), _localizationService.GetResource("EquProcessParameterReport"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new EquProcessParameterExportResultDto
                 {
-                    FileName = _localizationService.GetResource("EquProcessParameter"),
+                    FileName = _localizationService.GetResource("EquProcessParameterReport"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -289,12 +290,12 @@ namespace Hymson.MES.Services.Services.Report
                 listDto.Add(equParameterDto);
             }
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("EquProcessParameter"), _localizationService.GetResource("EquProcessParameter"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("EquProcessParameterReport"), _localizationService.GetResource("EquProcessParameterReport"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new EquProcessParameterExportResultDto
             {
-                FileName = _localizationService.GetResource("EquProcessParameter"),
+                FileName = _localizationService.GetResource("EquProcessParameterReport"),
                 Path = uploadResult.AbsoluteUrl,
             };
 
