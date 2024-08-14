@@ -14,11 +14,14 @@ using Hymson.MES.Data.Repositories.NioPushSwitch;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Requests.ERP;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
+using Hymson.MES.HttpClients.Responses.NioErp;
 using Hymson.MES.HttpClients.Responses.NioWms;
 using Hymson.Utils;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -62,6 +65,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
+        /// ERP接口
+        /// </summary>
+        private readonly IERPApiClient _eRPApiClient;
+
+        /// <summary>
         /// 末工序
         /// </summary>
         private readonly string PRODUCRE_END = "R01OP150";
@@ -76,7 +84,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IProcMaterialRepository procMaterialRepository,
-            IManuSfcStepRepository manuSfcStepRepository)
+            IManuSfcStepRepository manuSfcStepRepository,
+            IERPApiClient eRPApiClient)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _iWMSApiClient = wMSApiClient;
@@ -85,6 +94,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
+            _eRPApiClient = eRPApiClient;
         }
 
         /// <summary>
@@ -131,8 +141,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             //1.3 获取末工序数量
             SfcStepProcedureQuery sfcQuery = new SfcStepProcedureQuery();
             sfcQuery.ProcedureCodeList = new List<string>() { PRODUCRE_END };
-            sfcQuery.EndDate = DateTime.Parse(nowStr);
-            sfcQuery.BeginDate = sfcQuery.EndDate.AddDays(-1);
+            //sfcQuery.EndDate = DateTime.Parse(nowStr);
+            //sfcQuery.BeginDate = sfcQuery.EndDate.AddDays(-1);
+            sfcQuery.BeginDate = Convert.ToDateTime(nowStr);
+            sfcQuery.EndDate = sfcQuery.BeginDate.AddDays(1);
             var prodcutNumList = await _manuSfcStepRepository.GetSfcStepEndOpMavelAsync(sfcQuery);
 
             //2. 调用WMS接口
@@ -182,7 +194,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                 dto.BottleneckProcess = curBaseConfig.BottleneckProcess;
                 dto.ProductInNum = item.ProductInNum;
 
-                dto.Date = HymsonClock.Now();
+                dto.Date = HymsonClock.Now().ToString("yyyy-MM-dd HH:mm:ss");
                 dto.DownlineNum = downNum;
 
                 dtos.Add(dto);
@@ -223,9 +235,74 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                 //获取BOM中的物料
                 IEnumerable<ProcBomDetailView> bomDetailList = await _procBomDetailRepository.GetListMainAsync(bomId);
                 List<StockMesNIODto> paramList = bomDetailList.Select(m => new StockMesNIODto() { MaterialCode = m.MaterialCode }).ToList();
-                //调用WMS获取信息
+                
+                //调用WMS获取信息,WMS只会返回关键下级键
                 var wmsResult = await _iWMSApiClient.NioKeyItemInfoAsync(paramList);
-                //4.解析数据成指定格式
+                if(wmsResult == null || wmsResult.Data == null || wmsResult.Data.Count == 0)
+                {
+                    continue;
+                }
+                List<string> keyMaterialList = wmsResult.Data.Select(m => m.MaterialCode).Distinct().ToList();
+
+                //调用ERP接口，获取物料的供应商和合请购单数量
+                MaterialRequest erpQuery = new MaterialRequest();
+                erpQuery.MaterialCodeList = keyMaterialList;
+                erpQuery.Date = HymsonClock.Now();
+                NioErpResponse? erpResult = null; // await _eRPApiClient.MaterailQueryAsync(erpQuery);
+
+                //组装数据
+                foreach(var wmsItem in wmsResult.Data)
+                {
+                    if(string.IsNullOrEmpty(wmsItem.SubordinateCode) == true)
+                    {
+                        continue;
+                    }
+
+                    KeySubordinateDto dto = new KeySubordinateDto();
+                    dto.Date = HymsonClock.Now().ToString("yyyy-MM-dd HH:mm:ss");
+                    //产品编码
+                    dto.MaterialCode = curConfig.VendorProductCode;
+                    dto.MaterialName = curConfig.VendorProductName;
+                    //WMS取的BOM物料信息
+                    dto.PartnerBusiness = wmsItem.PartnerBusiness;
+                    dto.SubordinateStockQualified = wmsItem.SubordinateStockQualified;
+                    dto.SubordinateStockRejection = wmsItem.SubordinateStockRejection;
+                    dto.SubordinateStockUndetermined = wmsItem.SubordinateStockUndetermined;
+                    dto.SubordinateCode = wmsItem.SubordinateCode;
+                    dto.SubordinateName = wmsItem.SubordinateName;
+                    dto.SubordinateMOQ = wmsItem.SubordinateMOQ;
+                    dto.SubordinateLT = wmsItem.SubordinateLT;
+                    dto.SubordinateBackUpMax = wmsItem.SubordinateBackUpMax;
+                    dto.SubordinateBackUpMin = wmsItem.SubordinateBackUpMin;
+                    dto.SubordinateSource = wmsItem.SubordinateSource;
+                    dto.ParaConfigUnit = wmsItem.ParaConfigUnit;
+                    //ERP物料信息
+                    if(erpResult != null && erpResult.Data != null && erpResult.Data.Count > 0)
+                    {
+                        var curErpMat = erpResult.Data.Where(m => m.MaterialCode == wmsItem.SubordinateCode).FirstOrDefault();
+                        if(curErpMat != null)
+                        {
+                            dto.SubordinatePartner = curErpMat.SupperialName;
+                            dto.SubordinateArrivalPlan = 0;
+                            dto.SubordinateDemandPlan = curErpMat.Num; //ERP-MES请购单
+                        }
+                    }
+                    else
+                    {
+                        dto.SubordinatePartner = "ERP过来的供应商中文名";
+                        dto.SubordinateArrivalPlan = 0;
+                        dto.SubordinateDemandPlan = 1.0m; //ERP-MES请购单
+                    }
+
+                    //MES物料信息
+                    ProcBomDetailView? curBomDetail = bomDetailList.Where(m => m.MaterialCode == wmsItem.SubordinateCode).FirstOrDefault();
+                    if(curBomDetail != null)
+                    {
+                        dto.SubordinateDosage = curBomDetail.Usages;
+                    }              
+
+                    dtos.Add(dto);
+                }
             }
 
             //4. 保存数据至NIO
@@ -234,6 +311,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
 
         /// <summary>
         /// 实际交付情况
+        /// 时间以当晚推送，推送当天0点到24点
         /// </summary>
         /// <returns></returns>
         public async Task NioActualDeliveryAsync()
@@ -256,29 +334,49 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             //2. 调用WMS接口
             List<string> materialCodeList = configList.Select(m => m.VendorProductCode).ToList();
             StockMesDataDto query = new StockMesDataDto();
-            query.EndTime = Convert.ToDateTime(dateStr);
-            query.StartTime = query.EndTime.AddDays(-1);
+            query.StartTime = Convert.ToDateTime(dateStr);
+            query.EndTime = query.StartTime.AddDays(1);
             NioWmsActualDeliveryResponse? wmsResult = await _iWMSApiClient.NioActualDeliveryAsync(query);
             //3. 保存数据至NIO
-            if(wmsResult == null || wmsResult.Data == null || wmsResult.Data.Count == 0)
-            {
-                return;
-            }
+            //if(wmsResult == null || wmsResult.Data == null || wmsResult.Data.Count == 0)
+            //{
+            //    return;
+            //}
             List<ActualDeliveryDto> dtos = new List<ActualDeliveryDto>();
-            List<string> matList = wmsResult.Data.Select(m => m.MaterialCode).Distinct().ToList();
-            foreach(var item in matList)
+            //List<string> matList = configList.Select(m => m.VendorProductCode).Distinct().ToList();
+            foreach(var item in configList)
             {
-                var curItemList = wmsResult.Data.Where(m => m.MaterialCode == item).ToList();
-                if(curItemList == null || curItemList.Count == 0)
-                {
-                    continue;
-                }
-                var curItem = curItemList[0];
                 ActualDeliveryDto dto = new ActualDeliveryDto();
-                dto.MaterialCode = curItem.MaterialCode;
-                dto.MaterialName = curItem.MaterialName;
-                dto.ShippedQty = curItemList.Sum(m => m.ShippedQty);
-                dto.ActualDeliveryTime = curItem.ActualDeliveryDate;
+                dto.MaterialCode = item.VendorProductCode;
+                dto.MaterialName = item.VendorProductName;
+
+                if (wmsResult != null && wmsResult.Data != null && wmsResult.Data.Count != 0)
+                {
+                    var curItemList = wmsResult.Data.Where(m => m.MaterialCode == item.VendorProductCode).ToList();
+                    if (curItemList == null || curItemList.Count == 0)
+                    {
+                        dto.ShippedQty = 0;
+                        dto.ActualDeliveryTime = GetTimestamp(HymsonClock.Now());
+                        dtos.Add(dto);
+
+                        continue;
+                    }
+                    var curItem = curItemList[0];
+
+                    DateTime curDate = HymsonClock.Now();
+                    if(curItem.ActualDeliveryDate != null)
+                    {
+                        curDate = (DateTime)curItem.ActualDeliveryDate;
+                    }
+                    
+                    dto.ShippedQty = curItemList.Sum(m => m.ShippedQty);
+                    dto.ActualDeliveryTime = GetTimestamp(curDate);
+                }
+                else
+                {
+                    dto.ShippedQty = 0;
+                    dto.ActualDeliveryTime = GetTimestamp(HymsonClock.Now());
+                }
 
                 dtos.Add(dto);
             }
@@ -303,6 +401,17 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             }
 
             return baseConfigList;
+        }
+
+        /// <summary>
+        /// 获取时间戳
+        /// </summary>
+        /// <param name="createTime"></param>
+        /// <param name="updateTime"></param>
+        /// <returns></returns>
+        private long GetTimestamp(DateTime date)
+        {
+            return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
         }
     }
 }

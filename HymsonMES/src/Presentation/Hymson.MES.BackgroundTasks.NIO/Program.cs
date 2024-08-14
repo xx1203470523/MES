@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.BackgroundTasks.NIO;
 using Hymson.MES.BackgroundTasks.NIO.Extensions;
+using Hymson.MES.BackgroundTasks.NIO.Jobs.ERP;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,6 +69,10 @@ Host.CreateDefaultBuilder(args)
            q.AddJobAndTrigger<MasterProductJob>(hostContext.Configuration);
            q.AddJobAndTrigger<MasterStationJob>(hostContext.Configuration);
            //q.AddJobAndTrigger<MasterTeamSchedulingJob>(hostContext.Configuration);
+
+           q.AddJobAndTrigger<ActualDeliveryJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<KeySubordinateJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<ProductionCapacityJob>(hostContext.Configuration);
 
            //q.AddJobAndTrigger<MockHelloJob>(hostContext.Configuration);
            q.AddJobAndTrigger<PushNIOJob>(hostContext.Configuration);

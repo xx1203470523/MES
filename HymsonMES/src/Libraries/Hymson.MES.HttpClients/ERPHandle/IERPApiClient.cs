@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.HttpClients.Requests.ERP;
+using Hymson.MES.HttpClients.Responses.NioErp;
 
 namespace Hymson.MES.HttpClients
 {
@@ -14,5 +15,11 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         Task<BaseERPResponse> EnabledPlanAsync(PlanRequestDto request);
 
+        /// <summary>
+        /// 查询NIO需要的物料信息
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<NioErpResponse> MaterailQueryAsync(MaterialRequest request);
     }
 }
