@@ -28,7 +28,6 @@ namespace Hymson.MES.Data.Repositories.Marking
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoReportDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoReportCountSqlTemplate);
-            pagedQuery.PageSize = 10;
             sqlBuilder.Select("msmi.SFC,msmi.FoundBadProcedureId FindProcedureId,msmi.ShouldInterceptProcedureId AppointInterceptProcedureId,msmir.InterceptProcedureId," +
                 "msmir.InterceptEquipmentId,quc.UnqualifiedCode,quc.Type,quc.UnqualifiedCodeName," +
                 "quc.Status,ms.Qty,msmir.InterceptOn,msi.ProductId,msi.WorkOrderId,msp.ResourceId,msmi.`CreatedBy` MarkingCreatedBy," +
