@@ -413,31 +413,30 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
                 #endregion
 
+                //投入条码
+                var inputSfcs = new List<string>();
+                if (responseBo.ManuSfcCirculationEntities != null && responseBo.ManuSfcCirculationEntities.Any())
+                {
+                    inputSfcs.AddRange(responseBo.ManuSfcCirculationEntities.Select(x => x.CirculationBarCode));
+                }
+                if (requestBo.BindSfcs != null && requestBo.BindSfcs.Any())
+                {
+                    inputSfcs.AddRange(requestBo.BindSfcs);
+                }
+
                 #region 降级品继承
-                if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute
-                    && responseBo.ManuSfcCirculationEntities != null
-                    && responseBo.ManuSfcCirculationEntities.Any())
+                if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute && inputSfcs.Any())
                 {
                     var degradedProductExtendBo = new DegradedProductExtendBo
                     {
                         SiteId = commonBo.SiteId,
-                        UserName = commonBo.UserName
-                    };
-
-                    // 添加降级品记录
-                    degradedProductExtendBo.KeyValues.AddRange(responseBo.ManuSfcCirculationEntities.Select(s => new DegradedProductExtendKeyValueBo
-                    {
-                        BarCode = s.CirculationBarCode,
-                        SFC = sfcProduceEntity.SFC
-                    }));
-                    if (requestBo.BindSfcs != null && requestBo.BindSfcs.Any())
-                    {
-                        degradedProductExtendBo.KeyValues.AddRange(requestBo.BindSfcs.Select(item => new DegradedProductExtendKeyValueBo
+                        UserName = commonBo.UserName,
+                        KeyValues = inputSfcs.Distinct().Select(item => new DegradedProductExtendKeyValueBo
                         {
                             BarCode = item,
                             SFC = sfcProduceEntity.SFC
-                        }));
-                    }
+                        }).ToList()
+                    };
 
                     // 取得降级品记录
                     var downgradingEntities = await _manuDegradedProductExtendService.GetManuDownGradingsAsync(degradedProductExtendBo);
@@ -450,19 +449,14 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 #region Marking继承
 
-                if (responseBo.ManuSfcCirculationEntities != null && responseBo.ManuSfcCirculationEntities.Any())
+                if (inputSfcs.Any())
                 {
-                    var consumeSfcs = responseBo.ManuSfcCirculationEntities.Select(x => x.CirculationBarCode);
-                    if (requestBo.BindSfcs != null && requestBo.BindSfcs.Any())
-                    {
-                        consumeSfcs = consumeSfcs.Concat(requestBo.BindSfcs).Distinct();
-                    }
                     var (markingEntities, markingExecuteEntities) = await _manuSfcMarkingCoreService.GetMarkingInheritEntityAsync(new ManuSfcMarkingBo
                     {
                         SiteId = commonBo.SiteId,
                         UserName = commonBo.UserName,
                         SFC = sfcProduceEntity.SFC,
-                        ConsumeSFCs = consumeSfcs
+                        ConsumeSFCs = inputSfcs.Distinct(),
                     });
 
                     responseBo.MarkingEntities = markingEntities;
