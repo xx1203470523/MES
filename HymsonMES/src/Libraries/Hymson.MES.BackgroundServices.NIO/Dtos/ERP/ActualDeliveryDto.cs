@@ -33,7 +33,7 @@
         /// <summary>  
         /// 实际发货时间（可选）  
         /// </summary>  
-        public DateTime? ActualDeliveryTime { get; set; } // 使用Nullable<DateTime>（即DateTime?）来允许空值  
+        public long ActualDeliveryTime { get; set; } // 使用Nullable<DateTime>（即DateTime?）来允许空值  
 
         /// <summary>  
         /// 计划发货时间（可选）  

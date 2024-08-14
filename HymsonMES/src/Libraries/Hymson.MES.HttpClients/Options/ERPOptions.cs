@@ -20,6 +20,11 @@
         /// </summary>
         public string EnabledPlanRoute { get; set; } = "";
 
+        /// <summary>
+        /// NIO中需要的物料信息
+        /// </summary>
+        public string MaterialNioRoute { get; set; } = "";
+
     }
 
 }

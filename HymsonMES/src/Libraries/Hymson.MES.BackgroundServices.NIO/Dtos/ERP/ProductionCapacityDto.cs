@@ -28,7 +28,7 @@
         /// <summary>  
         /// 日期（格式为yyyy-MM-dd HH:mm:ss）  
         /// </summary>  
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
 
         /// <summary>  
         /// 排班数/天  

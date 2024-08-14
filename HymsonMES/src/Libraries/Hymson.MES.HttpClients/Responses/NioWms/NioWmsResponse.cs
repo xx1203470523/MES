@@ -170,6 +170,16 @@ namespace Hymson.MES.HttpClients.Responses.NioWms
         ///  关键下级件备库策略（最小值）
         /// </summary>
         public decimal SubordinateBackUpMin { get; set; }
+
+        /// <summary>  
+        /// 关键下级件原产国/城市  
+        /// </summary>  
+        public string SubordinateSource { get; set; }
+
+        /// <summary>  
+        /// 单位  
+        /// </summary>  
+        public string ParaConfigUnit { get; set; }
     }
 
     /// <summary>

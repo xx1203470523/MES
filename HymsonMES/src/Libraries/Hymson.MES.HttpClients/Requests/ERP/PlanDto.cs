@@ -59,4 +59,21 @@ namespace Hymson.MES.HttpClients.Requests.ERP
         public string Message { get; set; } = "";
     }
 
+    /// <summary>
+    /// 物料相关信息
+    /// </summary>
+    public record MaterialRequest
+    {
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public List<string> MaterialCodeList { get; set; } = new List<string>();
+
+        /// <summary>
+        /// 日期
+        /// </summary>
+        public DateTime Date { get; set; }
+    }
+
+
 }

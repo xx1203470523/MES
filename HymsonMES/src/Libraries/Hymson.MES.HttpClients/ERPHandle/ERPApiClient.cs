@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.ERP;
+using Hymson.MES.HttpClients.Responses.NioErp;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -73,6 +74,34 @@ namespace Hymson.MES.HttpClients
             return responseDto;
         }
 
+        /// <summary>
+        /// 查询NIO需要的物料信息
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<NioErpResponse> MaterailQueryAsync(MaterialRequest request)
+        {
+            var responseDto = new NioErpResponse { Status = false, Message = "未知的错误" };
 
+            _logger.LogDebug($"查询NIO需要的物料信息 -> Request: {request.ToSerialize()}");
+
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.MaterialNioRoute, request);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"查询NIO需要的物料信息 -> Response: {jsonResponse}");
+
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                var result = jsonResponse.ToDeserialize<NioErpResponse>();
+                if (result != null)
+                {
+                    responseDto.Status = result.Status;
+                    responseDto.Message = result.Message;
+                }
+            }
+
+            return responseDto;
+        }
     }
 }
