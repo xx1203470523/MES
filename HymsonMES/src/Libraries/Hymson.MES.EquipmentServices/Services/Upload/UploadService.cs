@@ -1,9 +1,13 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.EquipmentServices.Uploads;
 using Hymson.Minio;
+using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace Hymson.MES.EquipmentServices.Upload
 {
@@ -12,6 +16,11 @@ namespace Hymson.MES.EquipmentServices.Upload
     /// </summary>
     public class UploadService : IUploadService
     {
+        /// <summary>
+        /// 仓储接口（设备文件上传）
+        /// </summary>
+        private readonly IEquFileUploadRepository _equFileUploadRepository;
+
         /// <summary>
         /// 
         /// </summary>
@@ -22,10 +31,11 @@ namespace Hymson.MES.EquipmentServices.Upload
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="minioService"></param>
-        public UploadService(IMinioService minioService)
+        public UploadService(IMinioService minioService,
+            IEquFileUploadRepository equFileUploadRepository)
         {
             _minioService = minioService;
+            _equFileUploadRepository = equFileUploadRepository;
         }
 
         /// <summary>
@@ -70,6 +80,7 @@ namespace Hymson.MES.EquipmentServices.Upload
             if (fileList == null || !fileList.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES11600));
 
             List<UploadResultDto> uploadResultDtos = new();
+            List<EquFileUploadEntity> addList = new List<EquFileUploadEntity>();
             foreach (var file in fileList)
             {
                 var fileDir = $"{dto.PostionCode}/{HymsonClock.Now():yyyyMMdd}/{dto.BarCode}";
@@ -87,6 +98,30 @@ namespace Hymson.MES.EquipmentServices.Upload
                     FileSize = file.Length,
                     FileUrl = uploadResult.AbsoluteUrl
                 });
+
+                EquFileUploadEntity addModel = new EquFileUploadEntity();
+                addModel.Id = IdGenProvider.Instance.CreateId();
+                addModel.CreatedOn = HymsonClock.Now();
+                addModel.UpdatedOn = addModel.CreatedOn;
+                addModel.CreatedBy = "uploadApi";
+                addModel.UpdatedBy = addModel.CreatedBy;
+                addModel.BarCode = dto.BarCode;
+                addModel.PostionCode = dto.PostionCode;
+                addModel.Location = dto.Location;
+                addModel.CollectionTime = dto.CollectionTime;
+                addModel.FileExt = fileExt;
+                addModel.FileSize = file.Length;
+                addModel.FileUrl = uploadResult.AbsoluteUrl;
+                addList.Add(addModel);
+            }
+
+            try
+            {
+                await _equFileUploadRepository.InsertRangeAsync(addList);
+            }
+            catch(Exception ex)
+            {
+
             }
 
             return uploadResultDtos;
