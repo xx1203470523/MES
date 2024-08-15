@@ -6,6 +6,7 @@ using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Services.Dtos.Report;
@@ -192,7 +193,7 @@ namespace Hymson.MES.Services.Services.Report
         {
             var pagedQuery = param.ToQuery<ManuProductBadRecordReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            pagedQuery.PageSize = 10000;
+            pagedQuery.PageSize = ReportExport.PageSize;
             var pagedInfo = await _manuProductBadRecordRepository.GetPagedInfoReportAsync(pagedQuery);
 
             List<ManuProductBadRecordReportExportDto> listDto = new List<ManuProductBadRecordReportExportDto>();
@@ -242,7 +243,7 @@ namespace Hymson.MES.Services.Services.Report
         {
             var pagedQuery = param.ToQuery<ManuProductBadRecordLogReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            pagedQuery.PageSize = 10000;
+            pagedQuery.PageSize = ReportExport.PageSize; 
             var pagedInfo = await _manuProductBadRecordRepository.GetPagedInfoLogReportAsync(pagedQuery);
 
             List<ManuProductBadRecordLogReportExportDto> listDto = new List<ManuProductBadRecordLogReportExportDto>();
@@ -277,12 +278,12 @@ namespace Hymson.MES.Services.Services.Report
                 });
             }
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecordLog"), _localizationService.GetResource("BadRecordLog"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecordLogReport"), _localizationService.GetResource("BadRecordLogReport"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new ManuProductBadRecordLogReportExportResultDto
             {
-                FileName = _localizationService.GetResource("BadRecordLog"),
+                FileName = _localizationService.GetResource("BadRecordLogReport"),
                 Path = uploadResult.AbsoluteUrl,
             };
         }

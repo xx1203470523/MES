@@ -6,6 +6,7 @@ using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Core.Domain.ManuEquipmentStatusTime;
 using Hymson.MES.Data.Repositories.ManuEquipmentStatusTime;
 using Hymson.MES.Data.Repositories.ManuEquipmentStatusTime.Query;
@@ -106,7 +107,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 EquipmentId = param.EquipmentId,
                 SiteId = _currentSite.SiteId ?? 0,
                 PageIndex = param.PageIndex,
-                PageSize =10000,
+                PageSize = ReportExport.PageSize
             };
             var pagedInfo = await _manuEquipmentStatusTimeRepository.GetPagedListAsync(pageQuery);
             List<ManuEquipmentStatusRExportDto> listDto = new List<ManuEquipmentStatusRExportDto>();

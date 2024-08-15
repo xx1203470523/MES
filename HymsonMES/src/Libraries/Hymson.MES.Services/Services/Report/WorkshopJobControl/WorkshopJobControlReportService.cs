@@ -8,6 +8,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -333,18 +334,18 @@ namespace Hymson.MES.Services.Services.Report
         {
             var pagedQuery = param.ToQuery<WorkshopJobControlReportOptimizePagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            pagedQuery.PageSize = 10000;
+            pagedQuery.PageSize = ReportExport.PageSize; 
             var pagedInfo = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportOptimizeAsync(pagedQuery);
 
             List<WorkshopJobControlExportDto> listDto = new List<WorkshopJobControlExportDto>();
             if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkshopJobControl"), _localizationService.GetResource("WorkshopJobControl"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkshopJobControlReport"), _localizationService.GetResource("WorkshopJobControlReport"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new WorkshopJobControlResultDto
                 {
-                    FileName = _localizationService.GetResource("WorkshopJobControl"),
+                    FileName = _localizationService.GetResource("WorkshopJobControlReport"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -391,12 +392,12 @@ namespace Hymson.MES.Services.Services.Report
             }
 
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkshopJobControl"), _localizationService.GetResource("WorkshopJobControl"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkshopJobControlReport"), _localizationService.GetResource("WorkshopJobControlReport"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new WorkshopJobControlResultDto
             {
-                FileName = _localizationService.GetResource("WorkshopJobControl"),
+                FileName = _localizationService.GetResource("WorkshopJobControlReport"),
                 Path = uploadResult.AbsoluteUrl,
             };
         }

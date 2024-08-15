@@ -4,6 +4,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Process;
@@ -233,7 +234,7 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
                 ParameterId = pagedQueryDto.ParameterId,
                 CollectionTimeRange = pagedQueryDto.CollectionTimeRange,
                 PageIndex = pagedQueryDto.PageIndex,
-                PageSize = 10000
+                PageSize = ReportExport.PageSize
             };
 
             //有查询条件,过滤出条码
@@ -278,14 +279,14 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
 
             //分页查询
             List<ProductProcessParameterExportDto> listDto = new List<ProductProcessParameterExportDto>();
-            if (pagedInfo == null|| pagedInfo.Data == null || !pagedInfo.Data.Any())
+            if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("EquProcessParameter"), _localizationService.GetResource("EquProcessParameter"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ProductProcessParameterReport"), _localizationService.GetResource("ProductProcessParameterReport"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new ProductProcessParameterExportResultDto
                 {
-                    FileName = _localizationService.GetResource("EquProcessParameter"),
+                    FileName = _localizationService.GetResource("ProductProcessParameterReport"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -335,12 +336,12 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
                 });
             }
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ProductProcessParameter"), _localizationService.GetResource("ProductProcessParameter"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ProductProcessParameterReport"), _localizationService.GetResource("ProductProcessParameterReport"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new ProductProcessParameterExportResultDto
             {
-                FileName = _localizationService.GetResource("ProductProcessParameter"),
+                FileName = _localizationService.GetResource("ProductProcessParameterReport"),
                 Path = uploadResult.AbsoluteUrl,
             };
 

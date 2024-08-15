@@ -56,7 +56,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("export")]
-        public async Task<WorkOrderControlExportResultDto> ExprotListAsync([FromQuery] ManuDowngradingDetailReportPagedQueryDto param)
+        public async Task<ManuDowngradingDetailExportResultDto> ExprotListAsync([FromQuery] ManuDowngradingDetailReportPagedQueryDto param)
         {
             return await _manuDowngradingDetailReportService.ExprotListAsync(param);
         }

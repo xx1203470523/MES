@@ -4,6 +4,7 @@ using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -114,7 +115,7 @@ namespace Hymson.MES.Services.Services.Report
         {
             var pagedQuery = param.ToQuery<ComUsageReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId??0;
-            pagedQuery.PageSize = 1000;
+            pagedQuery.PageSize = ReportExport.PageSize;
             var pagedInfo = await _circulationRepository.GetReportPagedInfoAsync(pagedQuery);
 
             List<ComUsageReportExcelExportDto> listDto = new List<ComUsageReportExcelExportDto>();

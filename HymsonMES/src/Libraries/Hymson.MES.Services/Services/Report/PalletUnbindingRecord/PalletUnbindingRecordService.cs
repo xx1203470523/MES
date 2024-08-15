@@ -4,6 +4,7 @@ using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -135,18 +136,18 @@ namespace Hymson.MES.Services.Services.Report.PalletUnbindingRecord
         {
             var pagedQuery = param.ToQuery<InteVehicleFreightRecordPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            pagedQuery.PageSize = 10000;
+            pagedQuery.PageSize = ReportExport.PageSize;
             var pagedInfo = await _inteVehicleFreightRecordRepository.GetPagedInfoAsync(pagedQuery);
 
             List<VehicleFreightRecordExportDto> listDto = new List<VehicleFreightRecordExportDto>();
             if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("VehicleFreightRecord"), _localizationService.GetResource("VehicleFreightRecord"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("VehicleFreightRecordReport"), _localizationService.GetResource("VehicleFreightRecordReport"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new VehicleFreightRecordExportResultDto
                 {
-                    FileName = _localizationService.GetResource("VehicleFreightRecord"),
+                    FileName = _localizationService.GetResource("VehicleFreightRecordReport"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -196,12 +197,12 @@ namespace Hymson.MES.Services.Services.Report.PalletUnbindingRecord
                 listDto.Add(vehicleFreightRecord);
             }
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("VehicleFreightRecord"), _localizationService.GetResource("VehicleFreightRecord"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("VehicleFreightRecordReport"), _localizationService.GetResource("VehicleFreightRecordReport"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new VehicleFreightRecordExportResultDto
             {
-                FileName = _localizationService.GetResource("VehicleFreightRecord"),
+                FileName = _localizationService.GetResource("VehicleFreightRecordReport"),
                 Path = uploadResult.AbsoluteUrl,
             };
         }

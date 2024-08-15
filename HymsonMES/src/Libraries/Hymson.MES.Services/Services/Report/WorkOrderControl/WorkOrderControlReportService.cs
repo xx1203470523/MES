@@ -9,6 +9,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -146,18 +147,18 @@ namespace Hymson.MES.Services.Services.Report
         {
             var pagedQuery = param.ToQuery<PlanWorkOrderPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            pagedQuery.PageSize = 10000;
+            pagedQuery.PageSize = ReportExport.PageSize;
             var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
 
             List<WorkOrderControlExportDto> listDto = new List<WorkOrderControlExportDto>();
             if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkOrderControl"), _localizationService.GetResource("WorkOrderControl"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkOrderControlReport"), _localizationService.GetResource("WorkOrderControlReport"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new WorkOrderControlExportResultDto
                 {
-                    FileName = _localizationService.GetResource("WorkOrderControl"),
+                    FileName = _localizationService.GetResource("WorkOrderControlReport"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -183,12 +184,12 @@ namespace Hymson.MES.Services.Services.Report
                 });
             }
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkOrderControl"), _localizationService.GetResource("WorkOrderControl"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkOrderControlReport"), _localizationService.GetResource("WorkOrderControlReport"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new WorkOrderControlExportResultDto
             {
-                FileName = _localizationService.GetResource("WorkOrderControl"),
+                FileName = _localizationService.GetResource("WorkOrderControlReport"),
                 Path = uploadResult.AbsoluteUrl,
             };
         }

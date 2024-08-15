@@ -6,6 +6,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -215,7 +216,7 @@ namespace Hymson.MES.Services.Services.Report
                 EquipmentId = param.EquipmentId,
                 BatchId = param.BatchId,
                 PageIndex = param.PageIndex,
-                PageSize = 10000
+                PageSize = ReportExport.PageSize
             };
             var pagedInfo = await _paramRecordRepository.GetPagedListAsync(parameterQuery);
             List<EquStartupParameterExportDto> listDto = new List<EquStartupParameterExportDto>();

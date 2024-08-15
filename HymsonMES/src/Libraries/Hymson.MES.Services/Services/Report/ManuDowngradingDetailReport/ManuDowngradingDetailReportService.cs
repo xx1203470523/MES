@@ -4,6 +4,7 @@ using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
@@ -158,22 +159,22 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<WorkOrderControlExportResultDto> ExprotListAsync(ManuDowngradingDetailReportPagedQueryDto param)
+        public async Task<ManuDowngradingDetailExportResultDto> ExprotListAsync(ManuDowngradingDetailReportPagedQueryDto param)
         {
             var pagedQuery = param.ToQuery<ManuDowngradingDetailReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            pagedQuery.PageSize = 10000;
+            pagedQuery.PageSize = ReportExport.PageSize;
             var pagedInfo = await _manuDowngradingDetailReportRepository.GetPagedInfoAsync(pagedQuery);
 
             List<ManuDowngradingDetailExportDto> listDto = new List<ManuDowngradingDetailExportDto>();
             if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuDowngradingDetailRepor"), _localizationService.GetResource("ManuDowngradingDetailRepor"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuDowngradingDetailReport"), _localizationService.GetResource("ManuDowngradingDetailReport"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
-                return new WorkOrderControlExportResultDto
+                return new ManuDowngradingDetailExportResultDto
                 {
-                    FileName = _localizationService.GetResource("ManuDowngradingDetailRepor"),
+                    FileName = _localizationService.GetResource("ManuDowngradingDetailReport"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -218,12 +219,12 @@ namespace Hymson.MES.Services.Services.Report
                 });
             }
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuDowngradingDetailRepor"), _localizationService.GetResource("ManuDowngradingDetailRepor"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuDowngradingDetailReport"), _localizationService.GetResource("ManuDowngradingDetailReport"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
-            return new WorkOrderControlExportResultDto
+            return new ManuDowngradingDetailExportResultDto
             {
-                FileName = _localizationService.GetResource("ManuDowngradingDetailRepor"),
+                FileName = _localizationService.GetResource("ManuDowngradingDetailReport"),
                 Path = uploadResult.AbsoluteUrl,
             };
         }

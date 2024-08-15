@@ -5,6 +5,7 @@ using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants.Report;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Marking;
@@ -183,19 +184,19 @@ namespace Hymson.MES.Services.Services.Marking
         {
             var pagedQuery = param.ToQuery<MarkingReportReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            pagedQuery.PageSize = 10000;
+            pagedQuery.PageSize = ReportExport.PageSize;
             var pagedInfo = await _markingInterceptReportRepository.GetPagedInfoAsync(pagedQuery);
 
             List<MarkingRecordExportDto> listDto = new List<MarkingRecordExportDto>();
             var pagedInfoData = pagedInfo.Data;
             if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("MarkingRecordExport"), _localizationService.GetResource("MarkingRecordExport"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("MarkingRecordReport"), _localizationService.GetResource("MarkingRecordReport"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new MarkingRecordExportResultDto
                 {
-                    FileName = _localizationService.GetResource("MarkingRecordExport"),
+                    FileName = _localizationService.GetResource("MarkingRecordReport"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -266,12 +267,12 @@ namespace Hymson.MES.Services.Services.Marking
                 }); ;
             }
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("MarkingRecordExport"), _localizationService.GetResource("MarkingRecordExport"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("MarkingRecordReport"), _localizationService.GetResource("MarkingRecordReport"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new MarkingRecordExportResultDto
             {
-                FileName = _localizationService.GetResource("MarkingRecordExport"),
+                FileName = _localizationService.GetResource("MarkingRecordReport"),
                 Path = uploadResult.AbsoluteUrl,
             };
         }
