@@ -243,12 +243,21 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                     continue;
                 }
                 List<string> keyMaterialList = wmsResult.Data.Select(m => m.MaterialCode).Distinct().ToList();
+                List<ErpMaterialDetail> erpMatList = new List<ErpMaterialDetail>();
+                foreach (var keyMaterial in keyMaterialList)
+                {
+                    erpMatList.Add(new ErpMaterialDetail() { Code = keyMaterial });
+                }
 
                 //调用ERP接口，获取物料的供应商和合请购单数量
                 MaterialRequest erpQuery = new MaterialRequest();
-                erpQuery.MaterialCodeList = keyMaterialList;
-                erpQuery.Date = HymsonClock.Now();
-                NioErpResponse? erpResult = null; // await _eRPApiClient.MaterailQueryAsync(erpQuery);
+                erpQuery.cInvCode = erpMatList;
+                erpQuery.Voudate = HymsonClock.Now();
+                NioErpResponse? erpResult = await _eRPApiClient.MaterailQueryAsync(erpQuery);
+                if(erpResult != null)
+                {
+                    erpResult.InitData(keyMaterialList);
+                }
 
                 //组装数据
                 foreach(var wmsItem in wmsResult.Data)
@@ -277,7 +286,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                     dto.SubordinateSource = wmsItem.SubordinateSource;
                     dto.ParaConfigUnit = wmsItem.ParaConfigUnit;
                     //ERP物料信息
-                    if(erpResult != null && erpResult.Data != null && erpResult.Data.Count > 0)
+                    if(erpResult != null)
                     {
                         var curErpMat = erpResult.Data.Where(m => m.MaterialCode == wmsItem.SubordinateCode).FirstOrDefault();
                         if(curErpMat != null)
@@ -289,9 +298,9 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                     }
                     else
                     {
-                        dto.SubordinatePartner = "ERP过来的供应商中文名";
+                        dto.SubordinatePartner = "ERP没有该信息";
                         dto.SubordinateArrivalPlan = 0;
-                        dto.SubordinateDemandPlan = 1.0m; //ERP-MES请购单
+                        dto.SubordinateDemandPlan = 0m; //ERP-MES请购单
                     }
 
                     //MES物料信息

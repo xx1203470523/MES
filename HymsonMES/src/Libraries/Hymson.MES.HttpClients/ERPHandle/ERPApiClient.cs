@@ -98,6 +98,8 @@ namespace Hymson.MES.HttpClients
                 {
                     responseDto.Status = result.Status;
                     responseDto.Message = result.Message;
+                    responseDto.VenAndInvList = result.VenAndInvList;
+                    responseDto.AppVouchList = result.AppVouchList;
                 }
             }
 
