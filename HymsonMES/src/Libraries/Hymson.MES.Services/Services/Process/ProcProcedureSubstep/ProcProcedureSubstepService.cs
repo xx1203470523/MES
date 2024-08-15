@@ -341,6 +341,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
             }
 
+            substepEntity.Name = param.Name.Trim();
             substepEntity.Remark = param.Remark ?? "";
             substepEntity.Type = param.Type;
             substepEntity.UpdatedBy = updatedBy;

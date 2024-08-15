@@ -179,6 +179,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
                 sqlBuilder.Where("Name LIKE @Name");
             }
 
+            if (pagedQuery.Ids!=null&&pagedQuery.Ids.Any())
+            {
+                sqlBuilder.Where("Id in @Ids");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
