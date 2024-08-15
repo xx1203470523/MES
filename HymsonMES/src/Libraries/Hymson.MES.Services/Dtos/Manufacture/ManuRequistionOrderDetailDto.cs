@@ -57,5 +57,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 领料时间
         /// </summary>
         public DateTime PickTime { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; } = "";
+
     }
 }

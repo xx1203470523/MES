@@ -205,7 +205,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public class ManuReturnOrderDetailPagedQueryDto : PagerInfo { }
 
-    public record OrderManuReturnDetailDto 
+    /// <summary>
+    /// 
+    /// </summary>
+    public record OrderManuReturnDetailDto
     {
         /// <summary>
         /// 退料单号
@@ -251,6 +254,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 领料时间
         /// </summary>
         public DateTime ReturnTime { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; } = "";
+
     }
 
 }

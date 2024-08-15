@@ -749,7 +749,8 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                     //Batch = item.Batch,
                     Qty = item.Qty,
                     PickTime = requistionOrder?.CreatedOn ?? item.CreatedOn,
-                    Status = requistionOrder?.Status
+                    Status = requistionOrder?.Status,
+                    CreatedBy = requistionOrder?.CreatedBy ?? "-"
                 });
             }
             return details;
@@ -788,5 +789,6 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
 
             return rows > 0;
         }
+
     }
 }

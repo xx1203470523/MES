@@ -14,62 +14,62 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 入库工单号
         /// </summary>
         public string WarehouseOrderCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public string WorkOrderCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 箱号编码
         /// </summary>
         public string ContaineCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
         /// </summary>
         public bool Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料描述
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -82,62 +82,61 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 入库工单号
         /// </summary>
         public string WarehouseOrderCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public string WorkOrderCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 箱号编码
         /// </summary>
         public string ContaineCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
         /// </summary>
         public bool Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料描述
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
     }
 
     /// <summary>
@@ -180,12 +179,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public ProductReceiptQualifiedStatusEnum? Status { get; set; }
 
-
         /// <summary>
         /// 入库状态
         /// </summary>
         public ProductReceiptStatusEnum StorageStatus { get; set; }
-
 
         /// <summary>
         /// 创建时间
@@ -195,7 +192,13 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 完工单号
         /// </summary>
-        public string CompletionOrderCode {  get; set; }
+        public string CompletionOrderCode { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; } = "";
+
     }
 
     /// <summary>

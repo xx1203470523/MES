@@ -311,7 +311,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Batch = item.Batch ?? "",
                     Qty = item.Qty,
                     ReturnTime = retrurnOrder?.CreatedOn ?? item.CreatedOn,
-                    Status = retrurnOrder?.Status
+                    Status = retrurnOrder?.Status,
+                    CreatedBy = retrurnOrder?.CreatedBy ?? "-"
                 });
             }
             return details;

@@ -49,7 +49,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="manuProductReceiptOrderRepository"></param>
-        public ManuProductReceiptOrderService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuProductReceiptOrderSaveDto> validationSaveRules, 
+        public ManuProductReceiptOrderService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuProductReceiptOrderSaveDto> validationSaveRules,
             IManuProductReceiptOrderRepository manuProductReceiptOrderRepository, IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository)
         {
             _currentUser = currentUser;
@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
@@ -167,7 +167,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Sfc = entity.Sfc,
                         Status = entity.Status,
                         Unit = entity.Unit,
-                        CreateDate = entity.CreatedOn
+                        CreateDate = entity.CreatedOn,
+                        CreatedBy = entity.CreatedBy
                     };
                     manuProductReceiptOrders.Add(manuProductReceipt);
                 }
@@ -180,12 +181,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ManuProductReceiptOrderDto?> QueryByIdAsync(long id) 
+        public async Task<ManuProductReceiptOrderDto?> QueryByIdAsync(long id)
         {
-           var manuProductReceiptOrderEntity = await _manuProductReceiptOrderRepository.GetByIdAsync(id);
-           if (manuProductReceiptOrderEntity == null) return null;
-           
-           return manuProductReceiptOrderEntity.ToModel<ManuProductReceiptOrderDto>();
+            var manuProductReceiptOrderEntity = await _manuProductReceiptOrderRepository.GetByIdAsync(id);
+            if (manuProductReceiptOrderEntity == null) return null;
+
+            return manuProductReceiptOrderEntity.ToModel<ManuProductReceiptOrderDto>();
         }
 
         /// <summary>
