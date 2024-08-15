@@ -67,7 +67,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <returns></returns>
         public async Task<int> ExecuteAsync(int limitCount)
         {
-            var producreCode = $"{typeof(OP050).Name}";
+            var producreCode = $"{typeof(OP060).Name}";
             var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
@@ -124,7 +124,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var wireId = dr[id_key].ParseToLong();
                 if (wireId == 0) continue;
 
-                WireBarCodeEntity? wireEntity = wireSFCEntities.FirstOrDefault(f => f.Id == wireId);
+                WireBarCodeEntity? wireEntity = wireSFCEntities.FirstOrDefault(f => f.WireId == wireId);
                 if (wireEntity == null) continue;
 
                 var time = dr["RDate"].ToTime();
@@ -218,7 +218,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 if (parameterCodes == null || !parameterCodes.Any()) continue;
 
                 // 读取标准参数
-                var parameterEntities = await _mainService.GetParameterEntitiesAsync(parameterCodes, summaryBo.StatorBo);
+                var parameterEntities = await _mainService.GetParameterEntitiesAsync(parameterCodes, statorBo);
+                summaryBo.ProcParameterEntities.AddRange(parameterEntities);
 
                 // 遍历参数
                 foreach (var param in parameterEntities)

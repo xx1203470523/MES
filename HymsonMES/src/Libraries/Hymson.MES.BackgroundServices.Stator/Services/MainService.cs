@@ -276,16 +276,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
 
             var id_key = "ID";
             var barCode_key = "Barcode";
-            switch (producreCode)
-            {
-                case "OP120":
-                    id_key = "ID_stator";
-                    break;
-                default:
-                    id_key = "ID";
-                    barCode_key = "Barcode";
-                    break;
-            }
 
             // 批量读取条码（MES）
             var barCodes = dataTable.AsEnumerable().Select(s => $"{s[barCode_key]}").Distinct();
@@ -402,7 +392,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 if (parameterCodes == null || !parameterCodes.Any()) continue;
 
                 // 读取标准参数
-                var parameterEntities = await GetParameterEntitiesAsync(parameterCodes, summaryBo.StatorBo);
+                var parameterEntities = await GetParameterEntitiesAsync(parameterCodes, statorBo);
 
                 // 遍历参数
                 foreach (var param in parameterEntities)
@@ -467,45 +457,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 if (id == 0) continue;
 
                 StatorBarCodeEntity? statorSFCEntity = statorSFCEntities.FirstOrDefault(f => f.InnerId == id);
-                switch (producreCode)
-                {
-                    case "OP010":
-                        barCode = $"{opEntity.GetType().GetProperty("wire1_barcode")?.GetValue(opEntity)}";
-                        break;
-                    case "OP190":
-                    case "OP210":
-                        barCode = opEntity.Barcode;
-                        if (statorSFCEntity != null)
-                        {
-                            statorSFCEntity.OuterBarCode = barCode;
-                            statorSFCEntity.UpdatedOn = statorBo.Time;
-                            summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
-                        }
-                        break;
-                    case "OP340":
-                        barCode = $"{opEntity.GetType().GetProperty("busbar_barcode")?.GetValue(opEntity)}";
-                        if (statorSFCEntity != null)
-                        {
-                            statorSFCEntity.BusBarCode = barCode;
-                            statorSFCEntity.UpdatedOn = statorBo.Time;
-                            summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
-                        }
-                        break;
-                    case "OP490":
-                        barCode = $"{opEntity.GetType().GetProperty("LaserBarcode")?.GetValue(opEntity)}";
-                        if (statorSFCEntity != null)
-                        {
-                            statorSFCEntity.ProductionCode = barCode;
-                            statorSFCEntity.UpdatedOn = statorBo.Time;
-                            summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
-                        }
-                        break;
-                    case "OP070":
-                        barCode = opEntity.Barcode;
-                        break;
-                    default:
-                        break;
-                }
 
                 // 条码是否无效数据
                 if (StatorConst.IgnoreString.Contains(barCode) || string.IsNullOrWhiteSpace(barCode)) continue;
@@ -677,7 +628,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 if (parameterCodes == null || !parameterCodes.Any()) continue;
 
                 // 读取标准参数
-                var parameterEntities = await GetParameterEntitiesAsync(parameterCodes, summaryBo.StatorBo);
+                var parameterEntities = await GetParameterEntitiesAsync(parameterCodes, statorBo);
 
                 // 遍历参数
                 foreach (var param in parameterEntities)
@@ -718,22 +669,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <returns></returns>
         public async Task<IEnumerable<ProcParameterEntity>> GetParameterEntitiesAsync(IEnumerable<string> parameterCodes, BaseStatorBo statorBo)
         {
-            // 插入参数
-            await _procParameterRepository.InsertsAsync(parameterCodes.Select(s => new ProcParameterEntity
-            {
-                Id = IdGenProvider.Instance.CreateId(),
-                ParameterUnit = "1",
-                ParameterCode = s,
-                ParameterName = s,
-                Remark = StatorConst.USER,
-
-                SiteId = statorBo.SiteId,
-                CreatedBy = statorBo.User,
-                CreatedOn = statorBo.Time,
-                UpdatedBy = statorBo.User,
-                UpdatedOn = statorBo.Time
-            }));
-
             // 读取标准参数
             var parameterEntities = await _procParameterRepository.GetByCodesAsync(new Data.Repositories.Process.Query.ProcParametersByCodeQuery
             {
@@ -741,7 +676,33 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 Codes = parameterCodes
             });
 
-            return parameterEntities;
+            // 所有的参数
+            List<ProcParameterEntity> allParameterEntities = new();
+            allParameterEntities.AddRange(parameterEntities);
+
+            // 不存在的参数
+            foreach (var parameterCode in parameterCodes)
+            {
+                var parameterEntity = parameterEntities.FirstOrDefault(f => f.ParameterCode == parameterCode);
+                if (parameterEntity != null) continue;
+
+                allParameterEntities.Add(new ProcParameterEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    ParameterUnit = "1",
+                    ParameterCode = parameterCode,
+                    ParameterName = parameterCode,
+                    Remark = StatorConst.USER,
+
+                    SiteId = statorBo.SiteId,
+                    CreatedBy = statorBo.User,
+                    CreatedOn = statorBo.Time,
+                    UpdatedBy = statorBo.User,
+                    UpdatedOn = statorBo.Time
+                });
+            }
+
+            return allParameterEntities;
         }
 
         /// <summary>

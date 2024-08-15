@@ -319,7 +319,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 if (parameterCodes == null || !parameterCodes.Any()) continue;
 
                 // 读取标准参数
-                var parameterEntities = await _mainService.GetParameterEntitiesAsync(parameterCodes, summaryBo.StatorBo);
+                var parameterEntities = await _mainService.GetParameterEntitiesAsync(parameterCodes, statorBo);
+                summaryBo.ProcParameterEntities.AddRange(parameterEntities);
 
                 // 遍历参数
                 foreach (var param in parameterEntities)
