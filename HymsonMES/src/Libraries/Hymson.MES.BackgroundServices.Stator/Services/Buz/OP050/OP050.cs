@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class OP030 : BaseOPEntity
+    public class OP050 : BaseOPEntity
     {
 
     }

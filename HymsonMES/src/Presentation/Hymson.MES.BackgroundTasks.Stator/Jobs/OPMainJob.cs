@@ -16,8 +16,12 @@ namespace Hymson.MES.BackgroundTasks.Stator
         private readonly ILogger<OPMainJob> _logger;
         private readonly IOP010Service _op010Service;
         private readonly IOP020Service _op020Service;
+        private readonly IOP030Service _op030Service;
+        private readonly IOP050Service _op050Service;
+        private readonly IOP060Service _op060Service;
         private readonly IOP070Service _op070Service;
         private readonly IOP080Service _op080Service;
+        private readonly IOP090Service _op090Service;
         private readonly IOP120Service _op120Service;
         private readonly IOP160Service _op160Service;
         private readonly IOP190Service _op190Service;
@@ -30,8 +34,12 @@ namespace Hymson.MES.BackgroundTasks.Stator
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="op010Service"></param>
+        /// <param name="op020Service"></param>
+        /// <param name="op030Service"></param>
         /// <param name="op070Service"></param>
+        /// <param name="op080Service"></param>
         /// <param name="op120Service"></param>
+        /// <param name="op160Service"></param>
         /// <param name="op190Service"></param>
         /// <param name="op210Service"></param>
         /// <param name="op340Service"></param>
@@ -39,8 +47,12 @@ namespace Hymson.MES.BackgroundTasks.Stator
         public OPMainJob(ILogger<OPMainJob> logger,
             IOP010Service op010Service,
             IOP020Service op020Service,
+            IOP030Service op030Service,
+            IOP050Service op050Service,
+            IOP060Service op060Service,
             IOP070Service op070Service,
             IOP080Service op080Service,
+            IOP090Service op090Service,
             IOP120Service op120Service,
             IOP160Service op160Service,
             IOP190Service op190Service,
@@ -51,8 +63,12 @@ namespace Hymson.MES.BackgroundTasks.Stator
             _logger = logger;
             _op010Service = op010Service;
             _op020Service = op020Service;
+            _op030Service = op030Service;
+            _op050Service = op050Service;
+            _op060Service = op060Service;
             _op070Service = op070Service;
             _op080Service = op080Service;
+            _op090Service = op090Service;
             _op120Service = op120Service;
             _op160Service = op160Service;
             _op190Service = op190Service;
@@ -74,6 +90,7 @@ namespace Hymson.MES.BackgroundTasks.Stator
                 var limitCount = 5000;
                 await LoopExecuteAsync(() => _op010Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op020Service.ExecuteAsync(limitCount));
+                await LoopExecuteAsync(() => _op030Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op070Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op080Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op120Service.ExecuteAsync(limitCount));

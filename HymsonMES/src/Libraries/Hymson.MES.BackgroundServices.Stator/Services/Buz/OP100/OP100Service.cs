@@ -11,17 +11,17 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public partial class OP030Service : IOP030Service
+    public partial class OP100Service : IOP100Service
     {
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<OP030Service> _logger;
+        private readonly ILogger<OP100Service> _logger;
 
         /// <summary>
         /// 仓储接口（工序）
         /// </summary>
-        private readonly IOPRepository<OP030> _opRepository;
+        private readonly IOPRepository<OP100> _opRepository;
 
         /// <summary>
         /// 服务接口（基础）
@@ -46,8 +46,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
         /// <param name="procParameterRepository"></param>
-        public OP030Service(ILogger<OP030Service> logger,
-            IOPRepository<OP030> opRepository,
+        public OP100Service(ILogger<OP100Service> logger,
+            IOPRepository<OP100> opRepository,
             IMainService mainService,
             IWaterMarkService waterMarkService,
             IProcParameterRepository procParameterRepository)
@@ -67,7 +67,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <returns></returns>
         public async Task<int> ExecuteAsync(int limitCount)
         {
-            var producreCode = $"{typeof(OP030).Name}";
+            var producreCode = $"{typeof(OP100).Name}";
             var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
@@ -106,11 +106,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var id_key = "ID";
             var ids = dataTable.AsEnumerable().Select(s => $"{s[id_key]}").Distinct();
 
-            // 批量读取条码（铜线）
-            var wireSFCEntities = await _mainService.GetWireBarCodeEntitiesAsync(statorBo.SiteId, ids);
+            // 批量读取条码（定子）
+            var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, ids);
 
             // 批量读取条码（MES）
-            var barCodes = wireSFCEntities.Select(s => s.WireBarCode).Distinct();
+            var barCodes = statorSFCEntities.Select(s => s.InnerBarCode).Distinct();
             var manuSFCEntities = await _mainService.GetSFCEntitiesAsync(statorBo.SiteId, barCodes);
 
             // 批量读取条码信息（MES）
@@ -121,11 +121,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             foreach (DataRow dr in dataTable.Rows)
             {
                 // ID是否无效数据
-                var wireId = dr[id_key].ParseToLong();
-                if (wireId == 0) continue;
+                var statorId = dr[id_key].ParseToLong();
+                if (statorId == 0) continue;
 
-                WireBarCodeEntity? wireEntity = wireSFCEntities.FirstOrDefault(f => f.Id == wireId);
-                if (wireEntity == null) continue;
+                StatorBarCodeEntity? statorEntity = statorSFCEntities.FirstOrDefault(f => f.Id == statorId);
+                if (statorEntity == null) continue;
 
                 var time = dr["RDate"].ToTime();
 
@@ -133,7 +133,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var manuSFCStepId = IdGenProvider.Instance.CreateId();
                 var manuBadRecordId = IdGenProvider.Instance.CreateId();
 
-                var barCode = wireEntity.WireBarCode;
+                var barCode = statorEntity.InnerBarCode;
                 var manuSFCEntity = manuSFCEntities.FirstOrDefault(f => f.SFC == barCode);
                 if (manuSFCEntity == null) continue;
 
@@ -253,61 +253,17 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public partial class OP030Service
+    public partial class OP100Service
     {
         /// <summary>
         /// 参数编码集合
         /// </summary>
         private static readonly List<string> _parameterCodes = new()
         {
-            "pressCount",
-            "CrimpingPosition01",
-            "CrimpingPressDistance01",
-            "CrimpingPressLoad01",
-            "CrimpingPosition02",
-            "CrimpingPressDistance02",
-            "CrimpingPressLoad02",
-            "CrimpingPosition03",
-            "CrimpingPressDistance03",
-            "CrimpingPressLoad03",
-            "CrimpingPosition04",
-            "CrimpingPressDistance04",
-            "CrimpingPressLoad04",
-            "CrimpingPosition05",
-            "CrimpingPressDistance05",
-            "CrimpingPressLoad05",
-            "CrimpingPosition06",
-            "CrimpingPressDistance06",
-            "CrimpingPressLoad06",
-            "CrimpingPosition07",
-            "CrimpingPressDistance07",
-            "CrimpingPressLoad07",
-            "CrimpingPosition08",
-            "CrimpingPressDistance08",
-            "CrimpingPressLoad08",
-            "CrimpingPosition09",
-            "CrimpingPressDistance09",
-            "CrimpingPressLoad09",
-            "CrimpingPosition10",
-            "CrimpingPressDistance10",
-            "CrimpingPressLoad10",
-            /*
-            "CrimpingPosition11",
-            "CrimpingPressDistance11",
-            "CrimpingPressLoad11",
-            "CrimpingPosition12",
-            "CrimpingPressDistance12",
-            "CrimpingPressLoad12",
-            "CrimpingPosition13",
-            "CrimpingPressDistance13",
-            "CrimpingPressLoad13",
-            "CrimpingPosition14",
-            "CrimpingPressDistance14",
-            "CrimpingPressLoad14",
-            "CrimpingPosition15",
-            "CrimpingPressDistance15",
-            "CrimpingPressLoad15"
-            */
+            "LHCuttingYPosition",
+            "LHCuttingPressPosition",
+            "RHCuttingYPosition",
+            "RHCuttingPressPosition"
         };
 
     }

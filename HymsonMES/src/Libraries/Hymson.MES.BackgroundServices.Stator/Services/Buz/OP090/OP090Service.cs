@@ -1,7 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Extension;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Data;
@@ -11,17 +10,17 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public partial class OP030Service : IOP030Service
+    public partial class OP090Service : IOP090Service
     {
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<OP030Service> _logger;
+        private readonly ILogger<OP090Service> _logger;
 
         /// <summary>
         /// 仓储接口（工序）
         /// </summary>
-        private readonly IOPRepository<OP030> _opRepository;
+        private readonly IOPRepository<OP090> _opRepository;
 
         /// <summary>
         /// 服务接口（基础）
@@ -46,8 +45,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
         /// <param name="procParameterRepository"></param>
-        public OP030Service(ILogger<OP030Service> logger,
-            IOPRepository<OP030> opRepository,
+        public OP090Service(ILogger<OP090Service> logger,
+            IOPRepository<OP090> opRepository,
             IMainService mainService,
             IWaterMarkService waterMarkService,
             IProcParameterRepository procParameterRepository)
@@ -67,50 +66,49 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <returns></returns>
         public async Task<int> ExecuteAsync(int limitCount)
         {
-            var producreCode = $"{typeof(OP030).Name}";
+            var producreCode = $"{typeof(OP090).Name}";
             var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
             // 根据水位读取数据
-            var dataTable = await _opRepository.GetDataTableByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            var entities = await _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
             {
                 StartWaterMarkId = waterMarkId,
                 Rows = limitCount
             });
-            if (dataTable == null || dataTable.Rows.Count == 0)
+            if (entities == null || !entities.Any())
             {
                 _logger.LogDebug($"【{producreCode}】没有要拉取的数据！");
                 return 0;
             }
 
             // 获取转换数据（基础数据）
-            var summaryBo = await ConvertDataTableAsync(dataTable, producreCode, _parameterCodes);
+            var summaryBo = await ConvertDataListAsync(entities);
 
             // 保存数据
-            var waterLevel = dataTable.AsEnumerable().Select(s => s["index"].ParseToLong());
-            return await _mainService.SaveBaseDataWithCommitAsync(buzKey, waterLevel.Max(m => m), summaryBo);
+            return await _mainService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
         }
 
         /// <summary>
         /// 保存转换数据（附带参数）
         /// </summary>
-        /// <param name="dataTable"></param>
-        /// <param name="producreCode"></param>
+        /// <param name="entities"></param>
         /// <param name="parameterCodes"></param>
         /// <returns></returns>
-        private async Task<StatorSummaryBo> ConvertDataTableAsync(DataTable dataTable, string producreCode, IEnumerable<string>? parameterCodes = null)
+        private async Task<StatorSummaryBo> ConvertDataListAsync(IEnumerable<OP090> entities, IEnumerable<string>? parameterCodes = null)
         {
+            var producreCode = $"{typeof(OP090).Name}";
+
             // 初始化对象
             var statorBo = await _mainService.GetStatorBaseConfigAsync(producreCode);
 
-            var id_key = "ID";
-            var ids = dataTable.AsEnumerable().Select(s => $"{s[id_key]}").Distinct();
-
-            // 批量读取条码（铜线）
-            var wireSFCEntities = await _mainService.GetWireBarCodeEntitiesAsync(statorBo.SiteId, ids);
+            // 批量读取条码（定子）
+            var ids = entities.Where(w => !StatorConst.IgnoreString.Contains(w.ID) && !string.IsNullOrWhiteSpace(w.ID))
+                .Select(s => s.ID);
+            var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, ids);
 
             // 批量读取条码（MES）
-            var barCodes = wireSFCEntities.Select(s => s.WireBarCode).Distinct();
+            var barCodes = statorSFCEntities.Select(s => s.InnerBarCode);
             var manuSFCEntities = await _mainService.GetSFCEntitiesAsync(statorBo.SiteId, barCodes);
 
             // 批量读取条码信息（MES）
@@ -118,22 +116,27 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
 
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
-            foreach (DataRow dr in dataTable.Rows)
+            foreach (var opEntity in entities)
             {
+                var index = opEntity.index;
+                var time = opEntity.RDate;
+                var isOk = opEntity.Result == "OK";
+
                 // ID是否无效数据
-                var wireId = dr[id_key].ParseToLong();
-                if (wireId == 0) continue;
+                var statorId = opEntity.ID.ParseToLong();
+                if (statorId == 0) continue;
 
-                WireBarCodeEntity? wireEntity = wireSFCEntities.FirstOrDefault(f => f.Id == wireId);
-                if (wireEntity == null) continue;
+                StatorBarCodeEntity? statorSFCEntity = statorSFCEntities.FirstOrDefault(f => f.InnerId == statorId);
+                if (statorSFCEntity == null) continue;
 
-                var time = dr["RDate"].ToTime();
+                // 条码是否无效数据
+                var barCode = statorSFCEntity.InnerBarCode;
+                if (StatorConst.IgnoreString.Contains(barCode) || string.IsNullOrWhiteSpace(barCode)) continue;
 
                 // 条码ID
                 var manuSFCStepId = IdGenProvider.Instance.CreateId();
                 var manuBadRecordId = IdGenProvider.Instance.CreateId();
 
-                var barCode = wireEntity.WireBarCode;
                 var manuSFCEntity = manuSFCEntities.FirstOrDefault(f => f.SFC == barCode);
                 if (manuSFCEntity == null) continue;
 
@@ -162,7 +165,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     OperationResourceId = null,
                     OperationEquipmentId = null,
 
-                    Remark = $"{dr["index"]}",   // 这个ID是为了外层找到对应记录
+                    Remark = $"{index}",   // 这个ID是为了外层找到对应记录
 
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
@@ -173,7 +176,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 summaryBo.ManuSfcStepEntities.Add(stepEntity);
 
                 // 如果是不合格
-                var isOk = $"{dr["Result"]}" == "OK";
                 if (!isOk)
                 {
                     // 插入不良记录
@@ -217,98 +219,12 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 // 如果没有需要解析的参数
                 if (parameterCodes == null || !parameterCodes.Any()) continue;
 
-                // 读取标准参数
-                var parameterEntities = await _mainService.GetParameterEntitiesAsync(parameterCodes, summaryBo.StatorBo);
-
-                // 遍历参数
-                foreach (var param in parameterEntities)
-                {
-                    summaryBo.ManuProductParameterEntities.Add(new Core.Domain.Parameter.ManuProductParameterEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        ProcedureId = stepEntity.ProcedureId ?? 0,
-                        SfcstepId = stepEntity.Id,
-                        SFC = stepEntity.SFC,
-
-                        ParameterId = param.Id,
-                        ParameterValue = $"{dr[param.ParameterCode]}",
-                        ParameterGroupId = 0,
-                        CollectionTime = time,
-
-                        SiteId = stepEntity.SiteId,
-                        CreatedBy = stepEntity.CreatedBy,
-                        CreatedOn = stepEntity.CreatedOn,
-                        UpdatedBy = stepEntity.UpdatedBy,
-                        UpdatedOn = stepEntity.UpdatedOn
-                    });
-                }
+                // 无参数
             }
 
             summaryBo.StatorBo = statorBo;
             return summaryBo;
         }
-
-    }
-
-    /// <summary>
-    /// 服务
-    /// </summary>
-    public partial class OP030Service
-    {
-        /// <summary>
-        /// 参数编码集合
-        /// </summary>
-        private static readonly List<string> _parameterCodes = new()
-        {
-            "pressCount",
-            "CrimpingPosition01",
-            "CrimpingPressDistance01",
-            "CrimpingPressLoad01",
-            "CrimpingPosition02",
-            "CrimpingPressDistance02",
-            "CrimpingPressLoad02",
-            "CrimpingPosition03",
-            "CrimpingPressDistance03",
-            "CrimpingPressLoad03",
-            "CrimpingPosition04",
-            "CrimpingPressDistance04",
-            "CrimpingPressLoad04",
-            "CrimpingPosition05",
-            "CrimpingPressDistance05",
-            "CrimpingPressLoad05",
-            "CrimpingPosition06",
-            "CrimpingPressDistance06",
-            "CrimpingPressLoad06",
-            "CrimpingPosition07",
-            "CrimpingPressDistance07",
-            "CrimpingPressLoad07",
-            "CrimpingPosition08",
-            "CrimpingPressDistance08",
-            "CrimpingPressLoad08",
-            "CrimpingPosition09",
-            "CrimpingPressDistance09",
-            "CrimpingPressLoad09",
-            "CrimpingPosition10",
-            "CrimpingPressDistance10",
-            "CrimpingPressLoad10",
-            /*
-            "CrimpingPosition11",
-            "CrimpingPressDistance11",
-            "CrimpingPressLoad11",
-            "CrimpingPosition12",
-            "CrimpingPressDistance12",
-            "CrimpingPressLoad12",
-            "CrimpingPosition13",
-            "CrimpingPressDistance13",
-            "CrimpingPressLoad13",
-            "CrimpingPosition14",
-            "CrimpingPressDistance14",
-            "CrimpingPressLoad14",
-            "CrimpingPosition15",
-            "CrimpingPressDistance15",
-            "CrimpingPressLoad15"
-            */
-        };
 
     }
 }
