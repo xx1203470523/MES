@@ -213,6 +213,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             var buzScene = BuzSceneEnum.ERP_KeySubordinate;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
+            DateTime now = HymsonClock.Now();
+            string nowStr = now.ToString("yyyy-MM-dd");
 
             List<KeySubordinateDto> dtos = new List<KeySubordinateDto>();
 
@@ -252,7 +254,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                 //调用ERP接口，获取物料的供应商和合请购单数量
                 MaterialRequest erpQuery = new MaterialRequest();
                 erpQuery.cInvCode = erpMatList;
-                erpQuery.Voudate = HymsonClock.Now();
+                erpQuery.Voudate = Convert.ToDateTime(nowStr);
                 NioErpResponse? erpResult = await _eRPApiClient.MaterailQueryAsync(erpQuery);
                 if(erpResult != null)
                 {
