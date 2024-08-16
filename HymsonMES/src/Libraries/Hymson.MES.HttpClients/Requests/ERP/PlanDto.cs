@@ -65,15 +65,24 @@ namespace Hymson.MES.HttpClients.Requests.ERP
     public record MaterialRequest
     {
         /// <summary>
-        /// 物料编码
+        /// 物料编码列表
         /// </summary>
-        public List<string> MaterialCodeList { get; set; } = new List<string>();
+        public List<ErpMaterialDetail> cInvCode { get; set; } = new List<ErpMaterialDetail>();
 
         /// <summary>
         /// 日期
         /// </summary>
-        public DateTime Date { get; set; }
+        public DateTime Voudate { get; set; }
     }
 
-
+    /// <summary>
+    /// ERP物料详情
+    /// </summary>
+    public record ErpMaterialDetail
+    {
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string Code { get; set; }
+    }
 }
