@@ -201,6 +201,38 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据工序获取步骤表数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SfcStepOrderProcedureNumView>> GetSfcStepOrderOpMavelAsync(SfcStepOrderProcedureQuery query)
+        {
+            string orderSql = string.Empty;
+            if(string.IsNullOrEmpty(query.OrderCode) == false)
+            {
+                orderSql = $"and t2.OrderCode  = '{query.OrderCode}'";
+            }
+
+            string sql = $@"
+                select t4.WorkPlanCode,DATE(t1.CreatedOn) DateStr, t2.OrderCode  ,t3.Code ,t3.Name , t2.ProductId  , count(*) Num
+                from manu_sfc_step t1 
+                inner join plan_work_order t2 on t1.WorkOrderId = t2.Id and t2.IsDeleted = 0
+                inner join proc_procedure t3 on t1.ProcedureId = t3.Id and t3.IsDeleted = 0
+                inner join plan_work_plan t4 on t4.Id = t2.WorkPlanId and t4.IsDeleted = 0
+                where t1.SiteId  = {query.SiteId}
+                and t1.CreatedOn >= '{query.BeginDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+                and t1.CreatedOn < '{query.EndDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+                and t4.WorkPlanCode  = '{query.WorkPlanCode}'
+                {orderSql}
+                group by  t4.WorkPlanCode,DateStr, t2.OrderCode  ,t3.Code ,t3.Name , t2.ProductId
+                order by DateStr, t2.OrderCode ,t3.Code 
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<SfcStepOrderProcedureNumView>(sql, query);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuSfcStepEntity"></param>

@@ -68,4 +68,35 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public DateTime EndDate { get; set; }
     }
+
+    /// <summary>
+    /// 根据工单工序获取数量
+    /// </summary>
+    public class SfcStepOrderProcedureQuery
+    {
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        public DateTime BeginDate { get; set; }
+
+        /// <summary>
+        /// 结束时间
+        /// </summary>
+        public DateTime EndDate { get; set; }
+
+        /// <summary>
+        /// ERP订单
+        /// </summary>
+        public string WorkPlanCode { get; set; }
+
+        /// <summary>
+        /// MES工单
+        /// </summary>
+        public string? OrderCode { get; set; }
+
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+    }
 }
