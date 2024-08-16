@@ -36,7 +36,7 @@ Host.CreateDefaultBuilder(args)
    .ConfigureServices((hostContext, services) =>
    {
        services.Configure<PrintOptions>(hostContext.Configuration.GetSection(nameof(PrintOptions)));
-       services.AddLocalization();
+       //services.AddLocalization();
       
        services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
