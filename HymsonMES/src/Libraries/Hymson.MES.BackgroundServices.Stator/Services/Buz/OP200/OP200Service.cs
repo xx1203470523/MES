@@ -6,17 +6,17 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public partial class OP090Service : IOP090Service
+    public partial class OP200Service : IOP200Service
     {
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<OP090Service> _logger;
+        private readonly ILogger<OP200Service> _logger;
 
         /// <summary>
         /// 仓储接口（工序）
         /// </summary>
-        private readonly IOPRepository<OP090> _opRepository;
+        private readonly IOPRepository<OP200> _opRepository;
 
         /// <summary>
         /// 服务接口（基础）
@@ -29,31 +29,22 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         public readonly IWaterMarkService _waterMarkService;
 
         /// <summary>
-        /// 仓储接口（参数维护）
-        /// </summary>
-        private readonly IProcParameterRepository _procParameterRepository;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="opRepository"></param>
         /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
-        /// <param name="procParameterRepository"></param>
-        public OP090Service(ILogger<OP090Service> logger,
-            IOPRepository<OP090> opRepository,
+        public OP200Service(ILogger<OP200Service> logger,
+            IOPRepository<OP200> opRepository,
             IMainService mainService,
-            IWaterMarkService waterMarkService,
-            IProcParameterRepository procParameterRepository)
+            IWaterMarkService waterMarkService)
         {
             _logger = logger;
             _opRepository = opRepository;
             _mainService = mainService;
             _waterMarkService = waterMarkService;
-            _procParameterRepository = procParameterRepository;
         }
-
 
         /// <summary>
         /// 执行统计
@@ -62,7 +53,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <returns></returns>
         public async Task<int> ExecuteAsync(int limitCount)
         {
-            var producreCode = $"{typeof(OP090).Name}";
+            var producreCode = $"{typeof(OP200).Name}";
             var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
@@ -79,12 +70,32 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             }
 
             // 获取转换数据（基础数据）
-            var summaryBo = await _mainService.ConvertDataTableInnerAsync(dataTable, producreCode);
+            var summaryBo = await _mainService.ConvertDataTableOuterAsync(dataTable, producreCode, _parameterCodes);
 
             // 保存数据
             var waterLevel = dataTable.AsEnumerable().Select(s => s["index"].ParseToLong());
             return await _mainService.SaveBaseDataWithCommitAsync(buzKey, waterLevel.Max(m => m), summaryBo);
         }
+
+    }
+
+    /// <summary>
+    /// 服务
+    /// </summary>
+    public partial class OP200Service
+    {
+        /// <summary>
+        /// 参数编码集合
+        /// </summary>
+        private static readonly List<string> _parameterCodes = new()
+        {
+            "PreheatSetTemp",
+            "PreheatFinalTemp",
+            "PreheatTime",
+            "HeatSetTemp",
+            "HeatFinalTemp",
+            "HeatTime"
+        };
 
     }
 }

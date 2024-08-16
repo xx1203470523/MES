@@ -24,7 +24,25 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="producreCode"></param>
         /// <param name="parameterCodes"></param>
         /// <returns></returns>
-        Task<StatorSummaryBo> ConvertDataTableAsync(DataTable dataTable, string producreCode, IEnumerable<string>? parameterCodes = null);
+        Task<StatorSummaryBo> ConvertDataTableWireAsync(DataTable dataTable, string producreCode, IEnumerable<string>? parameterCodes = null);
+
+        /// <summary>
+        /// 保存转换数据（附带参数）
+        /// </summary>
+        /// <param name="dataTable"></param>
+        /// <param name="producreCode"></param>
+        /// <param name="parameterCodes"></param>
+        /// <returns></returns>
+        Task<StatorSummaryBo> ConvertDataTableInnerAsync(DataTable dataTable, string producreCode, IEnumerable<string>? parameterCodes = null);
+
+        /// <summary>
+        /// 保存转换数据（附带参数）
+        /// </summary>
+        /// <param name="dataTable"></param>
+        /// <param name="producreCode"></param>
+        /// <param name="parameterCodes"></param>
+        /// <returns></returns>
+        Task<StatorSummaryBo> ConvertDataTableOuterAsync(DataTable dataTable, string producreCode, IEnumerable<string>? parameterCodes = null);
 
         /// <summary>
         /// 保存转换数据（附带参数）
@@ -103,10 +121,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <summary>
         /// 批量读取条码（定子）
         /// </summary>
-        /// <param name="siteId"></param>
-        /// <param name="ids"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<StatorBarCodeEntity>> GetStatorBarCodeEntitiesAsync(long siteId, IEnumerable<string> ids);
+        Task<IEnumerable<StatorBarCodeEntity>> GetStatorBarCodeEntitiesAsync(StatorBarCodeQuery query);
 
         /// <summary>
         /// 批量获取（定子铜线关系）

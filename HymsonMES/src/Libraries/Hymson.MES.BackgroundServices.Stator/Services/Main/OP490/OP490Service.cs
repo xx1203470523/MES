@@ -103,7 +103,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var manuSFCInfoEntities = await _mainService.GetSFCInfoEntitiesAsync(manuSFCEntities.Select(s => s.Id));
 
             // 批量读取条码（定子）
-            var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, entities.Select(s => s.ID).Distinct());
+            var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(new StatorBarCodeQuery
+            {
+                SiteId = statorBo.SiteId,
+                InnerIds = entities.Select(s => s.ID).Distinct()
+            });
             // TODO: 这个条码短了，无法查询到数据
 
             // 遍历记录

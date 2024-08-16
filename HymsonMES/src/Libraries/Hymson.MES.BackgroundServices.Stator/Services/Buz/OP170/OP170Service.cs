@@ -6,17 +6,17 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public partial class OP090Service : IOP090Service
+    public partial class OP170Service : IOP170Service
     {
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<OP090Service> _logger;
+        private readonly ILogger<OP170Service> _logger;
 
         /// <summary>
         /// 仓储接口（工序）
         /// </summary>
-        private readonly IOPRepository<OP090> _opRepository;
+        private readonly IOPRepository<OP170> _opRepository;
 
         /// <summary>
         /// 服务接口（基础）
@@ -41,8 +41,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
         /// <param name="procParameterRepository"></param>
-        public OP090Service(ILogger<OP090Service> logger,
-            IOPRepository<OP090> opRepository,
+        public OP170Service(ILogger<OP170Service> logger,
+            IOPRepository<OP170> opRepository,
             IMainService mainService,
             IWaterMarkService waterMarkService,
             IProcParameterRepository procParameterRepository)
@@ -62,7 +62,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <returns></returns>
         public async Task<int> ExecuteAsync(int limitCount)
         {
-            var producreCode = $"{typeof(OP090).Name}";
+            var producreCode = $"{typeof(OP170).Name}";
             var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 

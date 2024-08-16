@@ -117,7 +117,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
 
             // 批量读取条码（定子）
             var ids = dataTable.AsEnumerable().Select(s => $"{s[id_key]}").Distinct();
-            var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, ids);
+            var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(new StatorBarCodeQuery
+            {
+                SiteId = statorBo.SiteId,
+                InnerIds = ids
+            });
 
             // 批量读取条码（定子铜线关系）
             var statorWireRelationEntities = await _mainService.GetStatorWireRelationEntitiesAsync(statorBo.SiteId, ids);
