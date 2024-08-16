@@ -45,15 +45,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         Task<StatorSummaryBo> ConvertDataTableOuterAsync(DataTable dataTable, string producreCode, IEnumerable<string>? parameterCodes = null);
 
         /// <summary>
-        /// 保存转换数据（附带参数）
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <param name="barCodes"></param>
-        /// <param name="parameterCodes"></param>
-        /// <returns></returns>
-        Task<StatorSummaryBo> ConvertDataListAsync<T>(IEnumerable<T> entities, IEnumerable<string> barCodes, IEnumerable<string>? parameterCodes = null) where T : BaseOPEntity;
-
-        /// <summary>
         /// 获取参数编码
         /// </summary>
         /// <param name="parameterCodes"></param>
@@ -94,6 +85,13 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="sfcIds"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcInfoEntity>> GetSFCInfoEntitiesAsync(IEnumerable<long> sfcIds);
+
+        /// <summary>
+        /// 批量获取（物料信息）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcMaterialEntity> GetMaterialEntityAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 批量获取（物料信息）

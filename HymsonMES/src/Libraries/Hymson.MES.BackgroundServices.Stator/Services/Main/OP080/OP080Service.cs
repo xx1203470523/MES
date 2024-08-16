@@ -116,6 +116,14 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 InnerIds = entities.Select(s => s.ID).Distinct()
             });
 
+            // 物料信息
+            var materialEntity = await _mainService.GetMaterialEntityAsync(new EntityByCodeQuery
+            {
+                Site = statorBo.SiteId,
+                Code = _materialCode
+            });
+            var materialId = materialEntity?.Id ?? 0;
+
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
             foreach (var opEntity in entities)
@@ -153,7 +161,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         Id = manuSFCId,
                         Qty = StatorConst.QTY,
                         SFC = barCode,
-                        IsUsed = YesOrNoEnum.No,
+                        IsUsed = YesOrNoEnum.Yes,
                         Type = SfcTypeEnum.NoProduce,
                         Status = SfcStatusEnum.Complete,
 
@@ -179,11 +187,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     {
                         Id = manuSFCInfoId,
                         SfcId = manuSFCId,
-                        WorkOrderId = statorBo.WorkOrderId,
-                        ProductId = statorBo.ProductId,
-                        ProductBOMId = statorBo.ProductBOMId,
-                        ProcessRouteId = statorBo.ProcessRouteId,
-                        IsUsed = false,
+                        WorkOrderId = null,
+                        ProductId = materialId,
+                        ProductBOMId = null,
+                        ProcessRouteId = null,
+                        IsUsed = true,
 
                         SiteId = statorBo.SiteId,
                         CreatedBy = statorBo.User,
@@ -241,8 +249,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     summaryBo.UpdateWhMaterialInventoryEntities.Add(inventoryEntity);
                 }
 
+                /*
                 var materialId = inventoryEntity?.MaterialId ?? 0;
                 var materialEntity = materialEntities.FirstOrDefault(f => f.Id == materialId);
+                */
+
                 if (materialEntity != null)
                 {
                     // 添加台账
@@ -343,4 +354,17 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         }
 
     }
+
+    /// <summary>
+    /// 服务
+    /// </summary>
+    public partial class OP080Service
+    {
+        /// <summary>
+        /// 编码（NHN绝缘纸-0.25mm x 130mm）
+        /// </summary>
+        private const string _materialCode = "030107000002";
+
+    }
+
 }

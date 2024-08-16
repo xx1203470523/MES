@@ -30,10 +30,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// </summary>
         public readonly IWaterMarkService _waterMarkService;
 
-        /// <summary>
-        /// 仓储接口（参数维护）
-        /// </summary>
-        private readonly IProcParameterRepository _procParameterRepository;
 
         /// <summary>
         /// 构造函数
@@ -42,18 +38,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="opRepository"></param>
         /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
-        /// <param name="procParameterRepository"></param>
         public OP010Service(ILogger<OP010Service> logger,
             IOPRepository<OP010> opRepository,
             IMainService mainService,
-            IWaterMarkService waterMarkService,
-            IProcParameterRepository procParameterRepository)
+            IWaterMarkService waterMarkService)
         {
             _logger = logger;
             _opRepository = opRepository;
             _mainService = mainService;
             _waterMarkService = waterMarkService;
-            _procParameterRepository = procParameterRepository;
         }
 
 
@@ -110,6 +103,14 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 批量读取条码信息（MES）
             var manuSFCInfoEntities = await _mainService.GetSFCInfoEntitiesAsync(manuSFCEntities.Select(s => s.Id));
 
+            // 物料信息
+            var materialEntity = await _mainService.GetMaterialEntityAsync(new EntityByCodeQuery
+            {
+                Site = statorBo.SiteId,
+                Code = _materialCode
+            });
+            var materialId = materialEntity?.Id ?? 0;
+
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
             foreach (var opEntity in entities)
@@ -137,7 +138,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         Id = manuSFCId,
                         Qty = StatorConst.QTY,
                         SFC = barCode,
-                        IsUsed = YesOrNoEnum.No,
+                        IsUsed = YesOrNoEnum.Yes,
                         Type = SfcTypeEnum.NoProduce,
                         Status = SfcStatusEnum.Complete,
 
@@ -163,11 +164,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     {
                         Id = manuSFCInfoId,
                         SfcId = manuSFCId,
-                        WorkOrderId = statorBo.WorkOrderId,
-                        ProductId = statorBo.ProductId,
-                        ProductBOMId = statorBo.ProductBOMId,
-                        ProcessRouteId = statorBo.ProcessRouteId,
-                        IsUsed = false,
+                        WorkOrderId = null,
+                        ProductId = materialId,
+                        ProductBOMId = null,
+                        ProcessRouteId = null,
+                        IsUsed = true,
 
                         SiteId = statorBo.SiteId,
                         CreatedBy = statorBo.User,
@@ -301,6 +302,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// </summary>
     public partial class OP010Service
     {
+        /// <summary>
+        /// 编码（PEEK线-2X3.07）
+        /// </summary>
+        private const string _materialCode = "030106000003";
+
         /// <summary>
         /// 参数编码集合
         /// </summary>

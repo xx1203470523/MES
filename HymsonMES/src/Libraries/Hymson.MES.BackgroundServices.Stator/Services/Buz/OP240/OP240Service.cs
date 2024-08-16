@@ -28,10 +28,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// </summary>
         public readonly IWaterMarkService _waterMarkService;
 
-        /// <summary>
-        /// 仓储接口（参数维护）
-        /// </summary>
-        private readonly IProcParameterRepository _procParameterRepository;
 
         /// <summary>
         /// 构造函数
@@ -40,18 +36,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="opRepository"></param>
         /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
-        /// <param name="procParameterRepository"></param>
         public OP240Service(ILogger<OP240Service> logger,
             IOPRepository<OP240> opRepository,
             IMainService mainService,
-            IWaterMarkService waterMarkService,
-            IProcParameterRepository procParameterRepository)
+            IWaterMarkService waterMarkService)
         {
             _logger = logger;
             _opRepository = opRepository;
             _mainService = mainService;
             _waterMarkService = waterMarkService;
-            _procParameterRepository = procParameterRepository;
         }
 
 

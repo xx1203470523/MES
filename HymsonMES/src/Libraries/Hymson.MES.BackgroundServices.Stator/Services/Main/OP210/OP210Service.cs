@@ -153,7 +153,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         Id = manuSFCId,
                         Qty = StatorConst.QTY,
                         SFC = barCode,
-                        IsUsed = YesOrNoEnum.No,
+                        IsUsed = YesOrNoEnum.Yes,
                         Type = SfcTypeEnum.NoProduce,
                         Status = SfcStatusEnum.Complete,
 
@@ -183,7 +183,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         ProductId = statorBo.ProductId,
                         ProductBOMId = statorBo.ProductBOMId,
                         ProcessRouteId = statorBo.ProcessRouteId,
-                        IsUsed = false,
+                        IsUsed = true,
 
                         SiteId = statorBo.SiteId,
                         CreatedBy = statorBo.User,
