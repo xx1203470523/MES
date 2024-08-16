@@ -322,6 +322,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public string? PickCode { get; set; }
 
+        /// <summary>
+        /// 线体ID
+        /// </summary>
+        public long? LineId { get; set; }
+
     }
 
     /// <summary>

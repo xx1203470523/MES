@@ -802,4 +802,53 @@ namespace Hymson.MES.Services.Dtos.Warehouse
 
 
     }
+
+    /// <summary>
+    /// 废成品入库申请
+    /// </summary>
+    public record WasteProductReceiptRequest
+    {
+        /// <summary>
+        /// 派工单编码
+        /// </summary>
+        public string WorkCode { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long OrderCodeId { get; set; }
+
+        /// <summary>
+        /// 领料数量
+        /// </summary>
+        public IEnumerable<WasteProductReceiptDetailRequest> Items { get; set; }
+    }
+
+    /// <summary>
+    /// 废成品入库申请明细
+    /// </summary>
+    public record WasteProductReceiptDetailRequest
+    {
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string Unit { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+    }
+
 }

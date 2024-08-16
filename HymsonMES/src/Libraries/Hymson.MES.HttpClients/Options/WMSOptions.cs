@@ -64,6 +64,11 @@
         /// 实际交付情况
         /// </summary>
         public WMSBusinessOptions NioActualDelivery { get; set; }
+
+        /// <summary>
+        /// 废成品入库单配置 
+        /// </summary>
+        public WMSBusinessOptions WasteProductReceipt { get; set; }
     }
 
     /// <summary>
@@ -110,6 +115,11 @@
         /// 不良品仓
         /// </summary>
         public string NgWarehouseCode { get; set; } = "";
+
+        /// <summary>
+        /// 废成品仓
+        /// </summary>
+        public string WasteWarehouseCode { get; set; } = "";
 
     }
 

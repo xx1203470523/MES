@@ -1465,7 +1465,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuRotorPackListEntity, ManuRotorPackListDto>();
 
             CreateMap<ManuProductReceiptOrderEntity, ManuProductReceiptOrderSaveDto>();
-            
+            CreateMap<ManuWasteProductsReceiptRecordEntity, ManuWasteProductsReceiptRecordSaveDto>();
+
             #region ManuReturnOrder
             CreateMap<ManuReturnOrderPagedQueryDto, ManuReturnOrderPagedQuery>();
             CreateMap<ManuReturnOrderEntity, ManuReturnOrderDto>();

@@ -513,5 +513,56 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
             manuJointProductAndByproducts.SFC = string.Join(",", sfcs);
             return manuJointProductAndByproducts;
         }
+
+
+        /// <summary>
+        /// 根据工单Id查询Bom副产品列表
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        public async Task<ManuJointProductAndByproductsReceiveRecordResult> GetWorkIdByProductsListAsync(long workOrderId)
+        {
+            ManuJointProductAndByproductsReceiveRecordResult manuJointProductAndByproductsReceiveRecordResult = new ManuJointProductAndByproductsReceiveRecordResult();
+            var planWorkOrder = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
+            if (planWorkOrder == null) return manuJointProductAndByproductsReceiveRecordResult;
+
+            //产品中的主物料信息
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrder.ProductId);
+
+            //查询Bom中得物料信息
+            var procBomDetails = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrder.ProductBOMId);
+            if (procBomDetails == null || !procBomDetails.Any())
+            {
+                manuJointProductAndByproductsReceiveRecordResult.ProductCodeVersion = procMaterialEntity.MaterialCode + "/" + procMaterialEntity.Version;
+                manuJointProductAndByproductsReceiveRecordResult.ProductName = procMaterialEntity.MaterialName;
+                return manuJointProductAndByproductsReceiveRecordResult;
+            }
+
+            //查询组件物料信息
+            var procMaterialIds = procBomDetails.Select(s => s.MaterialId).ToArray();
+            var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
+
+
+            //查询副产品信息
+            var ByProductList = procBomDetails.Where(x => x.BomProductType == ManuProductTypeEnum.ByProduct).ToList();
+            List<ByproductsResult> byProductList = new List<ByproductsResult>();
+            foreach (var byProduct in ByProductList)
+            {
+                var procMaterial = procMaterials.Where(x => x.Id == byProduct.MaterialId).FirstOrDefault();
+
+                byProductList.Add(new ByproductsResult()
+                {
+                    ProductId = procMaterial != null ? procMaterial.Id : 0,
+                    MaterialCode = procMaterial != null ? procMaterial.MaterialCode : "",
+                    MaterialName = procMaterial != null ? procMaterial.MaterialName : "",
+                    Unit = procMaterial != null ? procMaterial.Unit ?? "" : "",
+                    Type = byProduct.BomProductType
+                });
+            }
+
+            //返回前台信息
+            manuJointProductAndByproductsReceiveRecordResult.ByproductsList = byProductList;
+            return manuJointProductAndByproductsReceiveRecordResult;
+        }
     }
 }

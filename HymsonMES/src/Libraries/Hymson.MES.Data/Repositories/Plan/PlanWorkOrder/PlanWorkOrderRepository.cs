@@ -358,6 +358,11 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("wo.Type = @Type ");
             }
 
+            if (pageQuery.LineId.HasValue)
+            {
+                sqlBuilder.Where("wc.id = @LineId ");
+            }
+
             if (pageQuery.Status.HasValue)
             {
                 sqlBuilder.Where("wo.Status = @Status");

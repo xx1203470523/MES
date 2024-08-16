@@ -294,5 +294,16 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.GetPickMaterialsByOrderidAsync(id);
         }
+
+        /// <summary>
+        /// 副产品入库申请
+        /// </summary>
+        /// <param name="request"></param>
+        [HttpPost("WasteProductReceipt")]
+        [LogDescription("副产品入库申请", BusinessType.INSERT)]
+        public async Task WasteProductReceiptRequestAsync([FromBody] WasteProductReceiptRequest request)
+        {
+            await _whMaterialInventoryService.WasteProductReceiptRequestAsync(request);
+        }
     }
 }

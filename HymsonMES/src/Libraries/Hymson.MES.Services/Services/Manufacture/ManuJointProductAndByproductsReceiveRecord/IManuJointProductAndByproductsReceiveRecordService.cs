@@ -63,5 +63,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
         /// <param name="saveDto"></param>
         /// <returns></returns>
         Task<ManuJointProductAndByproductsReceiveRecordSaveResultDto> SaveJointProductAndByproductsInfoAsync(ManuJointProductAndByproductsReceiveRecordSaveDto saveDto);
+
+        /// <summary>
+        /// 查询副产品信息
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        Task<ManuJointProductAndByproductsReceiveRecordResult> GetWorkIdByProductsListAsync(long workOrderId);
     }
 }

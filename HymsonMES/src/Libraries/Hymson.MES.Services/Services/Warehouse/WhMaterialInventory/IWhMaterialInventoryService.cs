@@ -177,5 +177,12 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="orderId"></param>
         /// <returns></returns>
         Task<IEnumerable<WhMaterialInventoryDetailDto>> GetPickMaterialsByOrderidAsync(long orderId);
+
+        /// <summary>
+        /// 废产品入库
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task WasteProductReceiptRequestAsync(WasteProductReceiptRequest request);
     }
 }

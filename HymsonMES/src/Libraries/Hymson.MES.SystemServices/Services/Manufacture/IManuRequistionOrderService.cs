@@ -37,5 +37,12 @@ namespace Hymson.MES.SystemServices.Services
         /// <param name="productionPickDto"></param>
         /// <returns></returns>
         Task<ResponseOutputDto> ProductReceiptCallBackAsync(ProductionReturnCallBackDto productionPickDto);
+
+        /// <summary>
+        /// 副产品入库申请
+        /// </summary>
+        /// <param name="productionPickDto"></param>
+        /// <returns></returns>
+        Task<ResponseOutputDto> WasteProductReceiptCallBackAsync(ProductionReturnCallBackDto productionPickDto);
     }
 }
