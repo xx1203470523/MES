@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.MES.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -271,6 +272,101 @@ namespace Hymson.MES.HttpClients.Requests
         /// </summary>
         [JsonPropertyName("boxCode")]
         public string? BoxCode { get; set; }
+
+        /// <summary>
+        /// 是否为联副产品
+        /// </summary>
+        [JsonPropertyName("bRelated")]
+        public TrueOrFalseEnum? BRelated { get; set; }
+
+    }
+    /// <summary>
+    /// 废成品入库申请单
+    /// </summary>
+    public record WasteProductReceiptRequest
+    {
+        /// <summary>
+        /// 仓库编号
+        /// </summary>
+        [JsonPropertyName("warehouseCode")]
+        public string WarehouseCode { get; set; }
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        /// 
+        [JsonPropertyName("syncCode")]
+        public string SyncCode { get; set; }
+        [JsonPropertyName("type")]
+        public int Type { get; set; } = 101;
+        /// <summary>
+        /// 下发日期
+        /// </summary>
+        /// 
+        [JsonPropertyName("sendOn")]
+        public string SendOn { get; set; }
+        /// <summary>
+        /// 退料信息
+        /// </summary>
+        /// 
+        [JsonPropertyName("details")]
+        public List<WasteProductReceiptItemDto> Details { get; set; }
+    }
+    /// <summary>
+    /// 废成品入库
+    /// </summary>
+    public record WasteProductReceiptRequestDto
+    {
+
+        public string SyncCode { get; set; }
+
+
+        public string SendOn { get; set; }
+
+        public string WarehouseCode { get; set; }
+
+        public List<WasteProductReceiptItemDto> Details { get; set; }
+    }
+    /// <summary>
+    /// 废成品入库明细item
+    /// </summary>
+    public record WasteProductReceiptItemDto
+    {
+        /// <summary>
+        /// 生产订单号
+        /// </summary>
+        public string? ProductionOrderNumber { get; set; }
+
+        /// <summary>
+        /// 生产订单子表ID
+        /// </summary>
+        public long? ProductionOrderDetailID { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        /// 
+        [JsonPropertyName("materialCode")]
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 单位编号
+        /// </summary>
+        /// 
+        [JsonPropertyName("unitCode")]
+        public string UnitCode { get; set; }
+
+        /// <summary>
+        /// 物料数量
+        /// </summary>
+        /// 
+        [JsonPropertyName("quantity")]
+        public string Quantity { get; set; }
+
+        /// <summary>
+        /// 是否为联副产品
+        /// </summary>
+        [JsonPropertyName("bRelated")]
+        public TrueOrFalseEnum? BRelated {  get; set; }
 
     }
 

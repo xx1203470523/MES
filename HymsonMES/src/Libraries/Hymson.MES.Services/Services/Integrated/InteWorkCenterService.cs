@@ -201,6 +201,26 @@ namespace Hymson.MES.Services.Services.Integrated
             });
         }
 
+        /// <summary>
+        /// 获取当前站点下面的所有产线
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> GetProductionLineListAsync()
+        {
+            var workShops = await _inteWorkCenterRepository.GetWorkCenterListByTypeAsync(new EntityByTypeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = WorkCenterTypeEnum.Line,
+                Status = SysDataStatusEnum.Enable
+            });
+
+            return workShops.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = $"【{s.Code}】 {s.Name}",
+                Value = $"{s.Id}"
+            });
+        }
 
         /// <summary>
         /// 新增

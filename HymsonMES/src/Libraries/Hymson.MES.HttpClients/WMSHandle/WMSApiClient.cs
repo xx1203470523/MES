@@ -299,5 +299,31 @@ namespace Hymson.MES.HttpClients
             return await httpResponse.Content.ReadFromJsonAsync<NioWmsActualDeliveryResponse>();
         }
 
+        /// <summary>
+        /// 副成品入库
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<BaseResponse> WasteProductReceiptRequestAsync(WasteProductReceiptRequestDto request)
+        {
+            _logger.LogDebug($"副成品入库 -> Request: {request.ToSerialize()}");
+
+            WasteProductReceiptRequest wasteProductReceiptRequest = new()
+            {
+                SendOn = request.SendOn,
+                SyncCode = request.SyncCode,
+                Details = request.Details,
+                Type = _options.Value.WasteProductReceipt.Type,
+                WarehouseCode = _options.Value.WasteProductReceipt.WasteWarehouseCode
+            };
+
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.WasteProductReceipt.Route, wasteProductReceiptRequest);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"副成品入库 -> Response: {jsonResponse}");
+
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse>();
+        }
     }
 }

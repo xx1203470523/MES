@@ -97,5 +97,19 @@ namespace Hymson.MES.System.Api.Controllers
         {
             return await _manuRequistionOrderService.ProductReceiptCallBackAsync(callBackDto);
         }
+
+        /// <summary>
+        /// 副成品入库单结果反馈
+        /// </summary>
+        /// <param name="callBackDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("WasteProductReceiptCallBack")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("副成品入库单结果反馈", BusinessType.INSERT)]
+        public async Task<ResponseOutputDto> WasteProductReceiptCallBackAsync([FromBody] ProductionReturnCallBackDto callBackDto)
+        {
+            return await _manuRequistionOrderService.WasteProductReceiptCallBackAsync(callBackDto);
+        }
     }
 }

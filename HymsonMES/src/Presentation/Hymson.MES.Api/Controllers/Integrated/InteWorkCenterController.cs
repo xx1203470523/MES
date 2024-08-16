@@ -137,6 +137,16 @@ namespace Hymson.MES.Api.Controllers.Integrated
             await _inteWorkCenterService.DeleteRangInteWorkCenterAsync(ids);
         }
 
+        /// <summary>
+        /// 获取当前站点下面的所有车间
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("lines")]
+        public async Task<IEnumerable<SelectOptionDto>> GetProductionLineListAsync()
+        {
+            return await _inteWorkCenterService.GetProductionLineListAsync();
+        }
+
         #region 状态变更
         /// <summary>
         /// 启用（工作中心）

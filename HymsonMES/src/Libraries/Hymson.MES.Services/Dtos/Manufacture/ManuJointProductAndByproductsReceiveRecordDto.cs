@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -195,6 +196,26 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 待收货数量
         /// </summary>
         public decimal QuantityToBeReceived { get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string Unit {  get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode {  get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 产品类型
+        /// </summary>
+        public ManuProductTypeEnum Type { get; set; }
     }
 
     public class ManuJointProductAndByproductsReceiveRecordSaveResultDto
