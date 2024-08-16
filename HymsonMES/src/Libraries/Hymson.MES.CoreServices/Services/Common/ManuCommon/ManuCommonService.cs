@@ -431,7 +431,7 @@ namespace Hymson.MES.CoreServices.Services.Common
             var resourceIds = await commonBo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, commonBo.ProcedureId);
             if (resourceIds == null || !resourceIds.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16355)).WithData("ProcedureCode", procedureEntity.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16355)).WithData("ProcedureCode", $"{procedureEntity.Code}({procedureEntity.Name})");
             }
 
             // 校验工序和资源是否对应
@@ -505,7 +505,7 @@ namespace Hymson.MES.CoreServices.Services.Common
                         var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduce.SFC);
                         validationFailure.FormattedMessagePlaceholderValues.Add("SFC", sfcProduce.SFC);
-                        validationFailure.FormattedMessagePlaceholderValues.Add("Procedure", sfcProcedureEntity.Code);
+                        validationFailure.FormattedMessagePlaceholderValues.Add("Procedure", $"{sfcProcedureEntity.Code}({sfcProcedureEntity.Name})");
                         validationFailure.FormattedMessagePlaceholderValues.Add("Cycle", sfcProduce.RepeatedCount);
                         validationFailure.ErrorCode = nameof(ErrorCode.MES16368);
                         validationFailures.Add(validationFailure);
@@ -527,13 +527,13 @@ namespace Hymson.MES.CoreServices.Services.Common
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES18228))
                             .WithData("SFC", sfcProduce.SFC)
-                            .WithData("Procedure", sfcProcedureEntity.Code);
+                            .WithData("Procedure", $"{sfcProcedureEntity.Code}({sfcProcedureEntity.Name})");
                     }
                     if (endNode == null)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES18229))
                             .WithData("SFC", sfcProduce.SFC)
-                            .WithData("Current", procedureEntity.Code);
+                            .WithData("Current", $"{procedureEntity.Code}({procedureEntity.Name})");
                     }
 
                     var nodesOfOrdered = processRouteDetailNodes.OrderBy(o => o.SerialNo)
@@ -548,8 +548,8 @@ namespace Hymson.MES.CoreServices.Services.Common
                         var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduce.SFC);
                         validationFailure.FormattedMessagePlaceholderValues.Add("SFC", sfcProduce.SFC);
-                        validationFailure.FormattedMessagePlaceholderValues.Add("Current", procedureEntity.Code);
-                        validationFailure.FormattedMessagePlaceholderValues.Add("Procedure", sfcProcedureEntity.Code);
+                        validationFailure.FormattedMessagePlaceholderValues.Add("Current", $"{procedureEntity.Code}({procedureEntity.Name})");
+                        validationFailure.FormattedMessagePlaceholderValues.Add("Procedure", $"{sfcProcedureEntity.Code}({sfcProcedureEntity.Name})");
                         validationFailure.ErrorCode = nameof(ErrorCode.MES16354);
                         validationFailures.Add(validationFailure);
 
@@ -563,8 +563,8 @@ namespace Hymson.MES.CoreServices.Services.Common
                         var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduce.SFC);
                         validationFailure.FormattedMessagePlaceholderValues.Add("SFC", sfcProduce.SFC);
-                        validationFailure.FormattedMessagePlaceholderValues.Add("Current", procedureEntity.Code);
-                        validationFailure.FormattedMessagePlaceholderValues.Add("Procedure", sfcProcedureEntity.Code);
+                        validationFailure.FormattedMessagePlaceholderValues.Add("Current", $"{procedureEntity.Code}({procedureEntity.Name})");
+                        validationFailure.FormattedMessagePlaceholderValues.Add("Procedure", $"{sfcProcedureEntity.Code}({sfcProcedureEntity.Name})");
                         validationFailure.ErrorCode = nameof(ErrorCode.MES16357);
                         validationFailures.Add(validationFailure);
                         continue;

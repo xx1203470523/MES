@@ -566,7 +566,7 @@ namespace Hymson.MES.Services.Services.Process
                     var procedure = await _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
                     var equipmentGroup = await _procProcessEquipmentGroupRepository.GetByIdAsync(entity.EquipmentGroupId);
 
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15702)).WithData("materialCode", material?.MaterialCode ?? "").WithData("procedureCode", procedure?.Code ?? "").WithData("equipmentGroupCode", equipmentGroup?.Code ?? "");
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15702)).WithData("materialCode", material?.MaterialCode ?? "").WithData("procedureCode", $"{procedure?.Code}({procedure?.Name})").WithData("equipmentGroupCode", equipmentGroup?.Code ?? "");
                 }
             }
 

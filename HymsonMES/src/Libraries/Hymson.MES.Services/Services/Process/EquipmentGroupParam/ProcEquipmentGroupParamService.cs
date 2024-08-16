@@ -451,7 +451,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10536))
                     .WithData("Type", entity.Type.GetDescription())
                     .WithData("ProductCode", materialEntity.MaterialCode)
-                    .WithData("ProcedureCode", procedureEntity.Code)
+                    .WithData("ProcedureCode", $"{procedureEntity.Code}({procedureEntity.Name})")
                     .WithData("EquipmentGroupCode", equipmentGroupEntity.Code);
             }
 
@@ -466,7 +466,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10537))
                     .WithData("Type", entity.Type.GetDescription())
                     .WithData("ProductCode", materialEntity.MaterialCode)
-                    .WithData("ProcedureCode", procedureEntity.Code)
+                    .WithData("ProcedureCode", $"{procedureEntity.Code}({procedureEntity.Name})")
                     .WithData("EquipmentGroupCode", equipmentGroupEntity.Code);
             }
         }

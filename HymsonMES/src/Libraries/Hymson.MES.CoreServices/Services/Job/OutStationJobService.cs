@@ -1061,7 +1061,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
 
                 // 更新下一工序
-                if (!procedureRejudgeBo.IsHasUnQualifiedProcessRoute) throw new CustomerValidationException(nameof(ErrorCode.MES17115)).WithData("Procedure", procedureRejudgeBo.ProcedureCode);
+                if (!procedureRejudgeBo.IsHasUnQualifiedProcessRoute) throw new CustomerValidationException(nameof(ErrorCode.MES17115)).WithData("Procedure", $"{procedureRejudgeBo.ProcedureCode}");
                 sfcProduceEntity.ProcedureId = procedureRejudgeBo.NextProcedureId;
 
                 // 一旦切换工序，复投次数重置

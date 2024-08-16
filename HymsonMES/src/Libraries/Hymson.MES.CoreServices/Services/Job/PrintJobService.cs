@@ -133,7 +133,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (procProcedurePrintReleationEnties == null || !procProcedurePrintReleationEnties.Where(x => x.TemplateId != 0).Any())
             {
                 var materialEntity = await _procMaterialRepository.GetByIdAsync(sfcProduceEntities.First().ProductId);
-                throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", procedureEntity?.Code ?? "").WithData("MaterialCode", materialEntity?.MaterialCode ?? "");
+                throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", $"{procedureEntity.Code}({procedureEntity.Name})").WithData("MaterialCode", materialEntity?.MaterialCode ?? "");
             }
 
             #endregion

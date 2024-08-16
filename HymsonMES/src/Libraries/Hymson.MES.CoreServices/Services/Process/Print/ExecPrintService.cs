@@ -219,9 +219,10 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                 var procProcedurePrintReleationByMaterialIdEnties = procProcedurePrintReleationEnties.Where(x => x.MaterialId == groupItem.Key);
                 if (procProcedurePrintReleationByMaterialIdEnties == null || !procProcedurePrintReleationByMaterialIdEnties.Any())
                 {
-                    var procrdureCode = (await _procProcedureRepository.GetByIdAsync(@event.ProcedureId))?.Code ?? "";
+                    var procedureEntity = await _procProcedureRepository.GetByIdAsync(@event.ProcedureId);
+                    var procedureCode = $"{procedureEntity?.Code ?? ""}({procedureEntity?.Name ?? ""})";
                     var materialCode = (await _procMaterialRepository.GetByIdAsync(groupItem.Key))?.MaterialCode ?? "";
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", procrdureCode).WithData("MaterialCode", materialCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", procedureCode).WithData("MaterialCode", materialCode);
                 }
                 foreach (var procProcedurePrintReleation in procProcedurePrintReleationByMaterialIdEnties)
                 {

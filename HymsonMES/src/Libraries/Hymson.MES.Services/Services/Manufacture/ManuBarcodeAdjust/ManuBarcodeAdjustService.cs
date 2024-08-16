@@ -820,7 +820,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (manuSfcProduceEntity != null && manuSfcProduceEntity.IsRepair == TrueOrFalseEnum.Yes)
             {
                 var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(manuSfcProduceEntity.ProcedureId);
-                throw new CustomerValidationException(nameof(ErrorCode.MES12834)).WithData("sfc", param.SFC).WithData("ProcedureCode", procProcedureEntity.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES12834)).WithData("sfc", param.SFC).WithData("ProcedureCode", $"{procProcedureEntity?.Code}({procProcedureEntity?.Name})");
             }
 
             if (manuProductBadRecordEntities != null && manuProductBadRecordEntities.Any())
@@ -1333,7 +1333,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (sfcProduces != null && repairsSfcProduces != null && repairsSfcProduces.Any())
                 {
                     var procProcedureEntitys = await _procProcedureRepository.GetByIdsAsync(repairsSfcProduces.Select(x => x.ProcedureId));
-                    throw new CustomerValidationException(nameof(ErrorCode.MES12834)).WithData("sfc", string.Join(",", repairsSfcProduces.Select(x => x.SFC))).WithData("ProcedureCode", string.Join(",", procProcedureEntitys.Select(x => x.Code)));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12834)).WithData("sfc", string.Join(",", repairsSfcProduces.Select(x => x.SFC))).WithData("ProcedureCode", string.Join(",", procProcedureEntitys.Select(x => $"{x.Code}({x.Name})")));
                 }
 
                 //查询是否ng

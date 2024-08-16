@@ -285,7 +285,7 @@ namespace Hymson.MES.CoreServices.Services.Common
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16362))
                         .WithData("SFC", sfcProduceEntity.SFC)
-                        .WithData("Procedure", procedureEntity.Code);
+                        .WithData("Procedure", $"{procedureEntity.Code}({procedureEntity.Name})");
                 }
             }
 

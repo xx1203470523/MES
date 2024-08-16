@@ -400,7 +400,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10526))
                     .WithData("ProductCode", materialEntity.MaterialCode)
-                    .WithData("ProcedureCode", procedureEntity.Code)
+                    .WithData("ProcedureCode", $"{procedureEntity.Code}({procedureEntity.Name})")
                     .WithData("Version", entity.Version);
             }
 
@@ -412,7 +412,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10523))
                     .WithData("ProductCode", materialEntity.MaterialCode)
-                    .WithData("ProcedureCode", procedureEntity.Code);
+                    .WithData("ProcedureCode", $"{procedureEntity.Code}({procedureEntity.Name})");
             }
         }
 

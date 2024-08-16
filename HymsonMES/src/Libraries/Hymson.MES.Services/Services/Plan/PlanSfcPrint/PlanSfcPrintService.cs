@@ -198,7 +198,7 @@ namespace Hymson.MES.Services.Services.Plan
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16352));
 
             // 对工序资源类型和资源的资源类型校验
-            if (resourceEntity != null && procedureEntity != null && procedureEntity.ResourceTypeId.HasValue && resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
+            if (procedureEntity.ResourceTypeId.HasValue && resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16507));
             }
@@ -225,7 +225,7 @@ namespace Hymson.MES.Services.Services.Plan
             if (procProcedurePrintReleationEnties == null || !procProcedurePrintReleationEnties.Where(x => x.TemplateId != 0).Any())
             {
                 var materialEntity = await _procMaterialRepository.GetByIdAsync(sfcInfoEntity.ProductId);
-                throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", procedureEntity?.Code ?? "").WithData("MaterialCode", materialEntity?.MaterialCode ?? "");
+                throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", $"{procedureEntity.Code}({procedureEntity.Name})").WithData("MaterialCode", materialEntity?.MaterialCode ?? "");
             }
 
             _eventBus.Publish(new PrintIntegrationEvent
@@ -263,7 +263,7 @@ namespace Hymson.MES.Services.Services.Plan
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16352));
 
             // 对工序资源类型和资源的资源类型校验
-            if (resourceEntity != null && procedureEntity != null && procedureEntity.ResourceTypeId.HasValue && resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
+            if (procedureEntity.ResourceTypeId.HasValue && resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16507));
             }
@@ -290,7 +290,7 @@ namespace Hymson.MES.Services.Services.Plan
             if (procProcedurePrintReleationEnties == null || !procProcedurePrintReleationEnties.Where(x => x.TemplateId != 0).Any())
             {
                 var materialEntity = await _procMaterialRepository.GetByIdAsync(sfcInfoEntity.ProductId);
-                throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", procedureEntity?.Code ?? "").WithData("MaterialCode", materialEntity?.MaterialCode ?? "");
+                throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", $"{procedureEntity.Code}({procedureEntity.Name})").WithData("MaterialCode", materialEntity?.MaterialCode ?? "");
             }
 
             _eventBus.Publish(new PrintIntegrationEvent
@@ -516,7 +516,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 var procedureEntity = await _procProcedureRepository.GetByIdAsync(parm.ProcedureId);
                 var materialEntity = await _procMaterialRepository.GetByIdAsync(work.ProductId);
-                throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", procedureEntity?.Code ?? "").WithData("MaterialCode", materialEntity?.MaterialCode ?? "");
+                throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", $"{procedureEntity?.Code}({procedureEntity?.Name})").WithData("MaterialCode", materialEntity?.MaterialCode ?? "");
             }
 
             _eventBus.Publish(new PrintIntegrationEvent
