@@ -63,7 +63,7 @@
 		<PackageReference Include="Hymson.SqlActuator" Version="2.1.182" />
 
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
-
+		<PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.21" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
