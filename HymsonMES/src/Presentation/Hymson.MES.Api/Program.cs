@@ -1,14 +1,17 @@
 using AutoMapper;
+using Dapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.CoreServices.DependencyInjection;
+using Hymson.Kafka.Debezium;
+using Hymson.Kafka.Debezium.DbInstances;
+using Hymson.MES.Data;
+using Hymson.Utils;
 using Hymson.Web.Framework.Filters;
 using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
@@ -27,7 +30,6 @@ namespace Hymson.MES.Api
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            MemoryCacheExtensions.EnableCache = false;
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -60,6 +62,23 @@ namespace Hymson.MES.Api
             builder.AddNLogWeb(builder.Configuration);
             AddAutoMapper();
             var app = builder.Build();
+#if DM
+            HashSet<string?> keys = CommonHelper.GetConstHashSet(typeof(CachedTables));
+            SqlTransformHelper.SetSqlTransform((sql) =>
+            {
+                var tempSql=sql.ToLower();
+                if (!tempSql.StartsWith("select"))
+                {
+                    var  keyValues = keys.Where(x => tempSql.Contains(x ?? ""));
+                    if (keyValues!=null&& keyValues.Any())
+                    {
+                        var tableName= keyValues.First();
+                        Singleton<KafkaProducer<MESDbInstance>>.Instance.Publish($"mos.MESBATTERY.{tableName}", new BinlogData {  Source=new Source {  DB= "MESBATTERY", Table= tableName, Name=""} });
+                    }
+                }
+                return sql.Replace("`", "\"").Replace("@", ":");
+            });
+#endif
             app.UseHealthChecks("/healthy");
             //https://learn.microsoft.com/zh-cn/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-6.0&tabs=linux-ubuntu
             app.UseForwardedHeaders(new ForwardedHeadersOptions

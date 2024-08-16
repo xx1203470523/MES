@@ -14,10 +14,32 @@ using NLog;
 using Quartz;
 using System.Reflection;
 using AutoMapper;
+using Dapper;
+using Hymson.MES.Data;
+using Hymson.Utils;
+using Hymson.Kafka.Debezium;
+using Hymson.Kafka.Debezium.DbInstances;
 
 try
 {
     CreateHostBuilder(args).Build().Run();
+#if DM
+    HashSet<string?> keys = CommonHelper.GetConstHashSet(typeof(CachedTables));
+    SqlTransformHelper.SetSqlTransform((sql) =>
+    {
+        var tempSql = sql.ToLower();
+        if (!tempSql.StartsWith("select"))
+        {
+            var keyValues = keys.Where(x => tempSql.Contains(x ?? ""));
+            if (keyValues != null && keyValues.Any())
+            {
+                var tableName = keyValues.First();
+                Singleton<KafkaProducer<MESDbInstance>>.Instance.Publish($"mos.MESBATTERY.{tableName}", new BinlogData { Source = new Source { DB = "MESBATTERY", Table = tableName, Name = "" } });
+            }
+        }
+        return sql.Replace("`", "\"").Replace("@", ":");
+    });
+#endif
     return 0;
 }
 catch (Exception ex)
