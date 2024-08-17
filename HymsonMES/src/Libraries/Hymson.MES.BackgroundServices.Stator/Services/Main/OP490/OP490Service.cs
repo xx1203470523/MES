@@ -108,7 +108,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 SiteId = statorBo.SiteId,
                 InnerIds = entities.Select(s => s.ID).Distinct()
             });
-            // TODO: 这个条码短了，无法查询到数据
 
             // 物料信息
             var materialEntity = await _mainService.GetMaterialEntityAsync(new EntityByCodeQuery
@@ -181,10 +180,10 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     {
                         Id = manuSFCInfoId,
                         SfcId = manuSFCId,
-                        WorkOrderId = null,
-                        ProductId = materialId,
-                        ProductBOMId = null,
-                        ProcessRouteId = null,
+                        WorkOrderId = statorBo.WorkOrderId,
+                        ProductId = statorBo.ProductId,
+                        ProductBOMId = statorBo.ProductBOMId,
+                        ProcessRouteId = statorBo.ProcessRouteId,
                         IsUsed = true,
 
                         SiteId = statorBo.SiteId,
@@ -231,6 +230,30 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     UpdatedOn = time
                 };
                 summaryBo.ManuSfcStepEntities.Add(stepEntity);
+
+                // 插入流转记录
+                summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                {
+                    WorkOrderId = statorBo.WorkOrderId,
+                    ProductId = 51558094067523584, //TODO statorBo.ProductId,
+                    ProcedureId = statorBo.ProcedureId,
+                    ResourceId = null,
+                    SFC = statorSFCEntity.InnerBarCode,
+
+                    CirculationBarCode = barCode,
+                    CirculationWorkOrderId = statorBo.WorkOrderId,
+                    CirculationProductId = statorBo.ProductId,
+                    CirculationMainProductId = statorBo.ProductId,
+                    CirculationQty = StatorConst.QTY,
+                    CirculationType = SfcCirculationTypeEnum.Consume,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = statorBo.SiteId,
+                    CreatedBy = statorBo.User,
+                    CreatedOn = statorBo.Time,
+                    UpdatedBy = "OP490",//StatorConst.USER,
+                    UpdatedOn = time
+                });
 
                 // 如果是不合格
                 var isOk = opEntity.Result == "OK";

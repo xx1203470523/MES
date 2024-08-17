@@ -253,19 +253,21 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     });
                 }
 
+                // 铜线这里有点问题
+                /*
                 // 插入流转记录
                 summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
                 {
                     WorkOrderId = statorBo.WorkOrderId,
-                    ProductId = statorBo.ProductId,
+                    ProductId = 51558094476468224,//TODO materialId,
                     ProcedureId = statorBo.ProcedureId,
                     ResourceId = null,
-                    SFC = statorSFCEntity.InnerBarCode,
+                    SFC = barCode,
 
-                    CirculationBarCode = barCode,
+                    CirculationBarCode = statorSFCEntity.InnerBarCode,
                     CirculationWorkOrderId = statorBo.WorkOrderId,
-                    CirculationProductId = materialId,
-                    CirculationMainProductId = materialId,
+                    CirculationProductId = 51558094067523584,//TODO statorBo.ProductId,
+                    CirculationMainProductId = 51558094067523584,//TODOstatorBo.ProductId,
                     CirculationQty = StatorConst.QTY,
                     CirculationType = SfcCirculationTypeEnum.Consume,
 
@@ -273,9 +275,10 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
+                    UpdatedBy = "OP120",//StatorConst.USER,
                     UpdatedOn = time
                 });
+                */
 
                 // 如果是不合格
                 var isOk = $"{dr["Result"]}" == "OK";

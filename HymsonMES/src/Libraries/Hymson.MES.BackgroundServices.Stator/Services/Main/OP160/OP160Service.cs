@@ -284,15 +284,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
                 {
                     WorkOrderId = statorBo.WorkOrderId,
-                    ProductId = statorBo.ProductId,
+                    ProductId = 51558094604398592,//TODO materialId,
                     ProcedureId = statorBo.ProcedureId,
                     ResourceId = null,
-                    SFC = statorSFCEntity.InnerBarCode,
+                    SFC = barCode,
 
-                    CirculationBarCode = barCode,
+                    CirculationBarCode = statorSFCEntity.InnerBarCode,
                     CirculationWorkOrderId = statorBo.WorkOrderId,
-                    CirculationProductId = materialId,
-                    CirculationMainProductId = materialId,
+                    CirculationProductId = 51558094067523584,//TODO statorBo.ProductId,
+                    CirculationMainProductId = 51558094067523584,//TODOstatorBo.ProductId,
                     CirculationQty = StatorConst.QTY,
                     CirculationType = SfcCirculationTypeEnum.Consume,
 
@@ -300,7 +300,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
+                    UpdatedBy = "OP160",//StatorConst.USER,
                     UpdatedOn = time
                 });
 
