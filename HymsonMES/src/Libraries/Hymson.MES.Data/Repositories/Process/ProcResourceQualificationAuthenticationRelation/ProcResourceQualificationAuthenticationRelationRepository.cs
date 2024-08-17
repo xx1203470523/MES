@@ -97,6 +97,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByResourceIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByResourceIdsSql, new { ResourceIds = ids });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -133,6 +144,10 @@ namespace Hymson.MES.Data.Repositories.Process
             if (query.ResourceId.HasValue)
             {
                 sqlBuilder.Where("ResourceId=@ResourceId");
+            }
+            if (query.QualificationAuthenticationIds!= null&&query.QualificationAuthenticationIds.Any())
+            {
+                sqlBuilder.Where("QualificationAuthenticationId in @QualificationAuthenticationIds");
             }
 
             using var conn = GetMESDbConnection();
@@ -192,6 +207,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT * FROM proc_resource_qualification_authentication_relation WHERE Id IN @Ids ";
 
         const string DeleteByResourceIdSql = "delete from `proc_resource_qualification_authentication_relation` WHERE ResourceId = @ResourceId ";
-
+        const string DeleteByResourceIdsSql = "delete from `proc_resource_qualification_authentication_relation` WHERE ResourceId in @ResourceIds ";
     }
 }

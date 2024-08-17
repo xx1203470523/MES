@@ -133,6 +133,8 @@
         public const string MES10388 = "资源不存在！";
         public const string MES10389 = $"关联资质中，重复配置资质认证!";
         public const string MES10357 = $"关联子步骤中，重复配置子步骤!";
+        public const string MES10358 = $"资质已被资源引用,不能删除!";
+        public const string MES10359= $"资质已被工序引用,不能删除!";
         #endregion
 
         #region 标签模板 10340

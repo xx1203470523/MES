@@ -60,6 +60,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> DeleteByResourceIdAsync(long id);
 
         /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByResourceIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
