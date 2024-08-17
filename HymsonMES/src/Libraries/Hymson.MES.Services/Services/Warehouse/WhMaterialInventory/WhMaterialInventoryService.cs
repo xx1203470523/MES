@@ -102,6 +102,8 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IPlanWorkPlanProductRepository _planWorkPlanProductRepository;
         private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
         private readonly IManuProductReceiptOrderRepository _manuProductReceiptOrderRepository;
+        private readonly IManuWasteProductsReceiptRecordDetailRepository _manuWasteProductsReceiptRecordDetailRepository;
+        private readonly IManuWasteProductsReceiptRecordRepository _manuWasteProductsReceiptRecordRepository;
         /// <summary>
         /// 当前系统
         /// </summary>
@@ -151,6 +153,8 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="manuProductReceiptOrderDetailRepository"></param>
         /// <param name="wmsOptions"></param>
         /// <param name="sequenceService"></param>
+        /// <param name="manuWasteProductsReceiptRecordDetailRepository"></param>
+        /// <param name="manuWasteProductsReceiptRecordRepository"></param>
         public WhMaterialInventoryService(ICurrentUser currentUser, ICurrentSite currentSite,
             ILocalizationService localizationService,
             IProcMaterialRepository procMaterialRepository,
@@ -184,7 +188,9 @@ namespace Hymson.MES.Services.Services.Warehouse
             ICurrentSystem currentSystem,
             IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository,
             IOptions<WMSOptions> wmsOptions,
-            ISequenceService sequenceService)
+            ISequenceService sequenceService, 
+            IManuWasteProductsReceiptRecordDetailRepository manuWasteProductsReceiptRecordDetailRepository, 
+            IManuWasteProductsReceiptRecordRepository manuWasteProductsReceiptRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -221,6 +227,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             _manuProductReceiptOrderDetailRepository = manuProductReceiptOrderDetailRepository;
             _wmsOptions = wmsOptions;
             _sequenceService = sequenceService;
+            _manuWasteProductsReceiptRecordDetailRepository = manuWasteProductsReceiptRecordDetailRepository;
+            _manuWasteProductsReceiptRecordRepository = manuWasteProductsReceiptRecordRepository;
         }
 
 
@@ -1547,6 +1555,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     LotCode = item.Batch,
                     MaterialCode = request.MaterialCode,
                     Quantity = item.Qty.ToString(),
+                    BRelated = TrueOrFalseEnum.No,
                     UnitCode = item.Unit,
                 };
                 ManuProductReceiptOrderDetailEntity manuProductReceiptOrderDetailEntity = new ManuProductReceiptOrderDetailEntity
@@ -1804,6 +1813,111 @@ namespace Hymson.MES.Services.Services.Warehouse
                 whMaterialInventories.Add(whMaterialInventoryDto);
             }
             return whMaterialInventories;
+        }
+
+        /// <summary>
+        /// 废成品入库申请
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task WasteProductReceiptRequestAsync(WasteProductReceiptRequest request)
+        {
+            if (request.Items == null || request.Items.Count() == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16061));
+            }
+            //获取派工单对象
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                OrderCode = request.WorkCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", request.WorkCode);
+            var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new WhMaterialInventoryWorkOrderIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkOrderId = planWorkOrderEntity.Id
+            });
+            //工单ERP订单信息
+            List<string> orderItem = request.WorkCode.Split('-').ToList();
+            string erpOrder = orderItem[0] + "-" + orderItem[1];
+            PlanWorkPlanQuery planQuery = new PlanWorkPlanQuery();
+            planQuery.WorkPlanCode = erpOrder;
+            var erpInfo = await _planWorkPlanRepository.GetProductAsync(planQuery);
+            if (erpInfo == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16060))
+                    .WithData("orderCode", erpOrder);
+            }
+
+            var returnMaterialDtos = new List<HttpClients.Requests.WasteProductReceiptItemDto>();
+            var manuWasteProductsReceipts = new List<ManuWasteProductsReceiptRecordDetailEntity>();
+            var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
+            var CompletionOrderCode = $"{"FCP"}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
+            //创建入库申请单
+            ManuWasteProductsReceiptRecordEntity manuWasteProductsReceiptRecordEntity = new ManuWasteProductsReceiptRecordEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                Status = ProductReceiptStatusEnum.Approvaling,
+                WorkOrderId = request.OrderCodeId,
+                CompletionOrderCode = CompletionOrderCode,
+                WarehouseOrderCode = request.WorkCode,
+                CreatedBy = _currentSystem.Name,
+                UpdatedBy = _currentSystem.Name,
+            };
+            foreach (var item in request.Items)
+            {
+                // var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
+
+                HttpClients.Requests.WasteProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.WasteProductReceiptItemDto
+                {
+                    ProductionOrderNumber = erpOrder,
+                    ProductionOrderDetailID = erpInfo.ErpProductId,
+                    MaterialCode = item.MaterialCode,
+                    Quantity = item.Qty.ToString(),
+                    BRelated = TrueOrFalseEnum.Yes,
+                    UnitCode = item.Unit,
+                };
+                ManuWasteProductsReceiptRecordDetailEntity manuProductReceiptOrderDetailEntity = new ManuWasteProductsReceiptRecordDetailEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    ProductReceiptId = manuWasteProductsReceiptRecordEntity.Id,
+                    MaterialCode = item.MaterialCode,
+                    MaterialName = item.MaterialName,
+                    Qty = item.Qty,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Unit = item.Unit,
+                    CreatedBy = _currentSystem.Name,
+                    UpdatedBy = _currentSystem.Name,
+                };
+                manuWasteProductsReceipts.Add(manuProductReceiptOrderDetailEntity);
+                returnMaterialDtos.Add(returnMaterialDto);
+            }
+            string whCode = _wmsOptions.Value.WasteProductReceipt.WasteWarehouseCode;
+
+            //using var trans = TransactionHelper.GetTransactionScope();
+            //await _manuWasteProductsReceiptRecordRepository.InsertAsync(manuWasteProductsReceiptRecordEntity);
+            //await _manuWasteProductsReceiptRecordDetailRepository.InsertRangeAsync(manuWasteProductsReceipts);
+            //trans.Complete();
+            var response = await _wmsRequest.WasteProductReceiptRequestAsync(new HttpClients.Requests.WasteProductReceiptRequestDto
+            {
+                WarehouseCode = whCode,
+               // SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
+                SyncCode = CompletionOrderCode,
+                SendOn = HymsonClock.Now().ToDateTime(),//TODO：这个信息需要调研
+                Details = returnMaterialDtos
+            });
+            if (response.Code == 0)
+            {
+                using var trans = TransactionHelper.GetTransactionScope();
+                await _manuWasteProductsReceiptRecordRepository.InsertAsync(manuWasteProductsReceiptRecordEntity);
+                await _manuWasteProductsReceiptRecordDetailRepository.InsertRangeAsync(manuWasteProductsReceipts);
+                trans.Complete();
+            }
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16059)).WithData("msg", response.Message);
+            }
         }
     }
 }

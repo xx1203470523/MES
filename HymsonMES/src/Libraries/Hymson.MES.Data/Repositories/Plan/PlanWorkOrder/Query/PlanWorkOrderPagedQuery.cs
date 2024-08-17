@@ -81,5 +81,10 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         /// 工单Id列表
         /// </summary>
         public IEnumerable<long>? WorkOrderIds { get; set; }
+
+        /// <summary>
+        /// 线体ID
+        /// </summary>
+        public long? LineId { get; set; }
     }
 }

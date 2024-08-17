@@ -120,5 +120,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuJointProductAndByproductsReceiveRecordService.SaveJointProductAndByproductsInfoAsync(saveDto);
         }
+
+        /// <summary>
+        /// 根据工单Id查询Bom联副产品列表
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetWorkIdByProductsList/{workOrderId}")]
+        public async Task<ManuJointProductAndByproductsReceiveRecordResult> GetWorkIdByProductsListAsync(long workOrderId)
+        {
+            return await _manuJointProductAndByproductsReceiveRecordService.GetWorkIdByProductsListAsync(workOrderId);
+        }
     }
 }

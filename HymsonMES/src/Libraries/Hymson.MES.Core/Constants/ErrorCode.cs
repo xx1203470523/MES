@@ -1265,6 +1265,9 @@
         public const string MES16056 = "成品出入库失败,WMS返回失败，错误原因：【{msg}】。";
         public const string MES16057 = "请选择领料仓库！";
         public const string MES16058 = "修改数量不能超过生产计划最大数！";
+        public const string MES16059 = "废成品出入库失败,WMS返回失败，错误原因：【{msg}】。";
+        public const string MES16060 = "废成品入库中ERP工单信息不存在【{orderCode}】 ！";
+        public const string MES16061 = "废成品入库明细不能为空！";
         #endregion
 
         #region 条码接收 16100

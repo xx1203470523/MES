@@ -91,5 +91,12 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <returns></returns>
         Task<NioWmsActualDeliveryResponse?> NioActualDeliveryAsync(StockMesDataDto request);
+
+        /// <summary>
+        /// 废成品入库
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<BaseResponse> WasteProductReceiptRequestAsync(WasteProductReceiptRequestDto request);
     }
 }

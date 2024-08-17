@@ -84,6 +84,11 @@ namespace Hymson.MES.Core.Enums
         /// 转子LMS物料同步同步开关
         /// </summary>
         [Description("RotorLmsMaterialSwitch")]
-        RotorLmsMaterialSwitch = 17
+        RotorLmsMaterialSwitch = 17,
+        /// <summary>
+        /// 工作时长
+        /// </summary>
+        [Description("WorkHour")]
+        WorkHour = 18,
     }
 }

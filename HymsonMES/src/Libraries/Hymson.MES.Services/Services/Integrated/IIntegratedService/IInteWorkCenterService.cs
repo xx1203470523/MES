@@ -83,5 +83,11 @@ namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
         /// <returns></returns>
         Task UpdateStatusAsync(ChangeStatusDto param);
 
+        /// <summary>
+        /// 获取当前站点下面的所有产线
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> GetProductionLineListAsync();
+
     }
 }

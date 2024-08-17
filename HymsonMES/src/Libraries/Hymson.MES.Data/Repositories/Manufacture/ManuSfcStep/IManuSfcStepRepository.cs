@@ -74,6 +74,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<SfcStepProcedureNumView>> GetSfcStepEndOpMavelAsync(SfcStepProcedureQuery query);
 
         /// <summary>
+        /// 根据工序获取步骤表数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SfcStepOrderProcedureNumView>> GetSfcStepOrderOpMavelAsync(SfcStepOrderProcedureQuery query);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuSfcStepEntity"></param>
