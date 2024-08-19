@@ -756,7 +756,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 箱码
         /// </summary>
-        public string BoxCode { get; set; }
+        public string? BoxCode { get; set; }
 
         /// <summary>
         /// 批次号

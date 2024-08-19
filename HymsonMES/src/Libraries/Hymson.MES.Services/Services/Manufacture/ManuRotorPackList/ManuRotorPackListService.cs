@@ -14,6 +14,8 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
+using Hymson.MES.Data.Repositories.Mavel.Rotor;
+using Hymson.MES.Data.Repositories.Mavel.Rotor.ManuRotorSfc.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.PackList;
 using Hymson.MES.Data.Repositories.QualFqcInspectionMaval;
 using Hymson.MES.HttpClients.Options;
@@ -22,6 +24,7 @@ using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Options;
+using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -58,13 +61,19 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
         /// <summary>
+        /// 转子线主条码
+        /// </summary>
+        private readonly IManuRotorSfcRepository _manuRotorSfcRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ManuRotorPackListService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuRotorPackListSaveDto> validationSaveRules,
             IManuRotorPackListRepository manuRotorPackListRepository, ISequenceService sequenceService,
             IQualFqcInspectionMavalRepository qualFqcInspectionMavalRepository,
             IOptions<WMSOptions> wmsOptions,
-            IInteWorkCenterRepository inteWorkCenterRepository
+            IInteWorkCenterRepository inteWorkCenterRepository,
+            IManuRotorSfcRepository manuRotorSfcRepository
             )
         {
             _sequenceService = sequenceService;
@@ -75,6 +84,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _qualFqcInspectionMavalRepository = qualFqcInspectionMavalRepository;
             _wmsOptions = wmsOptions;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _manuRotorSfcRepository = manuRotorSfcRepository;
         }
 
 
@@ -192,9 +202,38 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             List<ManuRotorPackViewDto> manuRotors = new();
             var manuRotorPackEntities = await _manuRotorPackListRepository.GetEntitiesAsync(new ManuRotorPackListQuery { BoxCode = query.BoxCode, Sfc = query.Sfc, SiteId = _currentSite.SiteId ?? 0 });
-            if (manuRotorPackEntities.Any() == false) return manuRotors;
+            List<ManuRotorPackListEntity> manuRotorPackLists = manuRotorPackEntities.ToList();
+            if (manuRotorPackLists.Any() == false)
+            {
+                if (!string.IsNullOrEmpty(query.Sfc))
+                {
+                   
+                    //成品码信息
+                    ZSfcQuery zSfcQuery = new ZSfcQuery();
+                    zSfcQuery.SiteId = _currentSite.SiteId ?? 0;
+                    zSfcQuery.SfcList = new List<string>(query.Sfc.Split(','));
+                    var nioSfcList = await _manuRotorSfcRepository.GetListBySfcsAsync(zSfcQuery);
+                    if (nioSfcList.Any())
+                    {
+                        foreach (var item in nioSfcList)
+                        {
+                            ManuRotorPackListEntity manuRotorPackListEntity = new ManuRotorPackListEntity();
+                            manuRotorPackListEntity.ProductCode = item.Sfc;
+                            manuRotorPackLists.Add(manuRotorPackListEntity);
+                        }
+                    }
+                    else
+                    {
+                        return manuRotors;
+                    }
+                }
+                else
+                {
+                    return manuRotors;
+                }
+            }
 
-            var sfcs = manuRotorPackEntities.Select(x => x.ProductCode).ToList();
+            var sfcs = manuRotorPackLists.Select(x => x.ProductCode).ToList();
             var qualFqcs = await _qualFqcInspectionMavalRepository.GetQualFqcInspectionMavalEntitiesAsync(new QualFqcInspectionMavalQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
@@ -227,7 +266,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 inspectionOrder = $"{lineBrevityCode}{dateStr}{curKeyNum.ToString().PadLeft(3, '0')}";
             }
 
-            foreach (var item in manuRotorPackEntities)
+            foreach (var item in manuRotorPackLists)
             {
                 //var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
                 //var InspectionOrder = $"{query.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";

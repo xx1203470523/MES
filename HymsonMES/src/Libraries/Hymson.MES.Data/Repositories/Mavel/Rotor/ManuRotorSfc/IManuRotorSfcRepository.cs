@@ -41,5 +41,12 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuRotorSfcEntity>> GetListByZSfcsAsync(ZSfcQuery query);
+
+        /// <summary>
+        /// 查询总成码信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuRotorSfcEntity>> GetListBySfcsAsync(ZSfcQuery query);
     }
 }

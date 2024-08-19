@@ -89,6 +89,16 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor
             return await conn.QueryAsync<ManuRotorSfcEntity>(ZSfcQuerySql, query);
         }
 
+        /// <summary>
+        /// 根据轴码获取信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuRotorSfcEntity>> GetListBySfcsAsync(ZSfcQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuRotorSfcEntity>(SfcQuerySql, query);
+        }
     }
 
     public partial class ManuRotorSfcRepository
@@ -110,6 +120,13 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor
             from manu_rotor_sfc  
             where SiteId  = @SiteId
             and ZSfc in @SfcList
+        ";
+
+        const string SfcQuerySql = $@"
+            select * 
+            from manu_rotor_sfc  
+            where SiteId  = @SiteId
+            and Sfc in @SfcList
         ";
     }
 }
