@@ -1551,7 +1551,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 {
                     ProductionOrderNumber = erpOrder,
                     ProductionOrderDetailID = erpInfo.ErpProductId,
-                    BoxCode = item.BoxCode,
+                    BoxCode = item.BoxCode ?? "",
                     LotCode = item.Batch,
                     MaterialCode = request.MaterialCode,
                     Quantity = item.Qty.ToString(),
@@ -1568,7 +1568,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialCode = request.MaterialCode,
                     MaterialName = request.MaterialName,
                     Qty = item.Qty,
-                    ContaineCode = item.BoxCode,
+                    ContaineCode = item.BoxCode ?? "",
                     Status = item.Type ?? 0,
                     SiteId = _currentSite.SiteId ?? 0,
                     Unit = item.Unit,
