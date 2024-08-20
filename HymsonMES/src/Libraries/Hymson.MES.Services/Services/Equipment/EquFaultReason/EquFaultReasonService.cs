@@ -207,8 +207,28 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<PagedInfo<EquFaultReasonDto>> GetPagedListAsync(EquFaultReasonPagedQueryDto pagedQueryDto)
         {
+            var siteId = _currentSite.SiteId ?? 0;
             var pagedQuery = pagedQueryDto.ToQuery<EquFaultReasonPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = siteId;
+
+            var faultReasonDtos=new List<EquFaultReasonDto>();
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.PhenomenonCode))
+            {
+                var equFaultPhenomenon = await _equFaultPhenomenonRepository.GetByCodeAsync(new EntityByCodeQuery
+                {
+                    Code = pagedQueryDto.PhenomenonCode,
+                    Site = siteId
+                });
+                var reasonRelationEntities = await _equFaultPhenomenonRepository.GetReasonRelationEntitiesAsync(new EntityByParentIdQuery
+                {
+                    ParentId = equFaultPhenomenon?.Id ?? 0
+                });
+                if (reasonRelationEntities==null||!reasonRelationEntities.Any())
+                {
+                    return new PagedInfo<EquFaultReasonDto>(faultReasonDtos, pagedQueryDto.PageIndex, pagedQueryDto.PageSize, 0);
+                }
+                pagedQuery.Ids= reasonRelationEntities.Select(x=>x.FaultReasonId).ToList();
+            }
             var pagedInfo = await _equFaultReasonRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

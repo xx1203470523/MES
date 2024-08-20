@@ -2017,6 +2017,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     MaterialAndVersion = product == null ? "" : product.MaterialCode + " / " + product.Version,
                     ProcessRouteAndVersion = processRoute == null ? "" : processRoute.Code + " / " + processRoute.Version,
                     BomAndVersion = productBOM == null ? "" : productBOM.BomCode + " / " + productBOM.Version,
+                    Qty= item.Qty
                 };
                 manuSfcProduceDtos.Add(manuUpdateViewDto);
             }

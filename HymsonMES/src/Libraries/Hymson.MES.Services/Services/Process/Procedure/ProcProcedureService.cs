@@ -1206,6 +1206,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 rows += await _configSubstepRepository.DeleteByProcedureIdsAsync(idsAr);
                 rows += await _procProcedureRejudgeRepository.DeleteByParentIdAsync(idsAr);
                 rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsAr);
+                rows += await _authenticationRelationRepository.DeleteByProcedureIdsAsync(idsAr);
                 ts.Complete();
             }
             return rows;

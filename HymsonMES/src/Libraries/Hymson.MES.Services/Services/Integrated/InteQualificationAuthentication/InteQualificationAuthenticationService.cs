@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -45,8 +46,8 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteQualificationAuthenticationRepository _inteQualificationAuthenticationRepository;
 
         private readonly IInteQualificationAuthenticationDetailsRepository _authenticationDetailsRepository;
-        //private readonly IProcResourceQualificationAuthenticationRelationRepository _procResourceQualification;
-        //private readonly IProcProcedureQualificationAuthenticationRelationRepository _procProcedureQualification;
+        private readonly IProcResourceQualificationAuthenticationRelationRepository _procResourceQualification;
+        private readonly IProcProcedureQualificationAuthenticationRelationRepository _procProcedureQualification;
 
         /// <summary>
         /// 构造函数
@@ -54,13 +55,17 @@ namespace Hymson.MES.Services.Services.Integrated
         public InteQualificationAuthenticationService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<InteQualificationAuthenticationSaveDto> validationSaveRules,
             IInteQualificationAuthenticationRepository inteQualificationAuthenticationRepository,
-            IInteQualificationAuthenticationDetailsRepository authenticationDetailsRepository)
+            IInteQualificationAuthenticationDetailsRepository authenticationDetailsRepository,
+            IProcResourceQualificationAuthenticationRelationRepository procResourceQualification,
+            IProcProcedureQualificationAuthenticationRelationRepository procProcedureQualification)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _inteQualificationAuthenticationRepository = inteQualificationAuthenticationRepository;
             _authenticationDetailsRepository = authenticationDetailsRepository;
+            _procResourceQualification = procResourceQualification;
+            _procProcedureQualification = procProcedureQualification;
         }
 
         /// <summary>
@@ -250,7 +255,26 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES10135));
             }
 
-            //判断有没有被引用
+            //判断有没有被引用,资源
+            var procResources = await _procResourceQualification.GetEntitiesAsync(new Data.Repositories.Process.Query.ProcResourceQualificationAuthenticationRelationQuery
+            {
+                QualificationAuthenticationIds = ids
+            });
+            if(procResources != null && procResources.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10358));
+            }
+
+            //判断有没有被引用,工序
+            var procProcedures = await _procProcedureQualification.GetEntitiesAsync(new Data.Repositories.Process.Query.ProcProcedureQualificationAuthenticationRelationQuery
+            {
+                QualificationAuthenticationIds = ids
+            });
+            if (procProcedures != null && procProcedures.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10359));
+            }
+
             return await _inteQualificationAuthenticationRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
