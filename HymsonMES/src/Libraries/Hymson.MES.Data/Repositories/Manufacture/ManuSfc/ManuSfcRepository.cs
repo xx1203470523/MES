@@ -710,7 +710,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string ManuSfcCancellScrapByIdsSql = "UPDATE `manu_sfc` SET Status=StatusBack,SfcScrapId=null, StatusBack = null, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id = @Id AND Status=@CurrentStatus";
         const string GetManSfcAboutInfoBySfcSql = @"SELECT ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
-                                pwo.OrderCode as WorkOrderCode, 
+                                pwo.OrderCode as WorkOrderCode, MS.Qty,
                                 msi.ProcessRouteId, msi.ProductBOMId   -- 231219 修改，取 manu_sfc_info 里的才是最新的
                                                     FROM manu_sfc MS 
                                      INNER JOIN manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0
