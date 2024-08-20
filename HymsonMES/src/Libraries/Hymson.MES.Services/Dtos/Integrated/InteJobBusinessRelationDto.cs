@@ -91,7 +91,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 参数
         /// </summary>
-        public string Parameter { get; set; }
+        public string Parameter { get; set; } = "";
     }
 
     /// <summary>
