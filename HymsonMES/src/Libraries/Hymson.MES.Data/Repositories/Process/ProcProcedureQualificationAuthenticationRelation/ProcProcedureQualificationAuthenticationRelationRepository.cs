@@ -98,6 +98,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByProcedureIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByProcedureIdsSql, new { ProcedureIds = ids });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -134,6 +145,10 @@ namespace Hymson.MES.Data.Repositories.Process
             if (query.ProcedureId.HasValue)
             {
                 sqlBuilder.Where("ProcedureId=@ProcedureId");
+            }
+            if (query.QualificationAuthenticationIds != null && query.QualificationAuthenticationIds.Any())
+            {
+                sqlBuilder.Where("QualificationAuthenticationId in @QualificationAuthenticationIds");
             }
 
             using var conn = GetMESDbConnection();
@@ -189,6 +204,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteSql = "UPDATE proc_procedure_qualification_authentication_relation SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE proc_procedure_qualification_authentication_relation SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
         const string DeleteByProcedureIdSql = "delete from `proc_procedure_qualification_authentication_relation` WHERE ProcedureId = @ProcedureId ";
+        const string DeleteByProcedureIdsSql = "delete from `proc_procedure_qualification_authentication_relation` WHERE ProcedureId in @ProcedureIds ";
 
         const string GetByIdSql = @"SELECT * FROM proc_procedure_qualification_authentication_relation WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM proc_procedure_qualification_authentication_relation WHERE Id IN @Ids ";

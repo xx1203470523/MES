@@ -981,6 +981,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// Bom与版本
         /// </summary>
         public string BomAndVersion { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
     }
 
     /// <summary>
