@@ -110,6 +110,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述（设备故障原因）
         /// </summary>
         public string? Remark { get; set; } = "";
+
+        /// <summary>
+        /// 故障现象编码
+        /// </summary>
+        public string? PhenomenonCode { get; set; } = "";
     }
 
     /// <summary>

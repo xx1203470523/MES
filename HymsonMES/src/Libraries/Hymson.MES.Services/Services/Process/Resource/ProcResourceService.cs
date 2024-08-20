@@ -1351,6 +1351,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 rows += await _resourceRepository.DeleteRangeAsync(command);
                 rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsAr);
+                rows += await _authenticationRelationRepository.DeleteByResourceIdsAsync(idsAr);
                 ts.Complete();
             }
             return rows;

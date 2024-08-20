@@ -32,5 +32,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// 描述（设备故障原因）
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 故障原因Id列表
+        /// </summary>
+        public IEnumerable<long>? Ids { get; set; }
     }
 }
