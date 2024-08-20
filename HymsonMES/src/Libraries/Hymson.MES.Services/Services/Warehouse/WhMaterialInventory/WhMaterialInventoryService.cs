@@ -402,21 +402,27 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             //if (new MaterialInventorySourceEnum[] { MaterialInventorySourceEnum.ManualEntry, MaterialInventorySourceEnum.WMS, MaterialInventorySourceEnum.LoadingPoint }.Contains(entity.Source))
             //{
-                var detailDto = entity.ToModel<WhMaterialInventoryDetailDto>();
+            var detailDto = entity.ToModel<WhMaterialInventoryDetailDto>();
 
-                //查询关联信息
-                var materialInfo = (await _procMaterialRepository.GetByIdsAsync(new long[] { entity!.MaterialId })).FirstOrDefault();
-                var supplierInfo = (await _whSupplierRepository.GetByIdsAsync(new long[] { entity.SupplierId })).FirstOrDefault();
+            //查询关联信息
+            var materialInfo = (await _procMaterialRepository.GetByIdsAsync(new long[] { entity!.MaterialId })).FirstOrDefault();
+            var supplierInfo = (await _whSupplierRepository.GetByIdsAsync(new long[] { entity.SupplierId })).FirstOrDefault();
 
-                detailDto.MaterialCode = materialInfo?.MaterialCode ?? "";
-                detailDto.MaterialName = materialInfo?.MaterialName ?? "";
-                detailDto.MaterialVersion = materialInfo?.Version ?? "";
+            var planWorkOrder = new PlanWorkOrderEntity();
+            if (entity.WorkOrderId.HasValue)
+            {
+                planWorkOrder = (await _planWorkOrderRepository.GetByIdsAsync(new long[] { entity.WorkOrderId.Value })).FirstOrDefault();
+            }
 
-                detailDto.SupplierCode = supplierInfo?.Code ?? "";
-                detailDto.SupplierName = supplierInfo?.Name ?? "";
+            detailDto.MaterialCode = materialInfo?.MaterialCode ?? "";
+            detailDto.MaterialName = materialInfo?.MaterialName ?? "";
+            detailDto.MaterialVersion = materialInfo?.Version ?? "";
 
+            detailDto.SupplierCode = supplierInfo?.Code ?? "";
+            detailDto.SupplierName = supplierInfo?.Name ?? "";
+            detailDto.OrderCode = planWorkOrder?.OrderCode ?? "";
 
-                return detailDto;
+            return detailDto;
             //}
             //else
             //{
@@ -443,13 +449,19 @@ namespace Hymson.MES.Services.Services.Warehouse
                 var materialInfo = (await _procMaterialRepository.GetByIdsAsync(new long[] { entity!.MaterialId })).FirstOrDefault();
                 var supplierInfo = (await _whSupplierRepository.GetByIdsAsync(new long[] { entity.SupplierId })).FirstOrDefault();
 
+                var planWorkOrder = new PlanWorkOrderEntity();
+                if (entity.WorkOrderId.HasValue)
+                {
+                    planWorkOrder = (await _planWorkOrderRepository.GetByIdsAsync(new long[] { entity.WorkOrderId.Value })).FirstOrDefault();
+                }
+
                 detailDto.MaterialCode = materialInfo?.MaterialCode ?? "";
                 detailDto.MaterialName = materialInfo?.MaterialName ?? "";
                 detailDto.MaterialVersion = materialInfo?.Version ?? "";
 
                 detailDto.SupplierCode = supplierInfo?.Code ?? "";
                 detailDto.SupplierName = supplierInfo?.Name ?? "";
-
+                detailDto.OrderCode = planWorkOrder?.OrderCode ?? "";
                 return detailDto;
             }
             else
@@ -483,7 +495,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES15121));
             }
 
-            if (oldWhMIEntirty.Status == WhMaterialInventoryStatusEnum.InUse || oldWhMIEntirty.Status == WhMaterialInventoryStatusEnum.Locked|| oldWhMIEntirty.Status == WhMaterialInventoryStatusEnum.Invalid)
+            if (oldWhMIEntirty.Status == WhMaterialInventoryStatusEnum.InUse || oldWhMIEntirty.Status == WhMaterialInventoryStatusEnum.Locked || oldWhMIEntirty.Status == WhMaterialInventoryStatusEnum.Invalid)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15122)).WithData("materialBarCode", oldWhMIEntirty.MaterialBarCode).WithData("status", _localizationService.GetResource($"{typeof(WhMaterialInventoryStatusEnum).FullName}.{oldWhMIEntirty.Status.ToString()}"));
             }
@@ -491,6 +503,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             var whMaterialInventoryEntity = new WhMaterialInventoryEntity();
             whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
             whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
+            whMaterialInventoryEntity.WorkOrderId = modifyDto.WorkOrderId;
 
             whMaterialInventoryEntity.Id = modifyDto.Id;
             whMaterialInventoryEntity.MaterialId = modifyDto.MaterialId;
@@ -1034,7 +1047,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     afterBarcode = inputBarcodeSingle?.MaterialBarCode ?? string.Empty;
                 }
 
-                
+
 
                 var standingbook = new WhMaterialStandingbookEntity
                 {
@@ -1068,7 +1081,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 //{
                 //    continue;
                 //}            
-       
+
                 var manuBarCodeRelationEntity = new ManuBarCodeRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -1088,7 +1101,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     RelationType = ManuBarCodeRelationTypeEnum.SFC_Combined,
                     BusinessContent = new
                     {
-    
+
                         InputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == entity.MaterialBarCode).FirstOrDefault()?.Id,
                         OutputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == inputBarcodeSingle.MaterialBarCode).FirstOrDefault()?.Id
                     }.ToSerialize(),
