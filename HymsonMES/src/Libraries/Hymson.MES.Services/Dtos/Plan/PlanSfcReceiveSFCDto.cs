@@ -19,9 +19,14 @@ namespace Hymson.MES.Services.Dtos.Plan
         public PlanWorkOrderTypeEnum Type { get; set; }
 
         /// <summary>
-        /// 工单号
+        /// 工单计划数量
         /// </summary>
         public decimal OrderCodeQty { get; set; }
+
+        /// <summary>
+        /// 工单剩余可下达数量
+        /// </summary>
+        public decimal OrderResidue { get; set; }
 
         /// <summary>
         /// 条码

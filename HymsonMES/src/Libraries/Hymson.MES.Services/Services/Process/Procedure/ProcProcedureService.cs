@@ -717,23 +717,23 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         continue;
                     }
 
-                    if (string.IsNullOrWhiteSpace(item.Parameter))
-                    {
-                        var validationFailure = new ValidationFailure();
-                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", i}
-                        };
-                        }
-                        else
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
-                        }
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES10412);
-                        validationFailures.Add(validationFailure);
-                        continue;
-                    }
+                    //if (string.IsNullOrWhiteSpace(item.Parameter))
+                    //{
+                    //    var validationFailure = new ValidationFailure();
+                    //    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    //    {
+                    //        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                    //        { "CollectionIndex", i}
+                    //    };
+                    //    }
+                    //    else
+                    //    {
+                    //        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                    //    }
+                    //    validationFailure.ErrorCode = nameof(ErrorCode.MES10412);
+                    //    validationFailures.Add(validationFailure);
+                    //    continue;
+                    //}
 
                     var relationEntity = new InteJobBusinessRelationEntity
                     {
@@ -993,24 +993,23 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         continue;
                     }
 
-                    if (string.IsNullOrWhiteSpace(item.Parameter))
-                    {
-                        var validationFailure = new ValidationFailure();
-                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", i}
-                        };
-                        }
-                        else
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
-                        }
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES10412);
-                        validationFailures.Add(validationFailure);
-                        continue;
-                    }
-
+                    //if (string.IsNullOrWhiteSpace(item.Parameter))
+                    //{
+                    //    var validationFailure = new ValidationFailure();
+                    //    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    //    {
+                    //        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                    //        { "CollectionIndex", i}
+                    //    };
+                    //    }
+                    //    else
+                    //    {
+                    //        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                    //    }
+                    //    validationFailure.ErrorCode = nameof(ErrorCode.MES10412);
+                    //    validationFailures.Add(validationFailure);
+                    //    continue;
+                    //}
 
                     var relationEntity = new InteJobBusinessRelationEntity
                     {

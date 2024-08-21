@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 参数
         /// </summary>
        // [MaxLength(length: 100, ErrorMessage = "参数超长")]
-        public string Parameter { get; set; }
+        public string Parameter { get; set; } = "";
 
         /// <summary>
         /// Id

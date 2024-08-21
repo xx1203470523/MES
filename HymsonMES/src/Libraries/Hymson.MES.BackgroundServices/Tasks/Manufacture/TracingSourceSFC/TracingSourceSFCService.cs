@@ -56,6 +56,8 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
         /// </summary>
         private readonly IManuSFCNodeDestinationRepository _manuSFCNodeDestinationRepository;
 
+        private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -71,7 +73,8 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuSFCNodeRepository manuSFCNodeRepository,
             IManuSFCNodeSourceRepository manuSFCNodeSourceRepository,
-            IManuSFCNodeDestinationRepository manuSFCNodeDestinationRepository)
+            IManuSFCNodeDestinationRepository manuSFCNodeDestinationRepository,
+            IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _waterMarkService = waterMarkService;
             _procMaterialRepository = procMaterialRepository;
@@ -81,8 +84,8 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             _manuSFCNodeRepository = manuSFCNodeRepository;
             _manuSFCNodeSourceRepository = manuSFCNodeSourceRepository;
             _manuSFCNodeDestinationRepository = manuSFCNodeDestinationRepository;
+            _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
         }
-
 
         /// <summary>
         /// 执行统计
@@ -95,7 +98,7 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
 
             // 获取流转表数据（因为这张表的数据会有更新操作，所以不能用常规水位）
             DateTime startWaterMarkTime = DateTimeOffset.FromUnixTimeMilliseconds(waterMarkId).DateTime;
-            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
+            var manuSfcCirculationList = await _manuBarCodeRelationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
             {
                 StartWaterMarkTime = startWaterMarkTime,
                 Rows = limitCount
@@ -113,7 +116,7 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             List<ManuSfcEntity> sfcEntities = new();
             foreach (var item in manuSfcCirculationSiteIdDict)
             {
-                var barCodes = item.Value.Select(s => s.SFC).Union(item.Value.Select(s => s.CirculationBarCode)).Distinct();
+                var barCodes = item.Value.Select(s => s.InputBarCode).Union(item.Value.Select(s => s.OutputBarCode)).Distinct();
 
                 // 根据流转条码批量查询条码
                 sfcEntities.AddRange(await _manuSfcRepository.GetListAsync(new ManuSfcQuery
@@ -147,12 +150,12 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             // 遍历流转记录
             foreach (var item in manuSfcCirculationList)
             {
-                var beforeNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
-                var afterNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
+                var beforeNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.InputBarCode);
+                var afterNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.OutputBarCode);
 
                 if (beforeNode == null)
                 {
-                    var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
+                    var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.InputBarCode);
                     if (sfcEntity == null) continue;
 
                     if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
@@ -175,7 +178,7 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
 
                 if (afterNode == null)
                 {
-                    var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
+                    var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.OutputBarCode);
                     if (sfcEntity == null) continue;
 
                     if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;

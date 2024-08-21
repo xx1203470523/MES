@@ -16,6 +16,7 @@ using Hymson.MES.Data.Repositories.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
@@ -80,6 +81,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         private readonly JwtOptions _jwtOptions;
 
         private readonly IEquEquipmentVerifyRepository _equEquipmentVerifyRepository;
+        private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
 
         private readonly IProcResourceRepository _procResourceRepository;
 
@@ -122,7 +124,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             IEquEquipmentRepository equEquipmentRepository,
             IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
             IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository,
-            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, AbstractValidator<EquEquipmentVerifyCreateDto> verifyValidationRules, IProcResourceRepository procResourceRepository, IEquMaintenanceTemplateRepository equMaintenanceTemplateRepository, IEquMaintenanceTemplateEquipmentGroupRelationRepository equMaintenanceTemplateEquipmentGroupRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository, IEquEquipmentRecordService equEquipmentRecordService, IEquEquipmentRecordRepository equEquipmentRecordRepository)
+            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, AbstractValidator<EquEquipmentVerifyCreateDto> verifyValidationRules, IProcResourceRepository procResourceRepository, IEquMaintenanceTemplateRepository equMaintenanceTemplateRepository, IEquMaintenanceTemplateEquipmentGroupRelationRepository equMaintenanceTemplateEquipmentGroupRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository, IEquEquipmentRecordService equEquipmentRecordService, IEquEquipmentRecordRepository equEquipmentRecordRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -141,6 +143,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             _equSpotcheckTemplateEquipmentGroupRelationRepository = equSpotcheckTemplateEquipmentGroupRelationRepository;
             _equEquipmentRecordService = equEquipmentRecordService;
             _equEquipmentRecordRepository = equEquipmentRecordRepository;
+            _equEquipmentGroupRepository = equEquipmentGroupRepository;
         }
 
 
@@ -530,6 +533,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                     EquipmentIds = new long[] { equipmentDto.Id }
                 });
                 equipmentDto.ResourceCodes = string.Join(",", resources.Select(x => x.ResCode));
+                if (equipmentDto.EquipmentGroupId > 0)
+                {
+                    var equipmentGroup = await _equEquipmentGroupRepository.GetByIdAsync(equipmentDto.EquipmentGroupId);
+                    if (equipmentGroup != null)
+                    {
+                        equipmentDto.EquipmentGroupName = equipmentGroup.EquipmentGroupName;
+                    }
+                }
             }
 
             return equipmentDto ?? new EquEquipmentDto();
