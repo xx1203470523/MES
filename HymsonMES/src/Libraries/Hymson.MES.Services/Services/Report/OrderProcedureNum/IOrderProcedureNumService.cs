@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Services.Dtos.Report;
+﻿using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Report;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,6 @@ namespace Hymson.MES.Services.Services.Report.OrderProcedureNum
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<OrderProcedureNumAllResultDto> GetOrderProcedureNumListAsync(OrderProcedureNumDto param);
+        Task<PagedInfo<OrderProcedureNumResultDto>> GetOrderProcedureNumListAsync(OrderProcedureNumDto param);
     }
 }

@@ -376,8 +376,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 //model.VendorProductCode = item.SFC;
                 //model.VendorProductBatch = item.SFC;
                 model.OperatorAccount = item.CreatedBy;
-                model.InputTime = GetTimestamp(HymsonClock.Now());
-                model.OutputTime = model.InputTime;
+                //model.InputTime = GetTimestamp(HymsonClock.Now());
+                //model.OutputTime = model.InputTime;
                 model.StationStatus = "passed";
                 model.IsOk = CheckParam(curOpParam, item.ParameterValue);
                 model.VendorStationStatus = model.StationStatus;

@@ -1,4 +1,5 @@
 ﻿using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Report.OrderProcedureNum;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +33,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("GetAll")]
-        public async Task<OrderProcedureNumAllResultDto> GetOrderProcedureNumListAsync([FromQuery] OrderProcedureNumDto param)
+        public async Task<PagedInfo<OrderProcedureNumResultDto>> GetOrderProcedureNumListAsync([FromQuery] OrderProcedureNumDto param)
         {
             return await _orderProcedureNumService.GetOrderProcedureNumListAsync(param);
         }
