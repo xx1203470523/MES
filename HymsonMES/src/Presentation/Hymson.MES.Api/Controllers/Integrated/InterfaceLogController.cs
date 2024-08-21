@@ -35,7 +35,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<TraceLogEntry>> QueryPagedListAsync([FromQuery] InteIntefaceLogPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<HitTraceLogDto>> QueryPagedListAsync([FromQuery] InteIntefaceLogPagedQueryDto pagedQueryDto)
         {
             return await _inteIntefaceLogService.GetPagedListAsync(pagedQueryDto);
         }
@@ -43,14 +43,14 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 获取详情
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">主键</param>
+        /// <param name="indexName">索引名称</param>
         /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<TraceLogEntry> QueryByIdAsync(long id)
+        [HttpGet("{id}/{indexName}")]
+        public async Task<TraceLogEntry> QueryByIdAsync(string id, string indexName)
         {
-            var query = new InteIntefaceLogPagedQueryDto() { Id = id.ToString(), PageSize = 10, PageIndex = 1 };
-            var dtos = await _inteIntefaceLogService.GetPagedListAsync(query);
-            return dtos.Data.FirstOrDefault() ?? new TraceLogEntry();
+
+            return await _inteIntefaceLogService.QueryByIdAsync(id, indexName);
         }
 
     }
