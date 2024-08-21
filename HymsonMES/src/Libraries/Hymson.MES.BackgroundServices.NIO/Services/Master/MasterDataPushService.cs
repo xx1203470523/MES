@@ -274,7 +274,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //基础数据配置
             var baseConfigList = await GetBaseConfig();
 
-            int maxNum = 20;
+            int maxNum = 100;
             int batchNum = paramList.Count() / maxNum + 1;
             for(int i = 0; i < batchNum; ++i)
             {

@@ -1508,7 +1508,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES17756))
                     .WithData("orderCode", erpOrder);
             }
-
+            
             if (request.Items.Any())
             {
 
@@ -1526,7 +1526,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                 }
 
             }
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryEntities.Select(b => b.MaterialId).Distinct().ToArray());
             var returnMaterialDtos = new List<HttpClients.Requests.ProductReceiptItemDto>();
             var manuProductReceiptOrderDetails = new List<ManuProductReceiptOrderDetailEntity>();
             var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
@@ -1545,7 +1544,6 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
             foreach (var item in request.Items)
             {
-                // var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
 
                 HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
                 {
@@ -1848,6 +1846,16 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES16060))
                     .WithData("orderCode", erpOrder);
             }
+            //查询生产计划
+            var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", request.WorkCode);
+            // 查询生产计划物料
+            var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+            {
+                SiteId = planWorkOrderEntity.SiteId,
+                PlanId = planWorkPlanEntity.Id,
+                PlanProductId = planWorkOrderEntity.WorkPlanProductId ?? 0
+            });
 
             var returnMaterialDtos = new List<HttpClients.Requests.WasteProductReceiptItemDto>();
             var manuWasteProductsReceipts = new List<ManuWasteProductsReceiptRecordDetailEntity>();
@@ -1867,12 +1875,12 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
             foreach (var item in request.Items)
             {
-                // var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
+                var materialEntity = planWorkPlanMaterialEntities.FirstOrDefault(m => m.MaterialId == item.ProductId);
 
                 HttpClients.Requests.WasteProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.WasteProductReceiptItemDto
                 {
                     ProductionOrderNumber = erpOrder,
-                    ProductionOrderDetailID = erpInfo.ErpProductId,
+                    ProductionOrderDetailID = materialEntity?.Id ?? 0,
                     MaterialCode = item.MaterialCode,
                     Quantity = item.Qty.ToString(),
                     BRelated = TrueOrFalseEnum.Yes,

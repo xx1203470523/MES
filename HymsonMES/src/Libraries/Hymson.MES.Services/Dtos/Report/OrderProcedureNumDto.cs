@@ -40,7 +40,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 汇总
         /// </summary>
-        public List<OrderProcedureSumResultDto> SumList { get; set; } = new List<OrderProcedureSumResultDto>();
+        //public List<OrderProcedureSumResultDto> SumList { get; set; } = new List<OrderProcedureSumResultDto>();
     }
 
     /// <summary>
