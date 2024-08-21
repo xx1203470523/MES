@@ -10,6 +10,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
+using Hymson.MES.Core.NIO;
 using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -270,9 +271,9 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var baseParamList = await _procParameterRepository.GetProcParameterEntitiesAsync(paramQuery);
             if (baseParamList == null || baseParamList.Any() == false) return;
             //获取工序参数
-            //ProcProcedureQuery procedureQuery = new ProcProcedureQuery() { SiteId = siteId };
-            //var procedureList = await _procProcedureRepository.GetEntitiesAsync(procedureQuery);
-            //if (procedureList == null || procedureList.Any() == false) return;
+            ProcProcedureQuery procedureQuery = new ProcProcedureQuery() { SiteId = siteId };
+            var procedureList = await _procProcedureRepository.GetEntitiesAsync(procedureQuery);
+            if (procedureList == null || procedureList.Any() == false) return;
             ProcedureParamQuery query = new ProcedureParamQuery();
             query.SiteId = siteId;
             var procedureParamList = await _procProductParameterGroupRepository.GetParamListAsync(query);
@@ -306,13 +307,15 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
                 //工序参数
                 string procedure = "未知";
-                ProcedureParamView ?curOpParam = null;
-                var curProcedureList = procedureParamList.Where(m => m.ProcedureId == item.ProcedureId).ToList();
-                if (curProcedureList != null && curProcedureList.Count > 0)
+                var curOp = procedureList.Where(m => m.Id == item.ProcedureId).FirstOrDefault();
+                if(curOp == null)
                 {
-                    procedure = curProcedureList.ElementAt(0).ProcedureCode;
-                    curOpParam = curProcedureList.Where(m => m.ParameterCode == curBaseParam.ParameterCode).FirstOrDefault();
+                    continue;
                 }
+                procedure = curOp.Code;
+
+                ProcedureParamView? curOpParam = procedureParamList.Where(m => m.ProcedureId == item.ProcedureId &&
+                    m.ParameterCode == curBaseParam.ParameterCode).FirstOrDefault();
 
                 //总成码,指定工序才有总成码
                 string nioSfc = item.SFC;
