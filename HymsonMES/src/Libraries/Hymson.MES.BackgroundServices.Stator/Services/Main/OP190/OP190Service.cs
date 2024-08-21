@@ -109,7 +109,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 InnerIds = entities.Select(s => s.ID).Distinct()
             });
 
-            // 物料信息
+            // 物料信息（外定子）
             var materialEntity = await _mainService.GetMaterialEntityAsync(new EntityByCodeQuery
             {
                 Site = statorBo.SiteId,

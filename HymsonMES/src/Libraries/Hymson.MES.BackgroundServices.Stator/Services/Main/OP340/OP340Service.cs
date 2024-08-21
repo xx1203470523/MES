@@ -118,13 +118,21 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 InnerIds = entities.Select(s => s.ID).Distinct()
             });
 
-            // 物料信息
+            // 物料信息（BUSBAR）
             var materialEntity = await _mainService.GetMaterialEntityAsync(new EntityByCodeQuery
             {
                 Site = statorBo.SiteId,
                 Code = _materialCode
             });
             var materialId = materialEntity?.Id ?? 0;
+
+            // 物料信息（内定子）
+            var innerMaterialEntity = await _mainService.GetMaterialEntityAsync(new EntityByCodeQuery
+            {
+                Site = statorBo.SiteId,
+                Code = _innerStatorCode
+            });
+            var innerStatorId = innerMaterialEntity?.Id ?? 0;
 
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
@@ -284,15 +292,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
                 {
                     WorkOrderId = statorBo.WorkOrderId,
-                    ProductId = 51558094361128960,//TODO materialId,
+                    ProductId = materialId,// 51558094361128960
                     ProcedureId = statorBo.ProcedureId,
                     ResourceId = null,
                     SFC = barCode,
 
                     CirculationBarCode = statorSFCEntity.InnerBarCode,
                     CirculationWorkOrderId = statorBo.WorkOrderId,
-                    CirculationProductId = 51558094067523584,//TODO statorBo.ProductId,
-                    CirculationMainProductId = 51558094067523584,//TODOstatorBo.ProductId,
+                    CirculationProductId = innerStatorId,// 51558094067523584
+                    CirculationMainProductId = innerStatorId,// 51558094067523584
                     CirculationQty = StatorConst.QTY,
                     CirculationType = SfcCirculationTypeEnum.Consume,
 
@@ -366,6 +374,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// 编码（BUSBAR+软铜排组件）
         /// </summary>
         private const string _materialCode = "030105000002";
+
+        /// <summary>
+        /// 编码（內定子铁芯-NIO4.8量产φ154x121.5）
+        /// </summary>
+        private const string _innerStatorCode = "030101000002";
 
     }
 
