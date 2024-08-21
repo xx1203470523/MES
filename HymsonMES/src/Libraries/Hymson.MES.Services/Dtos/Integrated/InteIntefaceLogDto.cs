@@ -156,5 +156,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public int? IsSuccess { get; set; }
 
+        public DateTime[] RequestTime { get; set; }
+
     }
 }
