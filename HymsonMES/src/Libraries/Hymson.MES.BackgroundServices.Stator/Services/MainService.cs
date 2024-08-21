@@ -199,8 +199,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             }
 
             // 站点配置
-            var siteConfigEntity = siteConfigEntities.FirstOrDefault(f => f.Code == "MainSite")
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES12842)).WithData("Msg", "站点配置不存在！");
+            var siteConfigEntity = siteConfigEntities.FirstOrDefault(f => f.Code == "MainSite");
+            if (siteConfigEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12842)).WithData("Msg", "站点配置不存在！");
+            }
 
             // 站点赋值
             baseDto.SiteId = siteConfigEntity.Value.ParseToLong();
@@ -227,8 +230,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             }
 
             // 定子线配置
-            var lineConfigEntity = lineConfigEntities.FirstOrDefault(f => f.Code == "NioStatorConfig")
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES12842)).WithData("Msg", "定子线配置不存在！");
+            var lineConfigEntity = lineConfigEntities.FirstOrDefault(f => f.Code == "NioStatorConfig");
+            if (lineConfigEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12842)).WithData("Msg", "定子线配置不存在！");
+            }
 
             // 定子线赋值
             var configBo = lineConfigEntity.Value.ToDeserialize<NIOConfigBaseDto>();
