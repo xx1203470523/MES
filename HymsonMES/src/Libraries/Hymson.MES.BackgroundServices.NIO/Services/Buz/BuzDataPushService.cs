@@ -263,7 +263,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取当前水位
             var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioParam);
             //获取参数表数据
-            EntityByWaterMarkQuery waterQuery = new EntityByWaterMarkQuery() { Rows = 50, StartWaterMarkId = startWaterMarkId };
+            EntityByWaterMarkQuery waterQuery = new EntityByWaterMarkQuery() { Rows = 20, StartWaterMarkId = startWaterMarkId };
             var paramList = await _manuProductParameterRepository.GetManuParamMavelAsync(waterQuery);
             if (paramList == null || paramList.Any() == false) return;
             //获取标准参数，用于获取根据ID获取名称（参数表在其他库）

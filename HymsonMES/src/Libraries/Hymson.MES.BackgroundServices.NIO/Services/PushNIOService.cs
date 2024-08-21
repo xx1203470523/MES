@@ -1,4 +1,5 @@
-﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
+﻿using Google.Protobuf.WellKnownTypes;
+using Hymson.MES.BackgroundServices.NIO.Dtos;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.Enums.Plan;
@@ -11,6 +12,7 @@ using Hymson.MES.Data.Repositories.NioPushSwitch.Query;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
+using System.Drawing;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -86,6 +88,15 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 }
                 else
                 {
+                    if(data.BuzScene == BuzSceneEnum.Buz_Collection_Summary)
+                    {
+                        var curBuz = configEntities.Where(m => m.BuzScene == BuzSceneEnum.Buz_Collection).FirstOrDefault();
+                        if (curBuz != null)
+                        {
+                            config.IsEnabled = curBuz.IsEnabled;
+                        }
+                    }
+
                     if (config.IsEnabled == TrueOrFalseEnum.Yes)
                     {
                         // 推送
