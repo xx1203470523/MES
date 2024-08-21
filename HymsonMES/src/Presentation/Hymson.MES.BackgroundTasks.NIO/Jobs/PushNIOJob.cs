@@ -33,7 +33,7 @@ namespace Hymson.MES.BackgroundTasks.NIO
         {
             try
             {
-                await _pushNIOService.ExecutePushAsync(1000);
+                await _pushNIOService.ExecutePushAsync(20);
             }
             catch (Exception ex)
             {

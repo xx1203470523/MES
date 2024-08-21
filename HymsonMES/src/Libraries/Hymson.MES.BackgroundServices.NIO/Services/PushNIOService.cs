@@ -54,7 +54,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// </summary>
         /// <param name="limitCount"></param>
         /// <returns></returns>
-        public async Task<int> ExecutePushAsync(int limitCount = 5000)
+        public async Task<int> ExecutePushAsync(int limitCount = 100)
         {
             // 查询全部开关配置
             var configEntities = await _nioPushSwitchRepository.GetEntitiesAsync(new NioPushSwitchQuery { });

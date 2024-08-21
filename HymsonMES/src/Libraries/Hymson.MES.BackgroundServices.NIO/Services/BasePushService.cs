@@ -67,6 +67,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         public async Task AddToPushQueueAsync<T>(NioPushSwitchEntity config, BuzSceneEnum buzSceneEnum, IEnumerable<T> data,
             long id = 0)
         {
+            if(data == null || data.Count() == 0)
+            {
+                return;
+            }
+
             var user = "AddToPushQueue";
             var time = HymsonClock.Now();
 

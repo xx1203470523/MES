@@ -191,6 +191,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly string PRODUCRE_END = "R01OP150";
 
         /// <summary>
+        /// 小数精度
+        /// </summary>
+        private readonly int NIO_NUM_LEN = 4;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="nioPushSwitchRepository"></param>
@@ -301,11 +306,14 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
                 //工序参数
                 string procedure = "未知";
-                var curProcedure = procedureParamList.Where(m => m.ProcedureId == item.ProcedureId).FirstOrDefault();
-                if (curProcedure != null)
+                ProcedureParamView ?curOpParam = null;
+                var curProcedureList = procedureParamList.Where(m => m.ProcedureId == item.ProcedureId).ToList();
+                if (curProcedureList != null && curProcedureList.Count > 0)
                 {
-                    procedure = curProcedure.ProcedureCode;
+                    procedure = curProcedureList.ElementAt(0).ProcedureCode;
+                    curOpParam = curProcedureList.Where(m => m.ParameterCode == curBaseParam.ParameterCode).FirstOrDefault();
                 }
+
                 //总成码,指定工序才有总成码
                 string nioSfc = item.SFC;
                 if (ROTOR_NIOSN_OP.Contains(procedure) == true && nioSfcList != null)
@@ -341,13 +349,13 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     decimal tmpDecValue = 0;
                     if (decimal.TryParse(item.ParameterValue, out tmpDecValue) == true) //能转成decimal
                     {
-                        model.DecimalValue = tmpDecValue;
+                        model.DecimalValue = Math.Round(tmpDecValue, NIO_NUM_LEN);
                         model.StringValue = "";
                     }
                     else
                     {
                         model.DecimalValue = 0;
-                        model.StringValue = item.ParameterValue;
+                        model.StringValue = "";
                     }
                 }
                 else
@@ -371,7 +379,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.InputTime = GetTimestamp(HymsonClock.Now());
                 model.OutputTime = model.InputTime;
                 model.StationStatus = "passed";
-                model.IsOk = CheckParam(curProcedure, item.ParameterValue);
+                model.IsOk = CheckParam(curOpParam, item.ParameterValue);
                 model.VendorStationStatus = model.StationStatus;
                 model.VendorValueStatus = model.StationStatus;
                 //model.Debug = NIO_DEBUG;
@@ -432,6 +440,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     {
                         return Core.Enums.TrueOrFalseEnum.No;
                     }
+                    return result;
                 }
                 //中心值存在
                 if (opParam.CenterValue != null)
@@ -440,6 +449,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     {
                         return Core.Enums.TrueOrFalseEnum.No;
                     }
+                    return result;
                 }
                 //只存在上限值
                 if (opParam.UpperLimit != null)
@@ -448,6 +458,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     {
                         return Core.Enums.TrueOrFalseEnum.No;
                     }
+                    return result;
                 }
                 //只存在下限值
                 if (opParam.LowerLimit != null)
@@ -456,6 +467,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     {
                         return Core.Enums.TrueOrFalseEnum.No;
                     }
+                    return result;
                 }
 
                 return result;
@@ -486,7 +498,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取当前水位
             var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioManuData);
             //获取步骤数据
-            EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery() { Rows = WATER_ROWS, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
+            EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery() { Rows = 20, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
             var stepList = await _manuSfcStepRepository.GetSfcStepMavelAsync(stepQuery);
             if(stepList == null || stepList.Count() == 0)
             {
@@ -615,7 +627,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取已经走完的追溯记录
             EntityByWaterMarkTimeQuery rotorQuery = new EntityByWaterMarkTimeQuery();
             rotorQuery.StartWaterMarkTime = startWaterMarkTime;
-            rotorQuery.Rows = WATER_ROWS;
+            rotorQuery.Rows = 10;
             var rotorSfcList = await _manuRotorSfcRepository.GetListAsync(rotorQuery);
             if (rotorSfcList == null || rotorSfcList.Count() == 0)
             {
@@ -1037,7 +1049,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取当前水位
             var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioIssue);
             //获取参数表数据
-            EntityByWaterMarkQuery waterQuery = new EntityByWaterMarkQuery() { Rows = WATER_ROWS, StartWaterMarkId = startWaterMarkId };
+            EntityByWaterMarkQuery waterQuery = new EntityByWaterMarkQuery() { Rows = 20, StartWaterMarkId = startWaterMarkId };
             var paramList = await _manuProductParameterRepository.GetManuNgParamMavelAsync(waterQuery);
             if (paramList == null || paramList.Any() == false) return;
             //获取标准参数，用于获取根据ID获取名称（参数表在其他库）
@@ -1057,6 +1069,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 //标准参数
                 var curBaseParam = baseParamList.Where(m => m.Id == item.ParameterId).FirstOrDefault();
                 if (curBaseParam == null)
+                {
+                    continue;
+                }
+                if (curBaseParam.IsPush == TrueOrFalseEnum.No)
                 {
                     continue;
                 }
