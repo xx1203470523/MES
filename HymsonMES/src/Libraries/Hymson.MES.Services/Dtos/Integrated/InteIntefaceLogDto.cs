@@ -138,7 +138,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     public record DataObject
-    { 
+    {
         /// <summary>
         /// 请求方
         /// </summary>
@@ -156,7 +156,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public int? IsSuccess { get; set; }
 
-        public DateTime[] RequestTime { get; set; }
+        public DateTime[]? RequestTime { get; set; }
 
     }
 }
