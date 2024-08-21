@@ -168,6 +168,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             _manuRequistionOrderReceiveRepository = manuRequistionOrderReceiveRepository;
         }
 
+
         /// <summary>
         /// 领料单接收
         /// </summary>
@@ -637,6 +638,194 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
 
             //return manuReturnOrderEntity.ReturnOrderCode;
             #endregion
+
+            return "";
+        }
+
+        /// <summary>
+        /// 领料单接收（不校验物料明细）
+        /// 2024.08.21 开会讨论暂定方案
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<string> MaterialPickingReceiveWithoutDetailAsync(WhMaterialPickingReceiveDto requestDto)
+        {
+            if (requestDto.ReceiptResult == WhMaterialPickingReceiveResultEnum.CancelMaterialReceipt)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10254));
+            }
+
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
+            if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
+
+            var siteId = long.Parse(configEntities.FirstOrDefault()?.Value ?? "0");
+            var userName = requestDto.OperateBy;
+
+            // 1. 当前领料单状态
+            var requistionOrderEntity = await _manuRequistionOrderRepository.GetByCodeAsync(new ManuRequistionOrderQuery
+            {
+                SiteId = siteId,
+                ReqOrderCode = requestDto.RequistionOrderCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15160)).WithData("ReqOrderCode", requestDto.RequistionOrderCode);
+
+            // 领料单状态校验（收料状态已完成，不能领料）
+            if (requistionOrderEntity.Status == WhMaterialPickingStatusEnum.Completed)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15161)).WithData("ReqOrderCode", requestDto.RequistionOrderCode);
+            }
+
+            // 读取领料单明细
+            var requistionOrderDetailEntities = await _manuRequistionOrderDetailRepository.GetManuRequistionOrderDetailEntitiesAsync(new ManuRequistionOrderDetailQuery
+            {
+                SiteId = siteId,
+                RequistionOrderIds = new long[] { requistionOrderEntity.Id }
+            });
+
+            // 读取物料
+            var materialEntities = await _procMaterialRepository.GetEntitiesAsync(new ProcMaterialQuery
+            {
+                SiteId = siteId,
+                MaterialIds = requistionOrderDetailEntities.Select(s => s.MaterialId)
+            });
+
+            // 4.1 更新领料单状态
+            if (requestDto.ReceiptResult == WhMaterialPickingReceiveResultEnum.Receiving)
+            {
+                requistionOrderEntity.Status = WhMaterialPickingStatusEnum.Inspectioning;
+            }
+            else if (requestDto.ReceiptResult == WhMaterialPickingReceiveResultEnum.Completed)
+            {
+                requistionOrderEntity.Status = WhMaterialPickingStatusEnum.Completed;
+            }
+
+            var userId = requestDto.OperateBy;
+            var createOn = HymsonClock.Now();
+            requistionOrderEntity.UpdatedBy = userId;
+            requistionOrderEntity.UpdatedOn = createOn;
+
+            //4.2 新增领料单接收明细，台账明细，库存表
+            //manu_requistion_order_receive
+            List<ManuRequistionOrderReceiveEntity> manuRequistionOrderReceiveEntities = new();
+            List<WhMaterialStandingbookEntity> whMaterialStandingbookEntities = new();
+            List<WhMaterialInventoryEntity> whMaterialInventoryEntities = new();
+            foreach (var detailEntity in requistionOrderDetailEntities)
+            {
+                var materialEntity = materialEntities.FirstOrDefault(f => f.Id == detailEntity.MaterialId);
+                if (materialEntity == null) continue;
+
+                var materialPickingDetailDto = new WhMaterialPickingDetailDto
+                {
+                    MaterialBarCode = await GenerateOrderCodeAsync(materialEntity.Id, materialEntity.MaterialCode, siteId, userName)
+                };
+
+                // 接收明细
+                manuRequistionOrderReceiveEntities.Add(new ManuRequistionOrderReceiveEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    RequistionOrderId = requistionOrderEntity.Id,
+                    MaterialId = materialEntity.Id,
+                    MaterialBarCode = materialPickingDetailDto.MaterialBarCode,
+                    Qty = detailEntity.Qty,
+                    WarehouseId = 0,
+                    Remark = requestDto.Remark ?? "",
+                    SiteId = siteId,
+                    CreatedBy = requestDto.OperateBy,
+                    UpdatedBy = requestDto.OperateBy,
+                    CreatedOn = createOn,
+                    UpdatedOn = createOn,
+                    SupplierId = null,
+                    Batch = ""
+                });
+
+                // 台账明细
+                whMaterialStandingbookEntities.Add(new WhMaterialStandingbookEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    MaterialCode = materialEntity?.MaterialCode ?? "",
+                    MaterialName = materialEntity?.MaterialName ?? "",
+                    MaterialVersion = materialEntity?.Version ?? "",
+                    MaterialBarCode = materialPickingDetailDto.MaterialBarCode,
+                    Unit = materialEntity?.Unit ?? "",
+                    Quantity = detailEntity.Qty,
+                    Remark = requestDto.Remark,
+                    Type = WhMaterialInventoryTypeEnum.MaterialReceiving,
+                    Source = MaterialInventorySourceEnum.WMS,
+                    SiteId = siteId,
+                    SupplierId = 0,
+                    CreatedBy = requestDto.OperateBy,
+                    UpdatedBy = requestDto.OperateBy,
+                    CreatedOn = createOn,
+                    UpdatedOn = createOn,
+                    Batch = ""
+                });
+
+                // 库存明细
+                whMaterialInventoryEntities.Add(new WhMaterialInventoryEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SupplierId = 0,
+                    MaterialId = materialEntity!.Id,
+                    MaterialBarCode = materialPickingDetailDto.MaterialBarCode,
+                    QuantityResidue = detailEntity.Qty,
+                    ReceivedQty = detailEntity.Qty,
+                    Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                    Source = MaterialInventorySourceEnum.WMS,
+                    SiteId = siteId,
+                    MaterialType = MaterialInventoryMaterialTypeEnum.PurchaseParts,
+                    Batch = "",
+                    WorkOrderId = requistionOrderEntity.WorkOrderId,
+                    CreatedBy = requestDto.OperateBy,
+                    UpdatedBy = requestDto.OperateBy,
+                    CreatedOn = createOn,
+                    UpdatedOn = createOn
+                });
+            }
+
+            List<ManuSfcEntity> sfcEntities = new();
+            List<ManuSfcInfoEntity> sfcInfoEntities = new();
+            foreach (var whMaterialInventoryEntity in whMaterialInventoryEntities)
+            {
+                var sfcId = IdGenProvider.Instance.CreateId();
+
+                // 插入生产条码信息
+                sfcEntities.Add(new ManuSfcEntity
+                {
+                    Id = sfcId,
+                    SFC = whMaterialInventoryEntity.MaterialBarCode,
+                    Qty = whMaterialInventoryEntity.QuantityResidue,
+                    IsUsed = YesOrNoEnum.No,
+                    Status = SfcStatusEnum.Complete,
+                    Type = Core.Enums.Manufacture.SfcTypeEnum.NoProduce,
+                    SiteId = siteId,
+                    CreatedBy = requestDto.OperateBy,
+                    UpdatedBy = requestDto.OperateBy,
+                    CreatedOn = createOn,
+                    UpdatedOn = createOn
+                });
+
+                sfcInfoEntities.Add(new ManuSfcInfoEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    WorkOrderId = whMaterialInventoryEntity.WorkOrderId,
+                    ProductId = whMaterialInventoryEntity?.MaterialId ?? 0,
+                    SfcId = sfcId,
+                    IsUsed = true,
+                    SiteId = siteId,
+                    CreatedBy = requestDto.OperateBy,
+                    UpdatedBy = requestDto.OperateBy,
+                    CreatedOn = createOn,
+                    UpdatedOn = createOn
+                });
+            }
+
+            using var trans = TransactionHelper.GetTransactionScope();
+            await _manuSfcRepository.InsertRangeAsync(sfcEntities);
+            await _manuSfcInfoRepository.InsertsAsync(sfcInfoEntities);
+            await _whMaterialInventoryRepository.InsertsAsync(whMaterialInventoryEntities);
+            await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
+            await _manuRequistionOrderReceiveRepository.InsertRangeAsync(manuRequistionOrderReceiveEntities);
+            await _manuRequistionOrderRepository.UpdateAsync(requistionOrderEntity);
+            trans.Complete();
 
             return "";
         }
