@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Microsoft.Extensions.Options;
 
@@ -359,6 +360,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var totalCount = await totalCountTask;
             return new PagedInfo<ManuBarCodeRelationEntity>(manuSfcCirculationEntities, queryParam.PageIndex, queryParam.PageSize, totalCount);
         }
+
+        /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuBarCodeRelationEntity>> GetListByStartWaterMarkTimeAsync(EntityByWaterMarkTimeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuBarCodeRelationEntity>(GetListByStartWaterMarkTimeSql, query);
+        }
     }
 
 
@@ -388,5 +400,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
           "DisassembledBy = @UserId, DisassembledOn = @UpdatedOn, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn, DisassembledSfcStepId = @DisassembledSfcStepId WHERE Id = @Id AND IsDisassemble <> @IsDisassemble ";
 
         const string GetByLocationSql = @"SELECT * FROM manu_barcode_relation WHERE SiteId = @SiteId AND InputBarCode = @SFC AND InputBarCodeLocation = @Location ";
+
+        const string GetListByStartWaterMarkTimeSql = @"SELECT * FROM `manu_barcode_relation` WHERE UpdatedOn > @StartWaterMarkTime ORDER BY UpdatedOn ASC LIMIT @Rows";
     }
 }

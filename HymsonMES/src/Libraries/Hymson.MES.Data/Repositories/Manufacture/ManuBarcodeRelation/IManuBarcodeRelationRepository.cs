@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -122,5 +123,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcCirculationPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuBarCodeRelationEntity>> GetReportPagedInfoAsync(ComUsageReportPagedQuery queryParam);
+
+        /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuBarCodeRelationEntity>> GetListByStartWaterMarkTimeAsync(EntityByWaterMarkTimeQuery query);
     }
 }
