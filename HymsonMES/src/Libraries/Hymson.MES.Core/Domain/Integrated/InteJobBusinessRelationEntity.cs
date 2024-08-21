@@ -43,7 +43,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 参数
         /// </summary>
-        public string Parameter { get; set; }
+        public string Parameter { get; set; } = "";
 
         /// <summary>
         /// 备注

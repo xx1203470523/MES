@@ -531,6 +531,16 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 供应商名称
         /// </summary>
         public string SupplierName { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string OrderCode { get; set; }
     }
 
     /// <summary>
@@ -559,6 +569,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 供应商ID
         /// </summary>
         public long SupplierId { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
     }
 
 
