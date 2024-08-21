@@ -442,11 +442,17 @@ namespace Hymson.MES.Services.Services.Plan
                     relevanceOrderCode = relevancePlanWorkOrderEntity.OrderCode;
                 }
             }
+
+            // 应下达数量
+            var residue = Math.Ceiling(planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100));
+            // 查询已下发数量
+            var workOrderRecordEntity = await _planWorkOrderRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id);
             return new PlanSfcReceiveSfcDto()
             {
                 OrderCode = planWorkOrderEntity.OrderCode,
                 Type = planWorkOrderEntity.Type,
                 OrderCodeQty = planWorkOrderEntity.Qty,
+                OrderResidue = residue - (workOrderRecordEntity?.PassDownQuantity??0),
                 BarCode = param.SFC,
                 MaterialCode = procMaterialEntity.MaterialCode,
                 MaterialName = procMaterialEntity.MaterialName,
