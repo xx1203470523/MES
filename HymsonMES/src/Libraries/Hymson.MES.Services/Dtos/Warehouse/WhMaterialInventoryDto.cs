@@ -849,6 +849,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public decimal Qty { get; set; }
 
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long ProductId {  get; set; }
+
     }
 
 }
