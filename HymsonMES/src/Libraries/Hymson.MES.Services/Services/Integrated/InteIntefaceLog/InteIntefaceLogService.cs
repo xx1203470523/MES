@@ -6,6 +6,7 @@ using Hymson.MES.Core.Enums.Integrated;
 using Hymson.Logging;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Elastic.Clients.Elasticsearch.Core.Search;
 
 namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 {
@@ -27,7 +28,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<TraceLogEntry>> GetPagedListAsync(InteIntefaceLogPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<HitTraceLogDto>> GetPagedListAsync(InteIntefaceLogPagedQueryDto pagedQueryDto)
         {
             var logDataPagedQuery = new LogDataPagedQuery()
             {
@@ -44,13 +45,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             if (pagedQueryDto?.QueryType == InterfaceLogQueryTyeEnum.SystemLog)
             {
                 logDataPagedQuery.ServiceType = ServiceTypeEnum.MES;
-            }
-
-            if (pagedQueryDto?.TimeStamp != null)
-            {
-                logDataPagedQuery.BeginTime = pagedQueryDto.TimeStamp[0];
-                logDataPagedQuery.EndTime = pagedQueryDto.TimeStamp[1].AddDays(1);
-            }
+            }         
 
             if (pagedQueryDto?.Id != null)
             {
@@ -70,6 +65,12 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             if (pagedQueryDto?.Message != null)
             {
                 logDataPagedQuery.Message = pagedQueryDto.Message;
+            }
+
+            if (pagedQueryDto?.Data?.RequestTime != null)
+            {
+                logDataPagedQuery.BeginTime = pagedQueryDto.Data.RequestTime[0];
+                logDataPagedQuery.EndTime = pagedQueryDto.Data.RequestTime[1].AddDays(1);
             }
 
             var data = new Dictionary<string, string> { };
@@ -96,8 +97,36 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 
             logDataPagedQuery.Data = data;
 
-            return await _logDataService.GetLogDataPagedAsync(logDataPagedQuery);
+            var pagedInfo = await _logDataService.GetLogDataHitPagedAsync(logDataPagedQuery);
+            var hitDtos = new List<HitTraceLogDto>();
+
+            //转换 直接序列化ELK自定义
+            foreach (var item in pagedInfo.Data)
+            {
+                var hitDto = new HitTraceLogDto()
+                {
+                    Id = item.Source!.Id,
+                    InterfaceCode = item.Source!.InterfaceCode,
+                    Data = item.Source!.Data,
+                    Message = item.Source!.Message,
+                    ServiceType = item.Source!.ServiceType,
+                    Timestamp = item.Source!.Timestamp,
+                    Type = item.Source!.Type,
+                    IdentifierId = item.Id,
+                    IndexName = item.Index
+                };
+                hitDtos.Add(hitDto);
+            }
+
+
+            return new PagedInfo<HitTraceLogDto>(hitDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+
+
         }
 
+        public async Task<TraceLogEntry> QueryByIdAsync(string id, string indexName)
+        {
+            return await _logDataService.GetTraceLogEntryByIdAsync(id, indexName);
+        }
     }
 }
