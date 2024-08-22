@@ -1,14 +1,12 @@
 using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Web.Framework.Filters;
 using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
@@ -27,7 +25,6 @@ namespace Hymson.MES.Api
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            MemoryCacheExtensions.EnableCache = false;
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.

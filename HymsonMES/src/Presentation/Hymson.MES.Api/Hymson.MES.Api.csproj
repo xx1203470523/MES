@@ -31,10 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hymson.ClearCache" Version="2.1.180" />
-    <PackageReference Include="Hymson.EventBus.RabbitMQ" Version="2.1.180" />
-    <PackageReference Include="Hymson.NLog.Web" Version="2.1.180" />
-    <PackageReference Include="Hymson.Print" Version="2.1.180" />
+    <PackageReference Include="Hymson.ClearCache" Version="2.1.183" />
+    <PackageReference Include="Hymson.EventBus.RabbitMQ" Version="2.1.183" />
+    <PackageReference Include="Hymson.NLog.Web" Version="2.1.183" />
+    <PackageReference Include="Hymson.Print" Version="2.1.183" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />

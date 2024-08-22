@@ -21,7 +21,7 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// 失败
         /// </summary>
         [Description("失败")]
-        Failure = -1,
+        Failure = 1,
 
     }
 
