@@ -125,7 +125,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             _logger.LogInformation($"主数据（产品）ProductAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-            var buzScene = BuzSceneEnum.Master_Product;
+            var buzScene = BuzSceneEnum.Master_Product_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 
@@ -166,7 +166,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             _logger.LogInformation($"主数据（工序）StationAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-            var buzScene = BuzSceneEnum.Master_Station;
+            var buzScene = BuzSceneEnum.Master_Station_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
             ////站点配置
@@ -252,7 +252,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             _logger.LogInformation($"主数据（控制项）FieldAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-            var buzScene = BuzSceneEnum.Master_Field;
+            var buzScene = BuzSceneEnum.Master_Field_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
             //站点配置
@@ -462,7 +462,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             _logger.LogInformation($"主数据（一次合格率目标）PassrateTargetAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-            var buzScene = BuzSceneEnum.Master_PassrateTarget;
+            var buzScene = BuzSceneEnum.Master_PassrateTarget_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 

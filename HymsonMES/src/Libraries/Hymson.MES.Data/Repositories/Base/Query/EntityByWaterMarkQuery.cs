@@ -37,4 +37,25 @@
         /// </summary>
         public long SiteId { get; set; }
     }
+
+    /// <summary>
+    /// 根据时间查询
+    /// </summary>
+    public class EntityByDateSiteIdQuery
+    {
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        public DateTime BeginDate { get; set; }
+
+        /// <summary>
+        /// 结束时间
+        /// </summary>
+        public DateTime EndDate { get; set; }
+    }
 }

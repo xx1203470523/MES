@@ -181,6 +181,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 获取马威数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetSfcStepDateMavelAsync(EntityByDateSiteIdQuery query)
+        {
+            string sql = $@"
+                select * 
+                from manu_sfc_step t1
+                where t1.SiteId = @SiteId
+                and CreatedOn >= '{query.BeginDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+                and CreatedOn < '{query.EndDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcStepEntity>(sql, query);
+        }
+
+        /// <summary>
         /// 获取马威末尾工序数量数据
         /// </summary>
         /// <returns></returns>

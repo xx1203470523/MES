@@ -58,7 +58,7 @@ Host.CreateDefaultBuilder(args)
            q.AddJobAndTrigger<BuzIssueJob>(hostContext.Configuration);
            q.AddJobAndTrigger<BuzMaterialJob>(hostContext.Configuration);
            q.AddJobAndTrigger<BuzPassrateProductJob>(hostContext.Configuration);
-           q.AddJobAndTrigger<BuzPassrateStationJob>(hostContext.Configuration);
+           //q.AddJobAndTrigger<BuzPassrateStationJob>(hostContext.Configuration);
            q.AddJobAndTrigger<BuzProductionJob>(hostContext.Configuration);
            q.AddJobAndTrigger<BuzWorkOrderJob>(hostContext.Configuration);
           

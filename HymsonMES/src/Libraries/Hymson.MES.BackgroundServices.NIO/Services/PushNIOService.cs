@@ -1,18 +1,21 @@
 ﻿using Google.Protobuf.WellKnownTypes;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.BackgroundServices.NIO.Dtos;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.Enums.Plan;
 using Hymson.MES.Core.NIO;
 using Hymson.MES.CoreServices.Extension;
 using Hymson.MES.Data.NIO;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.NioPushSwitch;
 using Hymson.MES.Data.Repositories.NioPushSwitch.Query;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
-using System.Drawing;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -37,6 +40,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly INioPushRepository _nioPushRepository;
 
         /// <summary>
+        /// 系统配置
+        /// </summary>
+        private readonly ISysConfigRepository _sysConfigRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="waterMarkService"></param>
@@ -44,11 +52,13 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <param name="nioPushRepository"></param>
         public PushNIOService(IWaterMarkService waterMarkService,
             INioPushSwitchRepository nioPushSwitchRepository,
-            INioPushRepository nioPushRepository)
+            INioPushRepository nioPushRepository,
+            ISysConfigRepository sysConfigRepository)
         {
             _waterMarkService = waterMarkService;
             _nioPushSwitchRepository = nioPushSwitchRepository;
             _nioPushRepository = nioPushRepository;
+            _sysConfigRepository = sysConfigRepository;
         }
 
         /// <summary>
@@ -65,6 +75,24 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             // 总开关是否开启
             var masterConfig = configEntities.FirstOrDefault(f => f.BuzScene == BuzSceneEnum.All);
             if (masterConfig == null || masterConfig.IsEnabled != TrueOrFalseEnum.Yes) return default;
+
+            //站点配置
+            string host = string.Empty;
+            string hostsuffix = string.Empty;
+            IEnumerable<SysConfigEntity>? nioUrlList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.NioUrl });
+            if (nioUrlList != null && nioUrlList.Count() > 0)
+            {
+                var hostEntity = nioUrlList.Where(m => m.Code.ToLower() == "host").FirstOrDefault();
+                if(hostEntity != null)
+                {
+                    host = hostEntity.Value;
+                }
+                var hostsuffixEntity = nioUrlList.Where(m => m.Code.ToLower() == "hostsuffix").FirstOrDefault();
+                if (hostsuffixEntity != null)
+                {
+                    hostsuffix = hostsuffixEntity.Value;
+                }
+            }
 
             // 水位ID
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(WaterMarkKey.PushToNIO);
@@ -88,14 +116,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 }
                 else
                 {
-                    if(data.BuzScene == BuzSceneEnum.Buz_Collection_Summary)
-                    {
-                        var curBuz = configEntities.Where(m => m.BuzScene == BuzSceneEnum.Buz_Collection).FirstOrDefault();
-                        if (curBuz != null)
-                        {
-                            config.IsEnabled = curBuz.IsEnabled;
-                        }
-                    }
+                    config.IsEnabled = GetMapEnum(data, config, configEntities);
 
                     if (config.IsEnabled == TrueOrFalseEnum.Yes)
                     {
@@ -118,12 +139,18 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     else
                     {
                         data.Status = PushStatusEnum.Off;
+                        continue;
                     }
                 }
 
                 data.UpdatedBy = "PushToNIO";
                 data.UpdatedOn = HymsonClock.Now();
                 updates.Add(data);
+            }
+
+            if(updates == null || updates.Count == 0)
+            {
+                return 0;
             }
 
             var rows = 0;
@@ -139,5 +166,129 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             return rows;
         }
 
+        /// <summary>
+        /// 获取枚举映射
+        /// </summary>
+        /// <param name="sum">推送场景</param>
+        /// <param name="data">推送开关</param>
+        /// <param name="list">配置列表</param>
+        /// <returns></returns>
+        private TrueOrFalseEnum GetMapEnum(NioPushEntity sum, NioPushSwitchEntity data, IEnumerable<NioPushSwitchEntity> list)
+        {
+            if (list == null || list.Count() == 0)
+            {
+                return data.IsEnabled;
+            }
+
+            //主数据
+            if (sum.BuzScene == BuzSceneEnum.Master_Product_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.Master_Product).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            if (sum.BuzScene == BuzSceneEnum.Master_Station_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.Master_Station).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            if (sum.BuzScene == BuzSceneEnum.Master_Field_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.Master_Field).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            if (sum.BuzScene == BuzSceneEnum.Master_PassrateTarget_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.Master_PassrateTarget).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            //业务数据
+            if (sum.BuzScene == BuzSceneEnum.Buz_Collection_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.Buz_Collection).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            if (sum.BuzScene == BuzSceneEnum.Buz_Production_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.Buz_Production).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            if (sum.BuzScene == BuzSceneEnum.Buz_Material_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.Buz_Material).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            if (sum.BuzScene == BuzSceneEnum.Buz_PassrateProduct_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.Buz_PassrateProduct).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            if (sum.BuzScene == BuzSceneEnum.Buz_Issue_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.Buz_Issue).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            if (sum.BuzScene == BuzSceneEnum.Buz_WorkOrder_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.Buz_WorkOrder).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            //ERP&WMS
+            if (sum.BuzScene == BuzSceneEnum.ERP_ProductionCapacity_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.ERP_ProductionCapacity).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            if (sum.BuzScene == BuzSceneEnum.ERP_KeySubordinate_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.ERP_KeySubordinate).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+            if (sum.BuzScene == BuzSceneEnum.ERP_ActualDelivery_Summary)
+            {
+                var curBuz = list.Where(m => m.BuzScene == BuzSceneEnum.ERP_ActualDelivery).FirstOrDefault();
+                if (curBuz != null)
+                {
+                    return curBuz.IsEnabled;
+                }
+            }
+
+            return data.IsEnabled;
+        }
     }
 }

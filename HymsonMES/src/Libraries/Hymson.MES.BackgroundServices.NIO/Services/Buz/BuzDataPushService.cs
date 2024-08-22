@@ -485,7 +485,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             _logger.LogInformation($"业务数据（生产业务）ProductionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-            var buzScene = BuzSceneEnum.Buz_Production;
+            var buzScene = BuzSceneEnum.Buz_Production_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 
@@ -576,9 +576,9 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.OperatorId = NIO_USER_ID;
                 model.OperatorName = NIO_USER_NAME;
                 model.InputTime = GetTimestamp(item.CreatedOn);
-                model.OutputTime = model.InputTime;
+                model.OutputTime = GetTimestamp(item.UpdatedOn ?? item.CreatedOn);
                 //model.DeviceDeterminedStatus = item.ScrapQty > 0;
-                if(item.ScrapQty != null && item.ScrapQty > 0)
+                if (item.ScrapQty != null && item.ScrapQty > 0)
                 {
                     model.DeterminedStatus = false;
                 }
@@ -610,7 +610,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             _logger.LogInformation($"业务数据（材料清单）MaterialAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-            var buzScene = BuzSceneEnum.Buz_Material;
+            var buzScene = BuzSceneEnum.Buz_Material_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 
@@ -832,7 +832,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             _logger.LogInformation($"业务数据（产品一次合格率）PassrateProductAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-            var buzScene = BuzSceneEnum.Buz_PassrateProduct;
+            var buzScene = BuzSceneEnum.Buz_PassrateProduct_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 
@@ -849,9 +849,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取当前水位
             var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioPassrateProduct);
             //获取步骤数据
-            EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery()
-            { Rows = WATER_ALL_ROWS, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
-            var stepList = await _manuSfcStepRepository.GetSfcStepMavelAsync(stepQuery);
+            //EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery()
+            //{ Rows = WATER_ALL_ROWS, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
+            EntityByDateSiteIdQuery stepQuery = new EntityByDateSiteIdQuery();
+            var stepList = await _manuSfcStepRepository.GetSfcStepDateMavelAsync(stepQuery);
             if (stepList == null || !stepList.Any()) return;
 
             //型号
@@ -1043,7 +1044,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             _logger.LogInformation($"业务数据（缺陷业务）IssueAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-            var buzScene = BuzSceneEnum.Buz_Issue;
+            var buzScene = BuzSceneEnum.Buz_Issue_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 
@@ -1145,7 +1146,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             _logger.LogInformation($"业务数据（工单业务）WorkOrderAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-            var buzScene = BuzSceneEnum.Buz_WorkOrder;
+            var buzScene = BuzSceneEnum.Buz_WorkOrder_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 

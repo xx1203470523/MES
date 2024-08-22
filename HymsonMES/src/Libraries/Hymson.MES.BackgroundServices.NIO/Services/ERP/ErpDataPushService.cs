@@ -103,7 +103,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
         /// <returns></returns>
         public async Task NioStockInfoAsync()
         {
-            var buzScene = BuzSceneEnum.ERP_ProductionCapacity;
+            var buzScene = BuzSceneEnum.ERP_ProductionCapacity_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 
@@ -210,7 +210,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
         /// <returns></returns>
         public async Task NioKeyItemInfoAsync()
         {
-            var buzScene = BuzSceneEnum.ERP_KeySubordinate;
+            var buzScene = BuzSceneEnum.ERP_KeySubordinate_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
             DateTime now = HymsonClock.Now();
@@ -327,7 +327,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
         /// <returns></returns>
         public async Task NioActualDeliveryAsync()
         {
-            var buzScene = BuzSceneEnum.ERP_ActualDelivery;
+            var buzScene = BuzSceneEnum.ERP_ActualDelivery_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 
@@ -387,6 +387,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                 {
                     dto.ShippedQty = 0;
                     dto.ActualDeliveryTime = GetTimestamp(HymsonClock.Now());
+                }
+                if(dto.ShippedQty == 0)
+                {
+                    continue;
                 }
 
                 dtos.Add(dto);

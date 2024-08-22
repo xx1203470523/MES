@@ -192,7 +192,7 @@ namespace Hymson.MES.Data.NIO
         const string DeleteSql = "UPDATE nio_push SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE nio_push SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetListByStartWaterMarkIdSql = @"SELECT * FROM nio_push WHERE Status = 1 AND Id > @StartWaterMarkId ORDER BY Id ASC LIMIT @Rows";
+        const string GetListByStartWaterMarkIdSql = @"SELECT * FROM nio_push WHERE Status = 1 ORDER BY Id ASC LIMIT @Rows";
         const string GetByIdSql = @"SELECT * FROM nio_push WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM nio_push WHERE Id IN @Ids ";
 
