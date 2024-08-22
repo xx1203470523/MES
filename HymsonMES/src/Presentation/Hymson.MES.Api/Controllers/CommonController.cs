@@ -1,10 +1,12 @@
 ﻿using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Concurrent;
 using System.Net;
+using System.Reflection;
 
 namespace Hymson.MES.Api.Controllers
 {
@@ -18,13 +20,13 @@ namespace Hymson.MES.Api.Controllers
         private readonly IEnumService _enumService;
         private readonly IMemoryCache _memoryCache;
 
-       
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="enumService"></param>
         /// <param name="memoryCache"></param>
-        public CommonController(IEnumService enumService,IMemoryCache memoryCache)
+        public CommonController(IEnumService enumService, IMemoryCache memoryCache)
         {
             _enumService = enumService;
             _memoryCache = memoryCache;
@@ -59,6 +61,29 @@ namespace Hymson.MES.Api.Controllers
             }
 
             return keyValuePairs;
+        }
+        private Dictionary<string, string?> GetErrorCodes(Type type)
+        {
+            Dictionary<string, string?> keyValuePairs = new Dictionary<string, string?>();
+            var fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.Static |
+                BindingFlags.FlattenHierarchy)
+     .Where(fi => fi.IsLiteral && !fi.IsInitOnly).ToList();
+            foreach (var fieldInfo in fieldInfos)
+            {
+                keyValuePairs.Add(fieldInfo.Name, fieldInfo?.GetRawConstantValue()?.ToString());
+            }
+            return keyValuePairs;
+        }
+        /// <summary>
+        /// 系统错误码
+        /// </summary>
+        /// <returns></returns>
+        [Route("error-code")]
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetErrorCodes()
+        {
+            return Ok(GetErrorCodes(typeof(ErrorCode)));
         }
 
         /// <summary>
