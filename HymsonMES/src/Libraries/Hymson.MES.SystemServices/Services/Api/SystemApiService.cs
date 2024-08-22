@@ -110,7 +110,7 @@ public class SystemApiService : ISystemApiService
         if (queryDto.SFC?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19003));
 
         //获取模组码绑定信息
-        var modelSfcCirculationEntities = await _manuCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery() { SiteId = 123456, CirculationBarCodes = queryDto.SFC });
+        var modelSfcCirculationEntities = await _manuCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery() { SiteId = 123456, Sfc = queryDto.SFC });
 
         //获取电芯码绑定信息
         var modelsfcs = modelSfcCirculationEntities.Select(a=>a.SFC);
@@ -195,61 +195,64 @@ public class SystemApiService : ISystemApiService
             tracelist.Add(trace);
         }
 
-        List<SFCStepViewDto> steplist = new();
-        foreach (var item in manuSfcStepEntities)
-        {
-            var procdure = procdureEntities.FirstOrDefault(a => a.Id == item.ProcedureId);
-            var resource = resourceEntities.FirstOrDefault(a => a.Id == item.ResourceId);
-            var product = productEntities.FirstOrDefault(a => a.Id == item.ProductId);
-            var workOrder = workOrderEntities.FirstOrDefault(a => a.Id == item.WorkOrderId);
-            var equipment = equipmentEntities.FirstOrDefault(a => a.Id == item.EquipmentId);
-
-            steplist.Add(new()
-            {
-                CreateOn = item.CreatedOn,
-                Passed = item.Passed,
-                EquipmentName = equipment?.EquipmentName,
-                ProcedureCode = procdure?.Code,
-                ProcedureName = procdure?.Name,
-                ProcedureType = procdure?.Type,
-                ResourceName = resource?.ResName,
-                ProductName = product?.MaterialName,
-                WorkOrderType = workOrder?.Type
-            });
-
-        }
-
-        List<ProductParameterViewDto> paramlist = new();
-        foreach (var item in manuSfcParameterEntities)
-        {
-            var equipment = equipmentEntities.FirstOrDefault(a => a.Id == item.EquipmentId);
-            var param = paramEntities.FirstOrDefault(a => a.Id == item.ParameterId);
-            var procdure = procdureEntities.FirstOrDefault(a => a.Id == item.ProcedureId);
-
-            paramlist.Add(new()
-            {
-                EquipmentName = equipment?.EquipmentName,
-                JudgmentResult = item?.JudgmentResult,
-                LocalTime = item?.LocalTime,
-                ParameterCode = param?.ParameterCode,
-                ParameterName = param?.ParameterName,
-                ParameterValue = item?.ParamValue,
-                ProcedureCode = procdure?.Code,
-                ProcedureName = procdure?.Name,
-                StandardLowerLimit = item?.StandardLowerLimit,
-                StandardUpperLimit = item?.StandardUpperLimit
-            });
-        }
-
         foreach (var item in queryDto.SFC)
         {
             List<ProcductTraceViewDto> trace = new List<ProcductTraceViewDto>();
+            List<SFCStepViewDto> steplist = new();
+            List<ProductParameterViewDto> paramlist = new();
+
             //绑定的模组
             var modelTrace = tracelist.Where(a => a.CirculationBarCode == item);
 
             //绑定的电芯
-            var modelSfc = modelTrace.Select(a=>a.SFC);
-            var sfcTrace = tracelist.Where(a => modelSfc.Contains(a.CirculationBarCode));
+            var modelSfc = modelTrace.Select(a => a.SFC);
+            var sfcTrace = tracelist.Where(a => modelSfc.Contains(a.SFC));
+
+            var manuSfcSteps = manuSfcStepEntities.Where(a => a.SFC == item);
+            var manuSfcParameters = manuSfcParameterEntities.Where(a=>a.SFC == item);
+
+            foreach (var manuSfcStep in manuSfcSteps)
+            {
+                var procdure = procdureEntities.FirstOrDefault(a => a.Id == manuSfcStep.ProcedureId);
+                var resource = resourceEntities.FirstOrDefault(a => a.Id == manuSfcStep.ResourceId);
+                var product = productEntities.FirstOrDefault(a => a.Id == manuSfcStep.ProductId);
+                var workOrder = workOrderEntities.FirstOrDefault(a => a.Id == manuSfcStep.WorkOrderId);
+                var equipment = equipmentEntities.FirstOrDefault(a => a.Id == manuSfcStep.EquipmentId);
+
+                steplist.Add(new()
+                {
+                    CreateOn = manuSfcStep.CreatedOn,
+                    Passed = manuSfcStep.Passed,
+                    EquipmentName = equipment?.EquipmentName,
+                    ProcedureCode = procdure?.Code,
+                    ProcedureName = procdure?.Name,
+                    ProcedureType = procdure?.Type,
+                    ResourceName = resource?.ResName,
+                    ProductName = product?.MaterialName,
+                    WorkOrderType = workOrder?.Type
+                });
+            }
+
+            foreach (var manuSfcParameter in manuSfcParameters)
+            {
+                var equipment = equipmentEntities.FirstOrDefault(a => a.Id == manuSfcParameter.EquipmentId);
+                var param = paramEntities.FirstOrDefault(a => a.Id == manuSfcParameter.ParameterId);
+                var procdure = procdureEntities.FirstOrDefault(a => a.Id == manuSfcParameter.ProcedureId);
+
+                paramlist.Add(new()
+                {
+                    EquipmentName = equipment?.EquipmentName,
+                    JudgmentResult = manuSfcParameter?.JudgmentResult,
+                    LocalTime = manuSfcParameter?.LocalTime,
+                    ParameterCode = param?.ParameterCode,
+                    ParameterName = param?.ParameterName,
+                    ParameterValue = manuSfcParameter?.ParamValue,
+                    ProcedureCode = procdure?.Code,
+                    ProcedureName = procdure?.Name,
+                    StandardLowerLimit = manuSfcParameter?.StandardLowerLimit,
+                    StandardUpperLimit = manuSfcParameter?.StandardUpperLimit
+                });
+            }
 
             trace.AddRange(modelTrace);
             trace.AddRange(sfcTrace);
