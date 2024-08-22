@@ -53,9 +53,14 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         public string ProcedureCode { get; set; }
 
         /// <summary>
-        /// 时间
+        /// 出站时间
         /// </summary>
         public DateTime Date { get; set; }
+
+        /// <summary>
+        /// 进站时间
+        /// </summary>
+        public DateTime InDate { get; set; }
 
         /// <summary>
         /// 是否合格

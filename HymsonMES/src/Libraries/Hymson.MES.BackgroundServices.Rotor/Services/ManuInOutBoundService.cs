@@ -422,7 +422,12 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 mesDto.Sfc = item.ProductNo;
                 mesDto.ProcedureCode = procedureCode;
                 mesDto.IsPassed = item.Result == Result_OK ? true : false;
-                mesDto.Date = item.CreateTime;
+                if (item.EndTime == null || item.StartTime == null)
+                {
+                    continue;
+                }
+                mesDto.Date = (DateTime)item.EndTime;
+                mesDto.InDate = (DateTime)item.StartTime;
                 WorkOrderListDto? curProductOrder = productOrderList.Where(m => m.ProductNo == item.ProductNo).FirstOrDefault();
                 if(curProductOrder != null)
                 {
@@ -585,7 +590,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 if (mesItem.Type == 2)
                 {
                     ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode,
-                        mesItem.IsPassed, mesOrder, procedureId, mesItem.Date);
+                        mesItem.IsPassed, mesOrder, procedureId, mesItem.Date, mesItem.InDate);
                     stepId = step.Id;
                     stepList.Add(step);
                     sfcUpdateList.Add(new ManuSfcDto()
@@ -948,10 +953,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="produceCode"></param>
         /// <param name="mesOrder"></param>
         /// <param name="procedureId"></param>
-        /// <param name="createdOn"></param>
+        /// <param name="outDate"></param>
         /// <returns></returns>
         private ManuSfcStepEntity GetStepEntity(string sfc, int type, string produceCode,
-            bool isPassed, PlanWorkOrderEntity ?mesOrder, long procedureId, DateTime createdOn)
+            bool isPassed, PlanWorkOrderEntity ?mesOrder, long procedureId, DateTime outDate, DateTime inDate)
         {
             ManuSfcStepEntity step = new ManuSfcStepEntity();
             step.Id = IdGenProvider.Instance.CreateId();
@@ -966,8 +971,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             step.UpdatedBy = OperationBy;
             step.CreatedBy = OperationBy;
             step.ProcedureId = procedureId;
-            step.CreatedOn = createdOn;
-            step.UpdatedOn = HymsonClock.Now();
+            step.CreatedOn = inDate;
+            step.UpdatedOn = outDate;
             if(produceCode == PRODUCRE_END) //未工序设置为完成
             {
                 step.CurrentStatus = SfcStatusEnum.Complete;
