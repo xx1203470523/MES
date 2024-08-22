@@ -578,7 +578,14 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.InputTime = GetTimestamp(item.CreatedOn);
                 model.OutputTime = model.InputTime;
                 //model.DeviceDeterminedStatus = item.ScrapQty > 0;
-                model.DeterminedStatus = item.ScrapQty > 0;
+                if(item.ScrapQty != null && item.ScrapQty > 0)
+                {
+                    model.DeterminedStatus = false;
+                }
+                else
+                {
+                    model.DeterminedStatus = true;
+                }
                 //model.ManualDeterminedStatus = item.ScrapQty > 0;
                 model.UpdateTime = GetTimestamp(HymsonClock.Now());
 
@@ -697,7 +704,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.ChildSn = txSfc;
                 model.ChildName = txSfcMaterial == null ? "铁芯" : txSfcMaterial.MaterialName;
                 model.ChildNum = txSfcMaterial == null ? "030201000004" : txSfcMaterial.MaterialCode;
-                model.UpdateTime = GetTimestamp(HymsonClock.Now());
+                model.UpdateTime = GetTimestamp(item.CreatedOn);
                 dtos.Add(model);
 
                 MaterialDto zModel = new MaterialDto();
@@ -706,7 +713,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 zModel.ChildSn = zSfc;
                 zModel.ChildName = zSfcMaterial == null ? "电动机轴" : zSfcMaterial.MaterialName;
                 zModel.ChildNum = zSfcMaterial == null ? "030203000012" : zSfcMaterial.MaterialCode;
-                zModel.UpdateTime = GetTimestamp(HymsonClock.Now());
+                zModel.UpdateTime = GetTimestamp((DateTime)item.UpdatedOn);
                 dtos.Add(zModel);
 
                 #region 是否追溯明细
@@ -1282,6 +1289,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         private long GetTimestamp(DateTime date)
         {
+            date = date.AddHours(-8);
             return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
         }
 
