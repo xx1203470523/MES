@@ -57,5 +57,10 @@
         /// 结束时间
         /// </summary>
         public DateTime EndDate { get; set; }
+
+        /// <summary>
+        /// 工序列表
+        /// </summary>
+        public List<string> ProcedureCodeList { get; set; } = new List<string>();
     }
 }

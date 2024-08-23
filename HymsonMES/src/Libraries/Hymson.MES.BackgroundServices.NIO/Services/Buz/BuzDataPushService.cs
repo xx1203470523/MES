@@ -576,7 +576,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.OperatorId = NIO_USER_ID;
                 model.OperatorName = NIO_USER_NAME;
                 model.InputTime = GetTimestamp(item.CreatedOn);
-                model.OutputTime = GetTimestamp(item.UpdatedOn ?? item.CreatedOn);
+                model.OutputTime = model.InputTime; //GetTimestamp(item.UpdatedOn ?? item.CreatedOn);
                 //model.DeviceDeterminedStatus = item.ScrapQty > 0;
                 if (item.ScrapQty != null && item.ScrapQty > 0)
                 {
@@ -843,6 +843,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 throw new CustomerValidationException(nameof(ErrorCode.MES10139));
             }
             long siteId = long.Parse(configEntities.ElementAt(0).Value);
+
+            DateTime now = HymsonClock.Now();
+            string nowStr = now.ToString("yyyy-MM-dd 00:00:00");
+
             //获取基础配置
             var baseConfigList = await GetBaseConfigAsync();
             IEnumerable<NIOConfigBaseDto> baseDataList = GetBaseData(baseConfigList);
@@ -852,6 +856,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery()
             //{ Rows = WATER_ALL_ROWS, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
             EntityByDateSiteIdQuery stepQuery = new EntityByDateSiteIdQuery();
+            stepQuery.ProcedureCodeList = new List<string>() { PRODUCRE_END };
+            stepQuery.BeginDate = Convert.ToDateTime(nowStr);
+            stepQuery.EndDate = stepQuery.BeginDate.AddDays(1);
+            stepQuery.SiteId = siteId;
             var stepList = await _manuSfcStepRepository.GetSfcStepDateMavelAsync(stepQuery);
             if (stepList == null || !stepList.Any()) return;
 
@@ -880,7 +888,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     continue;
                 }
 
-                var curlAllStepList = stepList.Where(m => m.ProductId == item).Where(m => m.Remark == PRODUCRE_END).ToList();
+                var curlAllStepList = stepList.Where(m => m.ProductId == item).ToList();
 
                 PassrateProductDto model = new PassrateProductDto();
                 model.PlantId = curConfig.PlantId;

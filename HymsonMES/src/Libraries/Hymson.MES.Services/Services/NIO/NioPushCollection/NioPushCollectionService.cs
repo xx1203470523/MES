@@ -115,13 +115,41 @@ namespace Hymson.MES.Services.Services.NioPushCollection
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            // 验证DTO
+            //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+
+            Core.Enums.TrueOrFalseEnum isOk = Core.Enums.TrueOrFalseEnum.Yes;
+            //判断参数是否合格
+            if (saveDto.DecimalValue != null)
+            {
+                if(saveDto.UpperLimit != null && saveDto.LowerLimit != null)
+                {
+                    if (saveDto.DecimalValue > saveDto.UpperLimit || saveDto.DecimalValue < saveDto.LowerLimit)
+                    {
+                        isOk = Core.Enums.TrueOrFalseEnum.No;
+                    }
+                }
+                else if(saveDto.UpperLimit != null)
+                {
+                    if (saveDto.DecimalValue > saveDto.UpperLimit)
+                    {
+                        isOk = Core.Enums.TrueOrFalseEnum.No;
+                    }
+                }
+                else if(saveDto.LowerLimit != null)
+                {
+                    if (saveDto.DecimalValue < saveDto.LowerLimit)
+                    {
+                        isOk = Core.Enums.TrueOrFalseEnum.No;
+                    }
+                }
+            }
 
             // DTO转换实体
             var entity = saveDto.ToEntity<NioPushCollectionEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
+            entity.IsOk = isOk;
 
             long nioPushId = entity.NioPushId;
 
@@ -190,6 +218,13 @@ namespace Hymson.MES.Services.Services.NioPushCollection
         /// <returns></returns>
         public async Task<PagedInfo<NioPushCollectionDto>> GetPagedListAsync(NioPushCollectionPagedQueryDto pagedQueryDto)
         {
+            if(pagedQueryDto.CreatedOn == null)
+            {
+                string nowStr = HymsonClock.Now().ToString("yyyy-MM-dd 00:00:00");
+                DateTime now = Convert.ToDateTime(nowStr);
+                DateTime[] dateArr = new DateTime[] { now, now.AddDays(1) };
+                pagedQueryDto.CreatedOn = dateArr;
+            }
             var pagedQuery = pagedQueryDto.ToQuery<NioPushCollectionPagedQuery>();
             //pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _nioPushCollectionRepository.GetPagedListAsync(pagedQuery);

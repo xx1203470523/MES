@@ -187,11 +187,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<IEnumerable<ManuSfcStepEntity>> GetSfcStepDateMavelAsync(EntityByDateSiteIdQuery query)
         {
             string sql = $@"
-                select * 
+                select t1.* 
                 from manu_sfc_step t1
+                inner join proc_procedure t2 on t1.ProcedureId = t2.Id and t2.IsDeleted = 0
                 where t1.SiteId = @SiteId
-                and CreatedOn >= '{query.BeginDate.ToString("yyyy-MM-dd HH:mm:ss")}'
-                and CreatedOn < '{query.EndDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+                and t1.CreatedOn >= '{query.BeginDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+                and t1.CreatedOn < '{query.EndDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+                and t2.Code in @ProcedureCodeList
             ";
 
             using var conn = GetMESDbConnection();

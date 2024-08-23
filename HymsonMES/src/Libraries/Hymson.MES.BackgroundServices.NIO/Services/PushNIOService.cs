@@ -121,7 +121,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     if (config.IsEnabled == TrueOrFalseEnum.Yes)
                     {
                         // 推送
-                        var restResponse = await config.ExecuteAsync(data.Content);
+                        var restResponse = await config.ExecuteAsync(data.Content, host, hostsuffix);
 
                         // 处理推送结果
                         data.Status = PushStatusEnum.Failure;

@@ -90,5 +90,10 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("WorkHour")]
         WorkHour = 18,
+        /// <summary>
+        /// NIO地址配置
+        /// </summary>
+        [Description("NioUrl")]
+        NioUrl = 19,
     }
 }

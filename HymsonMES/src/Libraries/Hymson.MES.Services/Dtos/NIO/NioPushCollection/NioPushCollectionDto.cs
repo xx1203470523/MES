@@ -14,152 +14,165 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public long NioPushId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string PlantId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string WorkshopId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string ProductionLineId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string StationId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string VendorFieldCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string VendorProductNum { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string VendorProductName { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string VendorProductSn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string VendorProductTempSn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string ProcessType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public decimal? DecimalValue { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string? StringValue { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public bool BooleanValue { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string NioProductNum { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string NioProductName { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string OperatorAccount { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public long InputTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public long OutputTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string StationStatus { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string VendorStationStatus { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string VendorValueStatus { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string Owner { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public int DataType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
+        /// <summary>  
+        /// 上限值，可能来自t2表  
+        /// </summary>  
+        public decimal? UpperLimit { get; set; } // 假设是数值类型，根据实际情况选择类型  
+
+        /// <summary>  
+        /// 中心值，可能来自t2表  
+        /// </summary>  
+        public decimal? CenterValue { get; set; } // 假设是数值类型，根据实际情况选择类型  
+
+        /// <summary>  
+        /// 下限值，可能来自t2表  
+        /// </summary>  
+        public decimal? LowerLimit { get; set; } // 假设是数值类型，根据实际情况选择类型  
     }
 
     /// <summary>
@@ -387,6 +400,11 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// 是否合格
         /// </summary>
         public TrueOrFalseEnum? IsOk { get; set; }
+
+        /// <summary>
+        /// 操作时间
+        /// </summary>
+        public DateTime[] ? CreatedOn { get; set; }
     }
 
     /// <summary>

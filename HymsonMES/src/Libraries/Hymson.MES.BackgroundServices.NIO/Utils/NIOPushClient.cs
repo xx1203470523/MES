@@ -137,5 +137,50 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             return response;
         }
 
+        /// <summary>
+        /// 公用方法
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="body"></param>
+        /// <param name="host"></param>
+        /// <param name="hostsuffix"></param>
+        /// <returns></returns>
+        public static async Task<RestResponse> ExecuteAsync(this NioPushSwitchEntity config, string body, 
+            string host, string hostsuffix)
+        {
+            if(string.IsNullOrEmpty(host) == true)
+            {
+                host = HOST;
+            }
+            if(string.IsNullOrEmpty(hostsuffix) == true)
+            {
+                hostsuffix = HOSTSUFFIX;
+            }
+
+            if (config == null || string.IsNullOrWhiteSpace(body)) return new RestResponse { IsSuccessStatusCode = false };
+            var path = $"{hostsuffix}{config.Path}";
+
+            var TIMESTAMP = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
+            var NONCE = $"{Guid.NewGuid()}".Replace("-", "");
+            var METHOD = $"{(Method)config.Method}".ToUpper();
+
+            var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, body);
+
+            var client = new RestClient(host);
+            var request = new RestRequest(path, (Method)config.Method);
+            request.AddHeader("appKey", APP_KEY);
+            request.AddHeader("timestamp", TIMESTAMP);
+            request.AddHeader("nonce", NONCE);
+            request.AddHeader("sign", SIGN);
+            request.AddHeader("Accept", "*/*");
+            request.AddHeader("Accept-Encoding", "gzip, deflate, br");
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("Connection", "keep-alive");
+            request.AddHeader("User-Agent", "Pob_chen/1.1.0");
+            request.AddParameter("application/json", body, ParameterType.RequestBody);
+            request.Timeout = TimeSpan.FromSeconds(15);
+            var response = await client.ExecuteAsync(request);
+            return response;
+        }
     }
 }
