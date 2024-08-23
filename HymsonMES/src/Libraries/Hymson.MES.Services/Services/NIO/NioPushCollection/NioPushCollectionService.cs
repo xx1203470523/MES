@@ -143,6 +143,7 @@ namespace Hymson.MES.Services.Services.NioPushCollection
                         isOk = Core.Enums.TrueOrFalseEnum.No;
                     }
                 }
+                saveDto.DecimalValue = Math.Round((decimal)saveDto.DecimalValue, 4);
             }
 
             // DTO转换实体
