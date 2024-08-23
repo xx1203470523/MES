@@ -6,6 +6,7 @@ using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Param;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Param.View;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Proceduce;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Proceduce.View;
+using Hymson.MES.BackgroundServices.NIO.Utils;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Enums;
@@ -636,9 +637,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             if (updateTime == null)
             {
-                return (long)(createTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+                return NioHelper.GetTimestamp(createTime);
+                //return (long)(createTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
             }
-            return (long)((DateTime)updateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            return NioHelper.GetTimestamp((DateTime)updateTime);
+            //return (long)((DateTime)updateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
         }
 
     }

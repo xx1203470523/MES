@@ -7,11 +7,11 @@ namespace Hymson.MES.Core.Enums.Plan
     /// </summary>
     public enum PushStatusEnum : sbyte
     {
-        /// <summary>
-        /// 无需推送
-        /// </summary>
-        [Description("无需推送")]
-        NoNeed = 0,
+        ///// <summary>
+        ///// 无需推送
+        ///// </summary>
+        //[Description("无需推送")]
+        //NoNeed = 0,
         /// <summary>
         /// 待推送
         /// </summary>
@@ -27,11 +27,11 @@ namespace Hymson.MES.Core.Enums.Plan
         /// </summary> 
         [Description("推送失败")]
         Failure = 3,
-        /// <summary>
-        /// 没有配置 
-        /// </summary> 
-        [Description("没有配置")]
-        NotConfigured = 4,
+        ///// <summary>
+        ///// 没有配置 
+        ///// </summary> 
+        //[Description("没有配置")]
+        //NotConfigured = 4,
         /// <summary>
         /// 推送开关关闭 
         /// </summary> 

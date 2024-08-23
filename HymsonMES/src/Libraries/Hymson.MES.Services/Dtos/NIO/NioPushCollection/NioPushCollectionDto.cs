@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Plan;
 using Hymson.MES.Core.Enums;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Dtos.NioPushCollection
 {
@@ -99,15 +101,15 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// </summary>
         public string OperatorAccount { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public long InputTime { get; set; }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public long InputTime { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public long OutputTime { get; set; }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public long OutputTime { get; set; }
 
         /// <summary>
         /// 
@@ -270,15 +272,15 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// </summary>
         public string OperatorAccount { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public long InputTime { get; set; }
+       // /// <summary>
+       // /// 
+       // /// </summary>
+       // public long InputTime { get; set; }
 
-       /// <summary>
-        /// 
-        /// </summary>
-        public long OutputTime { get; set; }
+       ///// <summary>
+       // /// 
+       // /// </summary>
+       // public long OutputTime { get; set; }
 
         /// <summary>
         /// 
@@ -521,15 +523,15 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// </summary>
         public string OperatorAccount { get; set; }
 
-        /// <summary>
-        /// 投入时间，即进入工位时间，Unix 时间戳，单位：秒
-        /// </summary>
-        public long InputTime { get; set; }
+        ///// <summary>
+        ///// 投入时间，即进入工位时间，Unix 时间戳，单位：秒
+        ///// </summary>
+        //public long InputTime { get; set; }
 
-        /// <summary>
-        /// 产出时间，即离开工位时间，Unix 时间戳，单位：秒
-        /// </summary>
-        public long OutputTime { get; set; }
+        ///// <summary>
+        ///// 产出时间，即离开工位时间，Unix 时间戳，单位：秒
+        ///// </summary>
+        //public long OutputTime { get; set; }
 
         /// <summary>
         /// 标准化工位通过状态，参考附件分类
@@ -555,5 +557,23 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// 数据归属
         /// </summary>
         public string Owner { get; set; } = "EDS";
+    }
+
+    /// <summary>
+    /// NIO推送参数数据
+    /// </summary>
+    public class NioCollectionSchDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        [JsonProperty("schemaCode")]
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        [JsonProperty("list")]
+        public List<NioCollectionDto> List { get; set; } = new List<NioCollectionDto>();
     }
 }

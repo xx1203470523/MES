@@ -19,6 +19,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Hymson.MES.Services.Services.NioPushCollection
 {
@@ -143,7 +144,7 @@ namespace Hymson.MES.Services.Services.NioPushCollection
                         isOk = Core.Enums.TrueOrFalseEnum.No;
                     }
                 }
-                saveDto.DecimalValue = Math.Round((decimal)saveDto.DecimalValue, 4);
+                //saveDto.DecimalValue = Math.Round((decimal)saveDto.DecimalValue, 4);
             }
 
             // DTO转换实体
@@ -159,9 +160,30 @@ namespace Hymson.MES.Services.Services.NioPushCollection
             int result = await _nioPushCollectionRepository.UpdateAsync(entity);
             //同步修改NIO_PUSH
             var pushItemList = await _nioPushCollectionRepository.GetByPushIdAsync(nioPushId);
+            foreach(var item in pushItemList)
+            {
+                if(item.DecimalValue != null)
+                {
+                    item.DecimalValue = Math.Round((decimal)item.DecimalValue, 4);
+                }
+            }
             string tmpPushContext = JsonConvert.SerializeObject(pushItemList);
             List<NioCollectionDto> pushList = JsonConvert.DeserializeObject<List<NioCollectionDto>>(tmpPushContext);
-            string pushContext = JsonConvert.SerializeObject(pushList);
+            pushList.ForEach(m => m.UpdateTime = GetTimestamp(HymsonClock.Now()));
+            NioCollectionSchDto nioSch = new NioCollectionSchDto() { List = pushList };
+
+            NioPushEntity nioPushModel = await _nioPushRepository.GetByIdAsync(nioPushId);
+            if(nioPushModel != null)
+            {
+                nioSch.SchemaCode = nioPushModel.SchemaCode;
+            }
+
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            string pushContext = JsonConvert.SerializeObject(nioSch, settings);
+
             NioPushEntity updateEntity = new NioPushEntity();
             updateEntity.Id = nioPushId;
             updateEntity.UpdatedBy = _currentUser.UserName;
@@ -172,6 +194,17 @@ namespace Hymson.MES.Services.Services.NioPushCollection
             trans.Complete();
 
             return result;
+        }
+
+        /// <summary>
+        /// 获取时间戳
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        private long GetTimestamp(DateTime date)
+        {
+            date = date.AddHours(-8);
+            return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
         }
 
         /// <summary>

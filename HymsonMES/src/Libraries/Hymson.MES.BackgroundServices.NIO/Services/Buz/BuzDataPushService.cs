@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.BackgroundServices.NIO.Dtos;
 using Hymson.MES.BackgroundServices.NIO.Dtos.Buz;
+using Hymson.MES.BackgroundServices.NIO.Utils;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Common;
@@ -1298,8 +1299,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         private long GetTimestamp(DateTime date)
         {
-            date = date.AddHours(-8);
-            return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
+            return NioHelper.GetTimestamp(date);
+
+            //date = date.AddHours(-8);
+            //return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
         }
 
         /// <summary>
