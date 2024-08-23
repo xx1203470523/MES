@@ -110,7 +110,7 @@ public class SystemApiService : ISystemApiService
         if (queryDto.SFC?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19003));
 
         //获取模组码绑定信息
-        var modelSfcCirculationEntities = await _manuCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery() { SiteId = 123456, Sfc = queryDto.SFC });
+        var modelSfcCirculationEntities = await _manuCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery() { SiteId = 123456, CirculationBarCodes = queryDto.SFC });
 
         //获取电芯码绑定信息
         var modelsfcs = modelSfcCirculationEntities.Select(a=>a.SFC);
@@ -184,6 +184,8 @@ public class SystemApiService : ISystemApiService
         {
             var equipment = equipmentEntities.FirstOrDefault(a => a.Id == item.EquipmentId);
 
+            if (tracelist.Any(a => a.SFC == item.SFC)) continue;
+
             ProcductTraceViewDto trace = new()
             {
                 SFC = item.SFC,
@@ -206,7 +208,7 @@ public class SystemApiService : ISystemApiService
 
             //绑定的电芯
             var modelSfc = modelTrace.Select(a => a.SFC);
-            var sfcTrace = tracelist.Where(a => modelSfc.Contains(a.SFC));
+            var sfcTrace = tracelist.Where(a => modelSfc.Contains(a.CirculationBarCode));
 
             var manuSfcSteps = manuSfcStepEntities.Where(a => a.SFC == item);
             var manuSfcParameters = manuSfcParameterEntities.Where(a=>a.SFC == item);
