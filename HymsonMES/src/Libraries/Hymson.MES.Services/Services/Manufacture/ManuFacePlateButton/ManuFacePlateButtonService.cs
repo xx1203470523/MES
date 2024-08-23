@@ -460,11 +460,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             // 是否清除条码
-            if (buttonJobs.Any(a => a.IsClear)) dto.Param?.Add("IsClear", "True");
+            if (buttonJobs.Any(a => a.IsClear == YesOrNoEnum.Yes)) dto.Param?.Add("IsClear", "True");
 
             // 是否清除条码
             var isClear = false;
-            if (buttonJobs.Any(a => a.IsClear)) isClear = true;
+            if (buttonJobs.Any(a => a.IsClear == YesOrNoEnum.Yes)) isClear = true;
 
             // 如果没有读取到有效作业，就提示错误
             if (!jobs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17255));
@@ -609,7 +609,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
 
             // 是否清除条码
-            if (buttonJobs.Any(a => a.IsClear)) dto.Param?.Add("IsClear", "True");
+            if (buttonJobs.Any(a => a.IsClear == YesOrNoEnum.Yes)) dto.Param?.Add("IsClear", "True");
 
             var jobBos = new List<JobBo>();
             foreach (var job in jobs)

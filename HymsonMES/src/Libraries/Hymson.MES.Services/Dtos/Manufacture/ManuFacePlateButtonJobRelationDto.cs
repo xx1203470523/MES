@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -53,7 +54,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 是否清除条码
         /// </summary>
-        public bool IsClear { get; set; }
+        public YesOrNoEnum IsClear { get; set; }
 
         /// <summary>
         /// 创建人
@@ -115,7 +116,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 是否清除条码
         /// </summary>
-        public bool IsClear { get; set; }
+        public YesOrNoEnum IsClear { get; set; }
     }
 
     /// <summary>
@@ -151,7 +152,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 是否清除条码
         /// </summary>
-        public bool IsClear { get; set; }
+        public YesOrNoEnum IsClear { get; set; }
     }
 
     /// <summary>

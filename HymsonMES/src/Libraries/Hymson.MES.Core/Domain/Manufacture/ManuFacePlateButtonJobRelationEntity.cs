@@ -6,6 +6,7 @@
  *build datetime: 2023-04-01 03:34:48
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -40,7 +41,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 是否清除条码
         /// </summary>
-        public bool IsClear { get; set; }
+        public YesOrNoEnum IsClear { get; set; }
        
     }
 }
