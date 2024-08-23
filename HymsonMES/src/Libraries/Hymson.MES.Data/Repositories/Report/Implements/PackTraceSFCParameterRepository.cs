@@ -58,7 +58,7 @@ SELECT msc.SFC PACK, msc.CirculationBarCode MODULE, msc.SFC,1 LV FROM manu_sfc_c
 UNION ALL
 SELECT T1.PACK PACK, msc2.CirculationBarCode, msc2.SFC MODULE, T1.LV + 1 LV FROM T1
 LEFT JOIN manu_sfc_circulation msc2 ON T1.SFC = msc2.CirculationBarCode
-WHERE msc2.SFC<> '' AND msc2.CirculationBarCode<>'' AND msc2.IsDeleted = 0 AND msc2.IsDisassemble = 0
+WHERE msc2.SFC<> '' AND msc2.CirculationBarCode<>'' AND msc2.IsDeleted = 0 AND msc2.IsDisassemble = 0 AND t1.sfc != msc2.SFC
 )
 SELECT T1.PACK, T1.SFC, ee.EquipmentName , mpp.JudgmentResult,DATE_FORMAT(mpp.LocalTime,'%Y-%m-%d %H:%i:%s') `LocalTime`,pp.ParameterCode , pp.ParameterName , mpp.ParamValue ParameterValue, pp2.Code procedureCode, pp2.Name procedureName,
 mpp.StandardLowerLimit, mpp.StandardUpperLimit FROM T1

@@ -21,6 +21,8 @@ using Hymson.Authentication;
 using Hymson.MES.Core.Constants.Process;
 using System.Collections;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Equipment;
 
 namespace Hymson.MES.SystemServices.Services.Api;
 
@@ -113,7 +115,7 @@ public class SystemApiService : ISystemApiService
         var modelSfcCirculationEntities = await _manuCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery() { SiteId = 123456, CirculationBarCodes = queryDto.SFC });
 
         //获取电芯码绑定信息
-        var modelsfcs = modelSfcCirculationEntities.Select(a=>a.SFC);
+        var modelsfcs = modelSfcCirculationEntities.Select(a => a.SFC);
         var cellSfcCirculationEntities = Enumerable.Empty<ManuSfcCirculationEntity>();
         if (modelsfcs.Any())
         {
@@ -124,7 +126,7 @@ public class SystemApiService : ISystemApiService
         var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new() { SiteId = 123456, SFCs = queryDto.SFC });
 
         //根据条码获取设备采集参数
-        var manuSfcParameterEntities = await _manuProductParameterRepository.GetManuProductParameterAsync(new() { SiteId = 123456, SFCs = queryDto.SFC  });
+        var manuSfcParameterEntities = await _manuProductParameterRepository.GetManuProductParameterAsync(new() { SiteId = 123456, SFCs = queryDto.SFC });
 
         #region 基础信息
 
@@ -133,41 +135,42 @@ public class SystemApiService : ISystemApiService
         equipmentIds.AddRange(cellSfcCirculationEntities.Select(a => a.EquipmentId.GetValueOrDefault()));
         equipmentIds.AddRange(manuSfcStepEntities.Select(a => a.EquipmentId.GetValueOrDefault()));
         equipmentIds.AddRange(manuSfcParameterEntities.Select(a => a.EquipmentId));
-        var equipmentEntities = await _equEquipmentRepository.GetByIdsAsync(equipmentIds.ToArray());
+        var equipmentEntities = (await _equEquipmentRepository.GetByIdsAsync(equipmentIds.ToArray())).ToDictionary(a => a.Id);
 
         var procdureIds = new List<long>();
         procdureIds.AddRange(modelSfcCirculationEntities.Select(a => a.ProcedureId));
         procdureIds.AddRange(manuSfcStepEntities.Select(a => a.ProcedureId.GetValueOrDefault()));
         procdureIds.AddRange(manuSfcParameterEntities.Select(a => a.ProcedureId.GetValueOrDefault()));
-        var procdureEntities = await _procProcedureRepository.GetByIdsAsync(procdureIds.ToArray());
+        var procdureEntities = (await _procProcedureRepository.GetByIdsAsync(procdureIds.ToArray())).ToDictionary(a => a.Id);
 
         var resourceIds = new List<long>();
         resourceIds.AddRange(modelSfcCirculationEntities.Select(a => a.ResourceId.GetValueOrDefault()));
         resourceIds.AddRange(manuSfcStepEntities.Select(a => a.ResourceId.GetValueOrDefault()));
         resourceIds.AddRange(manuSfcParameterEntities.Select(a => a.ResourceId.GetValueOrDefault()));
-        var resourceEntities = await _procResourceRepository.GetByIdsAsync(new() { IdsArr = resourceIds.ToArray(), Status = 1 });
+        var resourceEntities = (await _procResourceRepository.GetByIdsAsync(new() { IdsArr = resourceIds.ToArray(), Status = 1 })).ToDictionary(a => a.Id);
 
         var productIds = new List<long>();
         productIds.AddRange(modelSfcCirculationEntities.Select(a => a.ProductId));
         productIds.AddRange(manuSfcStepEntities.Select(a => a.ProductId));
         productIds.AddRange(manuSfcParameterEntities.Select(a => a.ProductId.GetValueOrDefault()));
-        var productEntities = await _procMaterialRepository.GetByIdsAsync(productIds);
+        var productEntities = (await _procMaterialRepository.GetByIdsAsync(productIds)).ToDictionary(a => a.Id);
 
         var workOrderIds = new List<long>();
         workOrderIds.AddRange(modelSfcCirculationEntities.Select(a => a.WorkOrderId));
         workOrderIds.AddRange(manuSfcStepEntities.Select(a => a.WorkOrderId));
         workOrderIds.AddRange(manuSfcParameterEntities.Select(a => a.WorkOrderId.GetValueOrDefault()));
-        var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds.ToArray());
+        var workOrderEntities = (await _planWorkOrderRepository.GetByIdsAsync(workOrderIds.ToArray())).ToDictionary(a => a.Id);
 
         var paramIds = manuSfcParameterEntities.Select(a => a.ParameterId);
-        var paramEntities = await _procParameterRepository.GetByIdsAsync(paramIds);
+        var paramEntities = (await _procParameterRepository.GetByIdsAsync(paramIds)).ToDictionary(a => a.Id);
 
         #endregion
 
         List<ProcductTraceViewDto> tracelist = new();
+
         foreach (var item in modelSfcCirculationEntities)
         {
-            var equipment = equipmentEntities.FirstOrDefault(a => a.Id == item.EquipmentId);
+            var equipment = equipmentEntities.TryGetValue(item.EquipmentId.GetValueOrDefault(), out EquEquipmentEntity equiptment) ? equiptment : null;
 
             ProcductTraceViewDto trace = new()
             {
@@ -180,28 +183,35 @@ public class SystemApiService : ISystemApiService
             tracelist.Add(trace);
         }
 
-        foreach (var item in cellSfcCirculationEntities)
-        {
-            var equipment = equipmentEntities.FirstOrDefault(a => a.Id == item.EquipmentId);
-
-            if (tracelist.Any(a => a.SFC == item.SFC)) continue;
-
-            ProcductTraceViewDto trace = new()
-            {
-                SFC = item.SFC,
-                Level = 2,
-                CirculationBarCode = item.CirculationBarCode,
-                EquipmentCode = equipment?.EquipmentCode
-            };
-
-            tracelist.Add(trace);
-        }
-
-        foreach (var item in queryDto.SFC)
+        Parallel.ForEach(queryDto.SFC, item =>
         {
             List<ProcductTraceViewDto> trace = new List<ProcductTraceViewDto>();
             List<SFCStepViewDto> steplist = new();
             List<ProductParameterViewDto> paramlist = new();
+
+
+            //List<ProcductTraceViewDto> modelTrace = new List<ProcductTraceViewDto>();
+            //List<ProcductTraceViewDto> sfcTrace = new List<ProcductTraceViewDto>();
+
+            //Dictionary<string, string> modelTraceDict = new Dictionary<string, string>();
+
+            //foreach (var traceItem in tracelist)
+            //{
+            //    ProcductTraceViewDto modelTraceItem = null;
+            //    if (traceItem.Level == 1 && traceItem.CirculationBarCode.Equals(item))
+            //    {
+            //        modelTraceItem = traceItem;
+            //        modelTrace.Add(traceItem);
+            //        modelTraceDict.Add(traceItem.CirculationBarCode, item);
+            //        continue;
+            //    }
+
+            //    if (traceItem.Level == 2 && modelTraceDict.TryGetValue(traceItem.CirculationBarCode, out string sfc))
+            //    {
+
+            //    }
+            //}
+
 
             //绑定的模组
             var modelTrace = tracelist.Where(a => a.CirculationBarCode == item);
@@ -210,16 +220,16 @@ public class SystemApiService : ISystemApiService
             var modelSfc = modelTrace.Select(a => a.SFC);
             var sfcTrace = tracelist.Where(a => modelSfc.Contains(a.CirculationBarCode));
 
-            var manuSfcSteps = manuSfcStepEntities.Where(a => a.SFC == item);
-            var manuSfcParameters = manuSfcParameterEntities.Where(a=>a.SFC == item);
+            var manuSfcSteps = manuSfcStepEntities.Where(a => a.SFC == item).ToList();
+            var manuSfcParameters = manuSfcParameterEntities.Where(a => a.SFC == item);
 
             foreach (var manuSfcStep in manuSfcSteps)
             {
-                var procdure = procdureEntities.FirstOrDefault(a => a.Id == manuSfcStep.ProcedureId);
-                var resource = resourceEntities.FirstOrDefault(a => a.Id == manuSfcStep.ResourceId);
-                var product = productEntities.FirstOrDefault(a => a.Id == manuSfcStep.ProductId);
-                var workOrder = workOrderEntities.FirstOrDefault(a => a.Id == manuSfcStep.WorkOrderId);
-                var equipment = equipmentEntities.FirstOrDefault(a => a.Id == manuSfcStep.EquipmentId);
+                var procdure = procdureEntities.TryGetValue(manuSfcStep.ProcedureId.GetValueOrDefault(), out var produre) ? produre : null;
+                var resource = resourceEntities.TryGetValue(manuSfcStep.ResourceId.GetValueOrDefault(), out var res) ? res : null;
+                var product = productEntities.TryGetValue(manuSfcStep.ProductId, out var prod) ? prod : null;
+                var workOrder = workOrderEntities.TryGetValue(manuSfcStep.WorkOrderId, out var workO) ? workO : null;
+                var equipment = equipmentEntities.TryGetValue(manuSfcStep.EquipmentId.GetValueOrDefault(), out var equiptment) ? equiptment : null;
 
                 steplist.Add(new()
                 {
@@ -237,9 +247,9 @@ public class SystemApiService : ISystemApiService
 
             foreach (var manuSfcParameter in manuSfcParameters)
             {
-                var equipment = equipmentEntities.FirstOrDefault(a => a.Id == manuSfcParameter.EquipmentId);
-                var param = paramEntities.FirstOrDefault(a => a.Id == manuSfcParameter.ParameterId);
-                var procdure = procdureEntities.FirstOrDefault(a => a.Id == manuSfcParameter.ProcedureId);
+                var equipment = equipmentEntities.TryGetValue(manuSfcParameter.EquipmentId, out var equ) ? equ : null;
+                var param = paramEntities.TryGetValue(manuSfcParameter.ParameterId, out var par) ? par : null;
+                var procdure = procdureEntities.TryGetValue(manuSfcParameter.ProcedureId.GetValueOrDefault(), out var pro) ? pro : null;
 
                 paramlist.Add(new()
                 {
@@ -267,7 +277,8 @@ public class SystemApiService : ISystemApiService
                 ProductParameter = paramlist
             };
             result.Add(view);
-        }
+
+        });
 
         return result;
     }
@@ -280,7 +291,7 @@ public class SystemApiService : ISystemApiService
     /// <returns></returns>
     public async Task UpdateManuSFCProduceStatus(string isNext, string SFC)
     {
-        var manuSfcProcdure = await _manuSfcProduceRepository.GetBySFCAsync(new() { SiteId=123456, Sfc = SFC })
+        var manuSfcProcdure = await _manuSfcProduceRepository.GetBySFCAsync(new() { SiteId = 123456, Sfc = SFC })
             ?? throw new CustomerValidationException(nameof(ErrorCode.MES16600));
 
         var nextProcdure = 0;
