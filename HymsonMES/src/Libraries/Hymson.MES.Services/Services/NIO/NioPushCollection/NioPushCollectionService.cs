@@ -203,7 +203,6 @@ namespace Hymson.MES.Services.Services.NioPushCollection
         /// <returns></returns>
         private long GetTimestamp(DateTime date)
         {
-            date = date.AddHours(-8);
             return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
         }
 

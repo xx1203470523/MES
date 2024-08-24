@@ -19,7 +19,6 @@ namespace Hymson.MES.BackgroundServices.NIO.Utils
         /// <returns></returns>
         public static long GetTimestamp(DateTime date)
         {
-            date = date.AddHours(-8);
             return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
         }
     }

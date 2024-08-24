@@ -286,6 +286,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                     dto.SubordinateBackUpMax = wmsItem.SubordinateBackUpMax;
                     dto.SubordinateBackUpMin = wmsItem.SubordinateBackUpMin;
                     dto.SubordinateSource = wmsItem.SubordinateSource;
+                    if (string.IsNullOrEmpty(dto.SubordinateSource) == true)
+                    {
+                        dto.SubordinateSource = "WMS没有该信息";
+                    }
                     dto.ParaConfigUnit = wmsItem.ParaConfigUnit;
                     //ERP物料信息
                     if(erpResult != null)
