@@ -17,6 +17,8 @@ using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.ManuRotorSfc.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.PackList;
+using Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode;
+using Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode.Query;
 using Hymson.MES.Data.Repositories.QualFqcInspectionMaval;
 using Hymson.MES.HttpClients.Options;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -24,7 +26,6 @@ using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Options;
-using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -66,6 +67,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuRotorSfcRepository _manuRotorSfcRepository;
 
         /// <summary>
+        /// 定子线主条码
+        /// </summary>
+        private readonly IManuStatorBarcodeRepository _manuStatorBarcodeRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ManuRotorPackListService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuRotorPackListSaveDto> validationSaveRules,
@@ -73,7 +79,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             IQualFqcInspectionMavalRepository qualFqcInspectionMavalRepository,
             IOptions<WMSOptions> wmsOptions,
             IInteWorkCenterRepository inteWorkCenterRepository,
-            IManuRotorSfcRepository manuRotorSfcRepository
+            IManuRotorSfcRepository manuRotorSfcRepository,
+            IManuStatorBarcodeRepository manuStatorBarcodeRepository
             )
         {
             _sequenceService = sequenceService;
@@ -85,6 +92,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _wmsOptions = wmsOptions;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _manuRotorSfcRepository = manuRotorSfcRepository;
+            _manuStatorBarcodeRepository = manuStatorBarcodeRepository;
         }
 
 
@@ -201,24 +209,59 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<IEnumerable<ManuRotorPackViewDto>> QueryByIdAsync(ManuRotorPackListQuery query)
         {
             List<ManuRotorPackViewDto> manuRotors = new();
-            var manuRotorPackEntities = await _manuRotorPackListRepository.GetEntitiesAsync(new ManuRotorPackListQuery { BoxCode = query.BoxCode, Sfc = query.Sfc, SiteId = _currentSite.SiteId ?? 0 });
-            List<ManuRotorPackListEntity> manuRotorPackLists = manuRotorPackEntities.ToList();
-            if (manuRotorPackLists.Any() == false)
+
+            List<ManuRotorPackListEntity> manuRotorPackLists = new List<ManuRotorPackListEntity>();
+            if (query.WorkCenterCode == "JX101")
             {
-                if (!string.IsNullOrEmpty(query.Sfc))
+                var manuRotorPackEntities = await _manuRotorPackListRepository.GetEntitiesAsync(new ManuRotorPackListQuery { BoxCode = query.BoxCode, Sfc = query.Sfc, SiteId = _currentSite.SiteId ?? 0 });
+                manuRotorPackLists = manuRotorPackEntities.ToList();
+                if (manuRotorPackLists.Any() == false)
                 {
-                   
-                    //成品码信息
-                    ZSfcQuery zSfcQuery = new ZSfcQuery();
-                    zSfcQuery.SiteId = _currentSite.SiteId ?? 0;
-                    zSfcQuery.SfcList = new List<string>(query.Sfc.Split(','));
-                    var nioSfcList = await _manuRotorSfcRepository.GetListBySfcsAsync(zSfcQuery);
-                    if (nioSfcList.Any())
+                    if (!string.IsNullOrEmpty(query.Sfc))
                     {
-                        foreach (var item in nioSfcList)
+
+                        //成品码信息
+                        ZSfcQuery zSfcQuery = new ZSfcQuery();
+                        zSfcQuery.SiteId = _currentSite.SiteId ?? 0;
+                        zSfcQuery.SfcList = new List<string>(query.Sfc.Split(','));
+                        var nioSfcList = await _manuRotorSfcRepository.GetListBySfcsAsync(zSfcQuery);
+                        if (nioSfcList.Any())
+                        {
+                            foreach (var item in nioSfcList)
+                            {
+                                ManuRotorPackListEntity manuRotorPackListEntity = new ManuRotorPackListEntity();
+                                manuRotorPackListEntity.ProductCode = item.Sfc;
+                                manuRotorPackLists.Add(manuRotorPackListEntity);
+                            }
+                        }
+                        else
+                        {
+                            return manuRotors;
+                        }
+                    }
+                    else
+                    {
+                        return manuRotors;
+                    }
+                }
+
+            }
+            else
+            {
+                //查询 manu_stator_barcode 表，并转成 ManuRotorPackListEntity结构，BoxCode赋空值
+                if(string.IsNullOrEmpty(query.Sfc) == false)
+                {
+                    StatorSfcQuery statorSfcQuery = new StatorSfcQuery();
+                    statorSfcQuery.SiteId = _currentSite.SiteId ?? 0;
+                    statorSfcQuery.SfcList = new List<string>(query.Sfc.Split(','));
+                    var dbStatorList = await _manuStatorBarcodeRepository.GetListBySfcsAsync(statorSfcQuery);
+                    if(dbStatorList != null && dbStatorList.Count() > 0)
+                    {
+                        foreach(var sItem in dbStatorList)
                         {
                             ManuRotorPackListEntity manuRotorPackListEntity = new ManuRotorPackListEntity();
-                            manuRotorPackListEntity.ProductCode = item.Sfc;
+                            manuRotorPackListEntity.ProductCode = sItem.ProductionCode;
+                            manuRotorPackListEntity.BoxCode = "";
                             manuRotorPackLists.Add(manuRotorPackListEntity);
                         }
                     }
