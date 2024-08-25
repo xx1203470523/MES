@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.BackgroundTasks.NIO;
 using Hymson.MES.BackgroundTasks.NIO.Extensions;
+using Hymson.MES.BackgroundTasks.NIO.Jobs;
 using Hymson.MES.BackgroundTasks.NIO.Jobs.ERP;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -77,6 +78,7 @@ Host.CreateDefaultBuilder(args)
 
            //q.AddJobAndTrigger<MockHelloJob>(hostContext.Configuration);
            q.AddJobAndTrigger<PushNIOJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<PushFailNIOJob>(hostContext.Configuration);
            #endregion
 
            /*

@@ -178,7 +178,7 @@ namespace Hymson.MES.Services.Services.NioPushCollection
                 nioSch.SchemaCode = nioPushModel.SchemaCode;
             }
 
-            var settings = new JsonSerializerSettings
+            JsonSerializerSettings settings = new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };

@@ -96,4 +96,20 @@
         /// </summary>
         public bool DeterminedStatus { get; set; }
     }
+
+    /// <summary>
+    /// Nio推送数据
+    /// </summary>
+    public class NioProductionDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public List<ProductionDto> List = new List<ProductionDto>();
+    }
 }

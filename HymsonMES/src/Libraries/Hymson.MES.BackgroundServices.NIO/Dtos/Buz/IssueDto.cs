@@ -1,5 +1,8 @@
 ﻿namespace Hymson.MES.BackgroundServices.NIO.Dtos.Buz
 {
+    /// <summary>
+    /// 缺陷数据
+    /// </summary>
     public class IssueDto : BaseDto
     {
         /// <summary>  
@@ -56,5 +59,21 @@
         /// 合作伙伴定义的缺陷名字，最大长度50  
         /// </summary>  
         public string VendorIssueName { get; set; }
+    }
+
+    /// <summary>
+    /// NIO推送数据
+    /// </summary>
+    public class NioIssueDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public List<IssueDto> List = new List<IssueDto>();
     }
 }

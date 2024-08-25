@@ -46,4 +46,20 @@
         public string PassRateTarget { get; set; }
 
     }
+
+    /// <summary>
+    /// NIO推送数据
+    /// </summary>
+    public class NioPassrateTargetDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public List<PassrateTargetDto> List { get; set; } = new List<PassrateTargetDto>();
+    }
 }

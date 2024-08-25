@@ -40,4 +40,20 @@
         /// </summary>  
         public decimal PassRateTarget { get; set; }
     }
+
+    /// <summary>
+    /// NIO推送数据
+    /// </summary>
+    public class NioPassrateProductDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public List<PassrateProductDto> List = new List<PassrateProductDto>();
+    }
 }

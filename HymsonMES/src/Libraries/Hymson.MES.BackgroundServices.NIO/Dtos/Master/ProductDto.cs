@@ -60,4 +60,21 @@
         /// </summary>
         public string VendorHardwareRevision { get; set; }
     }
+
+    /// <summary>
+    /// NIO推送
+    /// </summary>
+    public class NioProductDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public List<ProductDto> List = new List<ProductDto>();
+    }
+
 }

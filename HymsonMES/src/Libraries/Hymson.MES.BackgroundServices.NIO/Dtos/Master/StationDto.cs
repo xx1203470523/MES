@@ -66,4 +66,20 @@
         public string VendorProductNum { get; set; }
 
     }
+
+    /// <summary>
+    /// NIO推送数据
+    /// </summary>
+    public class NioStationDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public List<StationDto> List = new List<StationDto>();
+    }
 }

@@ -83,4 +83,20 @@
         ///// </summary>  
         //public string NioProjectName { get; set; }
     }
+
+    /// <summary>
+    /// NIO推送数据
+    /// </summary>
+    public class NioWorkOrderDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public List<WorkOrderDto> List = new List<WorkOrderDto>();
+    }
 }

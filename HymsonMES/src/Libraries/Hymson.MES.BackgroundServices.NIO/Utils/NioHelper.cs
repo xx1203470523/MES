@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,5 +23,21 @@ namespace Hymson.MES.BackgroundServices.NIO.Utils
         {
             return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
         }
+
+        /// <summary>
+        /// 获取JSON序列化方式
+        /// </summary>
+        /// <returns></returns>
+        public static JsonSerializerSettings GetJsonSerializer()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+
+            return settings;
+        }
+
+
     }
 }

@@ -16,6 +16,11 @@ using Hymson.MES.Data.Repositories.NioPushSwitch.Query;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
+using Hymson.MES.BackgroundServices.NIO.Utils;
+using Hymson.MES.BackgroundServices.NIO.Dtos.Buz;
+using Hymson.MES.BackgroundServices.NIO.Dtos.Master;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -68,6 +73,15 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task<int> ExecutePushAsync(int limitCount = 100)
         {
+            // 获取步骤表数据
+            var waitPushEntities = await _nioPushRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            {
+                Rows = limitCount
+            });
+            if (waitPushEntities == null || !waitPushEntities.Any()) return default;
+
+            return await ExecuteAsync(limitCount, waitPushEntities);
+
             // 查询全部开关配置
             var configEntities = await _nioPushSwitchRepository.GetEntitiesAsync(new NioPushSwitchQuery { });
             if (configEntities == null || !configEntities.Any()) return default;
@@ -98,12 +112,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(WaterMarkKey.PushToNIO);
 
             // 获取步骤表数据
-            var waitPushEntities = await _nioPushRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
-            {
-                StartWaterMarkId = waterMarkId,
-                Rows = limitCount
-            });
-            if (waitPushEntities == null || !waitPushEntities.Any()) return default;
+            //var waitPushEntities = await _nioPushRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            //{
+            //    StartWaterMarkId = waterMarkId,
+            //    Rows = limitCount
+            //});
+            //if (waitPushEntities == null || !waitPushEntities.Any()) return default;
 
             // 遍历推送数据
             List<NioPushEntity> updates = new();
@@ -174,6 +188,14 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task<int> ExecutePushFailAsync(int limitCount = 100)
         {
+            // 获取步骤表数据
+            var waitPushEntities = await _nioPushRepository.GetFailListAsync(new EntityByWaterMarkQuery
+            {
+                Rows = limitCount
+            });
+            if (waitPushEntities == null || !waitPushEntities.Any()) return default;
+            return await ExecuteAsync(limitCount, waitPushEntities);
+
             // 查询全部开关配置
             var configEntities = await _nioPushSwitchRepository.GetEntitiesAsync(new NioPushSwitchQuery { });
             if (configEntities == null || !configEntities.Any()) return default;
@@ -204,11 +226,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //var waterMarkId = await _waterMarkService.GetWaterMarkAsync(WaterMarkKey.PushToNIO);
 
             // 获取步骤表数据
-            var waitPushEntities = await _nioPushRepository.GetFailListAsync(new EntityByWaterMarkQuery
-            {
-                Rows = limitCount
-            });
-            if (waitPushEntities == null || !waitPushEntities.Any()) return default;
+            //var waitPushEntities = await _nioPushRepository.GetFailListAsync(new EntityByWaterMarkQuery
+            //{
+            //    Rows = limitCount
+            //});
+            //if (waitPushEntities == null || !waitPushEntities.Any()) return default;
 
             // 遍历推送数据
             List<NioPushEntity> updates = new();
@@ -228,6 +250,117 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     {
                         // 推送
                         var restResponse = await config.ExecuteAsync(data.Content, host, hostsuffix);
+
+                        // 处理推送结果
+                        data.Status = PushStatusEnum.Failure;
+                        if (restResponse.IsSuccessStatusCode)
+                        {
+                            var responseContent = restResponse.Content?.ToDeserializeLower<NIOResponseDto>();
+                            if (responseContent != null && responseContent.NexusOpenapi.Code == "QM-000000")
+                            {
+                                data.Status = PushStatusEnum.Success;
+                            }
+                        }
+
+                        data.Result = restResponse.Content;
+                    }
+                    else
+                    {
+                        //data.Status = PushStatusEnum.Off;
+                        continue;
+                    }
+                }
+
+                data.UpdatedBy = "PushToNIO";
+                data.UpdatedOn = HymsonClock.Now();
+                updates.Add(data);
+            }
+
+            if (updates == null || updates.Count == 0)
+            {
+                return 0;
+            }
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            // 更新状态
+            rows = await _nioPushRepository.UpdateRangeAsync(updates);
+
+            // 更新水位
+            await _waterMarkService.RecordWaterMarkAsync(WaterMarkKey.PushToNIO, waitPushEntities.Max(x => x.Id));
+            trans.Complete();
+
+            return rows;
+        }
+
+        /// <summary>
+        /// 发送推送
+        /// </summary>
+        /// <param name="limitCount"></param>
+        /// <returns></returns>
+        private async Task<int> ExecuteAsync(int limitCount, IEnumerable<NioPushEntity> waitPushEntities)
+        {
+            if (waitPushEntities == null || !waitPushEntities.Any()) return default;
+
+            // 查询全部开关配置
+            var configEntities = await _nioPushSwitchRepository.GetEntitiesAsync(new NioPushSwitchQuery { });
+            if (configEntities == null || !configEntities.Any()) return default;
+
+            // 总开关是否开启
+            var masterConfig = configEntities.FirstOrDefault(f => f.BuzScene == BuzSceneEnum.All);
+            if (masterConfig == null || masterConfig.IsEnabled != TrueOrFalseEnum.Yes) return default;
+
+            //站点配置
+            string host = string.Empty;
+            string hostsuffix = string.Empty;
+            IEnumerable<SysConfigEntity>? nioUrlList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.NioUrl });
+            if (nioUrlList != null && nioUrlList.Count() > 0)
+            {
+                var hostEntity = nioUrlList.Where(m => m.Code.ToLower() == "host").FirstOrDefault();
+                if (hostEntity != null)
+                {
+                    host = hostEntity.Value;
+                }
+                var hostsuffixEntity = nioUrlList.Where(m => m.Code.ToLower() == "hostsuffix").FirstOrDefault();
+                if (hostsuffixEntity != null)
+                {
+                    hostsuffix = hostsuffixEntity.Value;
+                }
+            }
+
+            // 水位ID
+            var waterMarkId = await _waterMarkService.GetWaterMarkAsync(WaterMarkKey.PushToNIO);
+
+            //// 获取步骤表数据
+            //var waitPushEntities = await _nioPushRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            //{
+            //    StartWaterMarkId = waterMarkId,
+            //    Rows = limitCount
+            //});
+            //if (waitPushEntities == null || !waitPushEntities.Any()) return default;
+
+            // 遍历推送数据
+            List<NioPushEntity> updates = new();
+            foreach (var data in waitPushEntities)
+            {
+                var config = configEntities.FirstOrDefault(f => f.BuzScene == data.BuzScene);
+                if (config == null)
+                {
+                    //data.Status = PushStatusEnum.NotConfigured;
+                    continue;
+                }
+                else
+                {
+                    config.IsEnabled = GetMapEnum(data, config, configEntities);
+
+                    if (config.IsEnabled == TrueOrFalseEnum.Yes)
+                    {
+                        //这里将数据序列化在反序列化，更新时间戳字段
+                        string pusuContent = NioUpdateTime(data.BuzScene, data.Content);
+
+                        // 推送
+                        var restResponse = await config.ExecuteAsync(pusuContent, host, hostsuffix);
 
                         // 处理推送结果
                         data.Status = PushStatusEnum.Failure;
@@ -396,6 +529,89 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
 
             return data.IsEnabled;
+        }
+    
+        /// <summary>
+        /// 更新NIO的时间戳
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        private string NioUpdateTime(BuzSceneEnum scene, string content)
+        {
+            string result = content;
+
+            JsonSerializerSettings settings = NioHelper.GetJsonSerializer();
+            long timestmap = NioHelper.GetTimestamp(HymsonClock.Now());
+
+            #region 主数据
+            if (scene == BuzSceneEnum.Master_Field || scene == BuzSceneEnum.Master_Field_Summary)
+            {
+                NioFieldDto dto = JsonConvert.DeserializeObject<NioFieldDto>(content);
+                dto.List.ForEach(m => m.UpdateTime = timestmap);
+                result = JsonConvert.SerializeObject(dto, settings);
+            }
+            else if (scene == BuzSceneEnum.Master_PassrateTarget || scene == BuzSceneEnum.Master_PassrateTarget_Summary)
+            {
+                NioPassrateTargetDto dto = JsonConvert.DeserializeObject<NioPassrateTargetDto>(content);
+                dto.List.ForEach(m => m.UpdateTime = timestmap);
+                result = JsonConvert.SerializeObject(dto, settings);
+            }
+            else if (scene == BuzSceneEnum.Master_Product || scene == BuzSceneEnum.Master_Product_Summary)
+            {
+                NioProductDto dto = JsonConvert.DeserializeObject<NioProductDto>(content);
+                dto.List.ForEach(m => m.UpdateTime = timestmap);
+                result = JsonConvert.SerializeObject(dto, settings);
+            }
+            else if (scene == BuzSceneEnum.Master_Station || scene == BuzSceneEnum.Master_Station_Summary)
+            {
+                NioStationDto dto = JsonConvert.DeserializeObject<NioStationDto>(content);
+                dto.List.ForEach(m => m.UpdateTime = timestmap);
+                result = JsonConvert.SerializeObject(dto, settings);
+            }
+            #endregion
+
+            #region 业务数据
+            if (scene == BuzSceneEnum.Buz_Collection || scene == BuzSceneEnum.Buz_Collection_Summary)
+            {
+                NioCollectionDto dto = JsonConvert.DeserializeObject<NioCollectionDto>(content);
+                dto.List.ForEach(m => m.UpdateTime = timestmap);
+                result = JsonConvert.SerializeObject(dto, settings);
+            }
+            else if(scene == BuzSceneEnum.Buz_Production || scene == BuzSceneEnum.Buz_Production_Summary)
+            {
+                NioProductionDto dto = JsonConvert.DeserializeObject<NioProductionDto>(content);
+                dto.List.ForEach(m => m.UpdateTime = timestmap);
+                result = JsonConvert.SerializeObject(dto, settings);
+            }
+            else if (scene == BuzSceneEnum.Buz_PassrateProduct || scene == BuzSceneEnum.Buz_PassrateProduct_Summary)
+            {
+                NioPassrateProductDto dto = JsonConvert.DeserializeObject<NioPassrateProductDto>(content);
+                dto.List.ForEach(m => m.UpdateTime = timestmap);
+                result = JsonConvert.SerializeObject(dto, settings);
+            }
+            else if (scene == BuzSceneEnum.Buz_Issue || scene == BuzSceneEnum.Buz_Issue_Summary)
+            {
+                NioIssueDto dto = JsonConvert.DeserializeObject<NioIssueDto>(content);
+                dto.List.ForEach(m => m.UpdateTime = timestmap);
+                result = JsonConvert.SerializeObject(dto, settings);
+            }
+            else if (scene == BuzSceneEnum.Buz_Material || scene == BuzSceneEnum.Buz_Material_Summary)
+            {
+                NioMaterialDto dto = JsonConvert.DeserializeObject<NioMaterialDto>(content);
+                dto.List.ForEach(m => m.UpdateTime = timestmap);
+                result = JsonConvert.SerializeObject(dto, settings);
+            }
+            else if (scene == BuzSceneEnum.Buz_WorkOrder || scene == BuzSceneEnum.Buz_WorkOrder_Summary)
+            {
+                NioWorkOrderDto dto = JsonConvert.DeserializeObject<NioWorkOrderDto>(content);
+                dto.List.ForEach(m => m.UpdateTime = timestmap);
+                result = JsonConvert.SerializeObject(dto, settings);
+            }
+            #endregion
+
+            //NioWorkOrderDto
+            return result;
         }
     }
 }
