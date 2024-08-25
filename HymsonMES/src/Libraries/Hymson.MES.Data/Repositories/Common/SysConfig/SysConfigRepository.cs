@@ -138,9 +138,18 @@ namespace Hymson.MES.Data.Repositories.Common
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.OrderBy("CreatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+            if(pagedQuery.Type != null)
+            {
+                sqlBuilder.Where("Type = @Type");
+            }
+            if(pagedQuery.Code != null)
+            {
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("Code LIKE @Code");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -167,11 +176,11 @@ namespace Hymson.MES.Data.Repositories.Common
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM sys_config /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM sys_config /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/  ";
 
-        const string InsertSql = "REPLACE INTO sys_config(  `Id`, `Type`, `Code`, `Value`, `SiteId`, Remark, `CreatedBy`, `CreatedOn`, `IsDeleted`) VALUES (  @Id, @Type, @Code, @Value, @SiteId, @Remark, @CreatedBy, @CreatedOn, @IsDeleted) ";
-        const string InsertsSql = "REPLACE INTO sys_config(  `Id`, `Type`, `Code`, `Value`, `SiteId`, Remark, `CreatedBy`, `CreatedOn`, `IsDeleted`) VALUES (  @Id, @Type, @Code, @Value, @SiteId, @Remark, @CreatedBy, @CreatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO sys_config(  `Id`, `Type`, `Code`, `Value`, `SiteId`, Remark, `CreatedBy`, `CreatedOn`,`UpdatedBy`,`UpdatedOn`, `IsDeleted`) VALUES (  @Id, @Type, @Code, @Value, @SiteId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO sys_config(  `Id`, `Type`, `Code`, `Value`, `SiteId`, Remark, `CreatedBy`, `CreatedOn`,`UpdatedBy`,`UpdatedOn`, `IsDeleted`) VALUES (  @Id, @Type, @Code, @Value, @SiteId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE sys_config SET   Type = @Type, Code = @Code, Value = @Value, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE sys_config SET   Type = @Type, Code = @Code, Value = @Value, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE sys_config SET   Value = @Value, Remark = @Remark, UpdatedOn = @UpdatedOn, UpdatedBy = @UpdatedBy, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE sys_config SET  Value = @Value, Remark = @Remark, UpdatedOn = @UpdatedOn, UpdatedBy = @UpdatedBy, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE sys_config SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE sys_config SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

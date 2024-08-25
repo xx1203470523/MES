@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Common.Query
 {
@@ -12,5 +13,14 @@ namespace Hymson.MES.Data.Repositories.Common.Query
         /// </summary>
         public long SiteId { get; set; }
 
+        /// <summary>
+        /// 配置类型
+        /// </summary>
+        public SysConfigEnum ?Type { get; set; }
+
+        /// <summary>
+        /// 配置编码
+        /// </summary>
+        public string ?Code { get; set; }
     }
 }

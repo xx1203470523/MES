@@ -2090,6 +2090,13 @@
         public const string MES19303 = "已发布，不允许删除！";
         #endregion
 
+        #region 系统配置 19310
+
+        public const string MES19310 = "数据一个都不能为空！";
+        public const string MES19311 = "配置类型+配置编码组合已经存在，不能重复添加";
+
+        #endregion
+
         #region AQL校验 19400
         public const string MES19401 = "列【批次最小数量】值有重复！";
         public const string MES19402 = "列【批次最大数量】值有重复！";

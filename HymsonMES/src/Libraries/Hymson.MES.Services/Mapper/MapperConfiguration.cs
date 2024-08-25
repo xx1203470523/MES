@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
@@ -29,6 +30,7 @@ using Hymson.MES.Core.Domain.WhWarehouseShelf;
 using Hymson.MES.Core.NIO;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Integrated;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -700,6 +702,15 @@ namespace Hymson.MES.Services.Mapper
             #region InteQualificationAuthentication
             CreateMap<InteQualificationAuthenticationPagedQueryDto, InteQualificationAuthenticationPagedQuery>();
             CreateMap<InteQualificationAuthenticationEntity, InteQualificationAuthenticationDto>();
+            #endregion
+
+            #region SysConfig
+
+            CreateMap<SysConfigPagedQueryDto, SysConfigPagedQuery>();
+            CreateMap<SysConfigEntity, SysConfigDto>();
+            CreateMap<SysConfigDto, SysConfigEntity>();
+            CreateMap<SysConfigSaveDto, SysConfigEntity>();
+
             #endregion
         }
 

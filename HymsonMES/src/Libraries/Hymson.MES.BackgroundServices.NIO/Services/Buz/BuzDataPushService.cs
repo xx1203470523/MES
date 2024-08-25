@@ -284,8 +284,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             zSfcQuery.SfcList = paramList.Select(m => m.SFC).Distinct().ToList();
             var nioSfcList = await _manuRotorSfcRepository.GetListByZSfcsAsync(zSfcQuery);
 
-            var dtos = new List<CollectionDto>();
-            List<NioPushCollectionEntity> nioList = new List<NioPushCollectionEntity>();
+            var rotordtos = new List<CollectionDto>();
+            var statordtos = new List<CollectionDto>();
+            List<NioPushCollectionEntity> rotorNioList = new List<NioPushCollectionEntity>();
+            List<NioPushCollectionEntity> statorNioList = new List<NioPushCollectionEntity>();
             // TODO: 替换为实际数据
             foreach (var item in paramList)
             {
@@ -388,9 +390,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.VendorValueStatus = model.StationStatus;
                 //model.Debug = NIO_DEBUG;
                 model.UpdateTime = GetTimestamp(HymsonClock.Now());
-
-                dtos.Add(model);
-
+              
                 var tmpStr = JsonConvert.SerializeObject(model);
                 NioPushCollectionEntity nioModel = JsonConvert.DeserializeObject<NioPushCollectionEntity>(tmpStr);
                 nioModel.Id = IdGenProvider.Instance.CreateId();
@@ -398,23 +398,36 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 nioModel.UpdatedOn = nioModel.CreatedOn;
                 nioModel.CreatedBy = NIO_USER_ID;
                 nioModel.UpdatedBy = NIO_USER_ID;
-                nioList.Add(nioModel);
+                if(model.DataType == 1)
+                {
+                    rotorNioList.Add(nioModel);
+                    rotordtos.Add(model);
+                }
+                else
+                {
+                    statorNioList.Add(nioModel);
+                    statordtos.Add(model);
+                }
             }
-            if (dtos == null || dtos.Count == 0)
+            if ((rotordtos == null || rotordtos.Count == 0) && (statordtos == null || statordtos.Count == 0))
             {
                 await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioParam, paramList.Max(x => x.Id));
                 _logger.LogError($"结束业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 return;
             }
 
-            long nioId = IdGenProvider.Instance.CreateId();
-            nioList.ForEach(m => m.NioPushId = nioId);
+            long rotorNioId = IdGenProvider.Instance.CreateId();
+            rotorNioList.ForEach(m => m.NioPushId = rotorNioId);
+            long statorNioId = IdGenProvider.Instance.CreateId();
+            statorNioList.ForEach(m => m.NioPushId = statorNioId);
 
             //MES数据入库
             using var trans = TransactionHelper.GetTransactionScope();
 
-            await AddToPushQueueAsync(config, buzScene, dtos, nioId);
-            await _nioPushCollectionRepository.InsertRangeAsync(nioList);
+            await AddToPushQueueAsync(config, buzScene, rotordtos, rotorNioId);
+            await AddToPushQueueAsync(config, buzScene, statordtos, statorNioId);
+            await _nioPushCollectionRepository.InsertRangeAsync(rotorNioList);
+            await _nioPushCollectionRepository.InsertRangeAsync(statorNioList);
             await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioParam, paramList.Max(x => x.Id));
 
             trans.Complete();

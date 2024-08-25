@@ -41,6 +41,11 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<NioPushCollectionEntity> entities)
         {
+            if(entities == null || entities.Count() == 0)
+            {
+                return 0;
+            }
+
             var (sql, param) = SqlHelper.JoinInsertSql(InsertSqlInsert, InsertSqlValue, entities);
 
             using var conn = GetMESDbConnection();
