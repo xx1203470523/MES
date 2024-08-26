@@ -88,7 +88,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             };
 
             var opArray = await Task.WhenAll(readTasks);
-            var entities = opArray.SelectMany(s => s);
+            var entities = opArray.SelectMany(s => s).ToList();
             if (entities == null || !entities.Any())
             {
                 _logger.LogDebug($"【{producreCode}】没有要拉取的数据！");
