@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: stator-back
+  name: stator-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stator-back
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: stator-back
+    spec:
+      containers:
+      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks.stator:20240826163641
+        name: stator-back
+        volumeMounts:
+          - mountPath: /logs
+            name: stator-back-volume
+        env:
+        - name: DOTNET_ENVIRONMENT
+          value: "Production"
+        - name: TZ
+          value: "Asia/Shanghai"
+        resources: {}
+      volumes:
+      - name: stator-back-volume
+        # 挂载 /data/foo，但仅当该目录已经存在时
+        hostPath:
+          path: /data/logs # 主机上的目录位置
+          type: DirectoryOrCreate # 此字段可选
+status: {}
