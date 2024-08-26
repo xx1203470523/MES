@@ -63,6 +63,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public IQCHandMethodEnum? HandMethod { get; set; }
 
+        /// <summary>
+        /// bomId
+        /// </summary>
+        public long? BomId { get; set; }
+
     }
 
     /// <summary>
@@ -322,6 +327,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// BomId
+        /// </summary>
+        public long? BomId { get; set; }
 
     }
 

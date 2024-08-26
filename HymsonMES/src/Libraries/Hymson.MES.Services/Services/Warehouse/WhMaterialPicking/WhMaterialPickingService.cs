@@ -175,7 +175,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                 var procMaterialEntity = procMaterialEntities.FirstOrDefault(x => x.Id == item.MaterialId);
 
                 // 2024.07.27 TODO: 临时处理
-                var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId);
+                var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId && x.BomId == item.BomId);
                 if (planWorkPlanMaterialEntity != null)
                 {
                     warehousingDeliveryDetails.Add(new DeliveryDetailDto
