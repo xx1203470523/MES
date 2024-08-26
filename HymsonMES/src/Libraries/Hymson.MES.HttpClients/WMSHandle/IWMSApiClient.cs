@@ -15,21 +15,28 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<BaseResponse> IQCReceiptCallBackAsync(IQCReceiptResultDto request);
+        Task<BaseResponse?> IQCReceiptCallBackAsync(IQCReceiptResultDto request);
 
         /// <summary>
         /// 生产入库
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<BaseResponse> WarehousingEntryRequestAsync(WarehousingEntryDto request);
+        Task<BaseResponse?> WarehousingEntryRequestAsync(WarehousingEntryDto request);
 
         /// <summary>
         /// 出库单
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<BaseResponse> WarehousingDeliveryRequestAsync(DeliveryDto request);
+        Task<BaseResponse?> WarehousingDeliveryRequestAsync(DeliveryDto request);
+
+        /// <summary>
+        /// 领料取消
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<BaseResponse?> MaterialPickingCancelAsync(MaterialPickingCancelDto request);
 
 
 
@@ -39,13 +46,6 @@ namespace Hymson.MES.HttpClients
         /// <param name="request"></param>
         /// <returns></returns>
         Task<bool> MaterialPickingRequestAsync(MaterialPickingRequestDto request);
-
-        /// <summary>
-        /// 领料取消
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        Task<bool> MaterialPickingCancelAsync(MaterialPickingCancelDto request);
 
         /// <summary>
         /// 退料申请，请求发送成功之后，库存即刻扣除，后续WMS反馈有问题时候再加回来

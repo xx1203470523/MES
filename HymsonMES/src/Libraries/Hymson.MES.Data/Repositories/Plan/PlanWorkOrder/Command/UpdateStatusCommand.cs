@@ -1,16 +1,11 @@
 ﻿using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command
 {
     /// <summary>
-    /// 数据库
+    /// 这么这个类起这么名字，跟基础状态操作类 UpdateStatusCommand 重名了，先加个New吧
     /// </summary>
-    public class UpdateStatusCommand
+    public class UpdateStatusNewCommand
     {
         public long Id { get; set; }
 

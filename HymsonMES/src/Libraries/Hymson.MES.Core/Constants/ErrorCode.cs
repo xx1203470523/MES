@@ -1268,6 +1268,8 @@
         public const string MES16059 = "废成品出入库失败,WMS返回失败，错误原因：【{msg}】。";
         public const string MES16060 = "废成品入库中ERP工单信息不存在【{orderCode}】 ！";
         public const string MES16061 = "废成品入库明细不能为空！";
+
+        public const string MES16062 = "存在状态为【{Status}】的领料单，不允许取消！";
         #endregion
 
         #region 条码接收 16100

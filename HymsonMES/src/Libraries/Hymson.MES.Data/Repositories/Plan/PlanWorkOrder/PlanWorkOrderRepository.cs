@@ -555,7 +555,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<int> ModifyWorkOrderStatusAsync(IEnumerable<UpdateStatusCommand> parms)
+        public async Task<int> ModifyWorkOrderStatusAsync(IEnumerable<UpdateStatusNewCommand> parms)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateWorkOrderStatusSql, parms);

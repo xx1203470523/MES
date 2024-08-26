@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 httpClient.BaseAddress = new Uri(rotorOptions.BaseAddressUri);
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(nameof(RotorOption.SYSTOKEN), rotorOptions.SYSTOKEN);
-            });
+            }); //.AddHttpMessageHandler<LoggingDelegatingHandler>();
 
             var printOptions = new PrintOptions();
             configuration.GetSection("PrintOptions").Bind(printOptions);

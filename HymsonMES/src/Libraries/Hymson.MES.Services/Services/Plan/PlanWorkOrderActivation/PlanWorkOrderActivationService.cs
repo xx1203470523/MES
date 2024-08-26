@@ -523,9 +523,9 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
 
 
                     //修改工单状态为生产中
-                    List<UpdateStatusCommand> updateStatusCommands = new List<UpdateStatusCommand>
+                    List<UpdateStatusNewCommand> updateStatusCommands = new List<UpdateStatusNewCommand>
                     {
-                        new UpdateStatusCommand()
+                        new UpdateStatusNewCommand()
                         {
                             Id = activationWorkOrderDto.Id,
                             Status = Core.Enums.PlanWorkOrderStatusEnum.InProduction,

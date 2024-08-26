@@ -50,34 +50,44 @@ namespace Hymson.MES.HttpClients.Requests
         public List<ProductionPickMaterialDto> details { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     internal record MaterialPickingCancel
     {
-        /// <summary>
-        /// 仓库编号
-        /// </summary>
-        [JsonPropertyName("warehouseCode")]
-        public string WarehouseCode { get; set; }
         /// <summary>
         /// 同步单号
         /// </summary>
         [JsonPropertyName("syncCode")]
-        public string SyncCode { get; set; }
-        [JsonPropertyName("type")]
-        public int Type { get; set; } = 304;
+        public string SyncCode { get; set; } = "";
+
         /// <summary>
-        /// 下发日期
+        /// 
         /// </summary>
-        [JsonPropertyName("sendOn")]
-        public string SendOn { get; set; }
+        [JsonPropertyName("UpdatedBy")]
+        public string UpdatedBy { get; set; } = "";
 
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public record MaterialPickingCancelDto
     {
         /// <summary>
         /// 同步单号
         /// </summary>
-        public string SyncCode { get; set; }
-        public string SendOn { get; set; }
+        public string SyncCode { get; set; } = "";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string UpdatedBy { get; set; } = "";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string SendOn { get; set; } = "";
 
     }
 

@@ -7,12 +7,9 @@
  */
 
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
-using System.Text.Json.Serialization;
 
 namespace Hymson.MES.Services.Dtos.Warehouse
 {
@@ -500,11 +497,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public IEnumerable<WhMaterialInventoryStatusEnum>? Statuss { get; set; }
 
 
-    #region 添加 库存修改功能时添加 karl
-    /// <summary>
-    /// 接收时间  时间范围  数组
-    /// </summary>
-    public DateTime[]? CreatedOnRange { get; set; }
+        #region 添加 库存修改功能时添加 karl
+        /// <summary>
+        /// 接收时间  时间范围  数组
+        /// </summary>
+        public DateTime[]? CreatedOnRange { get; set; }
 
         #endregion
     }
@@ -628,7 +625,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public List<PickBomDetail> Items { get; set; }
     }
-    public class PickBomDetail 
+    public class PickBomDetail
     {
         /// <summary>
         /// 物料Id
@@ -664,7 +661,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 工序代码
         /// </summary>
         public string? Code { get; set; }
-        
+
         /// <summary>
         /// 是否主物料，1：主物料
         /// </summary>
@@ -683,6 +680,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public int Qty { get; set; }
     }
+
     /// <summary>
     /// 派工单领料申请
     /// </summary>
@@ -691,15 +689,15 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 派工单编码
         /// </summary>
-        public string WorkCode { get; set; }
+        public string WorkOrderCode { get; set; } = "";
+
         /// <summary>
         /// 领料单Id
         /// </summary>
-        public long RequistionOrderId { get; set; }
-
-
+        public string ReqOrderCode { get; set; }
 
     }
+
     /// <summary>
     /// 退料请求
     /// </summary>
@@ -761,12 +759,12 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次号
         /// </summary>
-        public string Batch {  get; set; }
+        public string Batch { get; set; }
 
         /// <summary>
         /// 单位
         /// </summary>
-        public string Unit {  get; set; }
+        public string Unit { get; set; }
 
         /// <summary>
         /// 数量
@@ -784,7 +782,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string? WarehouseCode { get; set; }
     }
 
-    
+
     /// <summary>
     /// 取消退料
     /// </summary>
@@ -852,7 +850,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 产品Id
         /// </summary>
-        public long ProductId {  get; set; }
+        public long ProductId { get; set; }
 
     }
 

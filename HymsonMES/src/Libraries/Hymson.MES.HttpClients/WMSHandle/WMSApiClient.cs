@@ -49,14 +49,14 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 回调（来料IQC）
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<BaseResponse> IQCReceiptCallBackAsync(IQCReceiptResultDto dto)
+        public async Task<BaseResponse?> IQCReceiptCallBackAsync(IQCReceiptResultDto requestBody)
         {
-            _logger.LogDebug($"来料IQC -> Request: {dto.ToSerialize()}");
+            _logger.LogDebug($"来料IQC -> Request: {requestBody.ToSerialize()}");
             var responseDto = new BaseResponse { Code = -1, Message = "未知的错误" };
 
-            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReceipt.Route, dto);
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReceipt.Route, requestBody);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
@@ -78,66 +78,89 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 入库申请单
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<BaseResponse> WarehousingEntryRequestAsync(WarehousingEntryDto request)
+        public async Task<BaseResponse?> WarehousingEntryRequestAsync(WarehousingEntryDto requestDto)
         {
-            _logger.LogDebug($"退料入库 -> Request: {request.ToSerialize()}");
-            WarehousingEntryRequest materialReturnRequest = new WarehousingEntryRequest()
+            _logger.LogDebug($"退料入库 -> Request: {requestDto.ToSerialize()}");
+            var requestBody = new WarehousingEntryRequest()
             {
-                Type = request.Type,
-                WarehouseCode = request.WarehouseCode,
-                SyncCode = request.SyncCode,
-                SendOn = request.SendOn,
-                SupplierCode = request.SupplierCode,
-                CustomerCode = request.CustomerCode,
-                PurchaseType = request.PurchaseType,
-                InboundCategory = request.InboundCategory,
-                IsAutoExecute = request.IsAutoExecute,
-                CreatedBy = request.CreatedBy,
-                Remark = request.Remark,
-                Details = request.Details
+                Type = requestDto.Type,
+                WarehouseCode = requestDto.WarehouseCode,
+                SyncCode = requestDto.SyncCode,
+                SendOn = requestDto.SendOn,
+                SupplierCode = requestDto.SupplierCode,
+                CustomerCode = requestDto.CustomerCode,
+                PurchaseType = requestDto.PurchaseType,
+                InboundCategory = requestDto.InboundCategory,
+                IsAutoExecute = requestDto.IsAutoExecute,
+                CreatedBy = requestDto.CreatedBy,
+                Remark = requestDto.Remark,
+                Details = requestDto.Details
             };
 
-            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.Receipt.Route, materialReturnRequest);
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.Receipt.Route, requestBody);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
             _logger.LogDebug($"退料入库 -> Response: {jsonResponse}");
 
-            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse>();
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse?>();
         }
 
         /// <summary>
         /// 出库申请单
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<BaseResponse> WarehousingDeliveryRequestAsync(DeliveryDto request)
+        public async Task<BaseResponse?> WarehousingDeliveryRequestAsync(DeliveryDto requestDto)
         {
-            _logger.LogDebug($"领料出库 -> Request: {request.ToSerialize()}");
-            DeliveryRequest deliveryRequest = new()
+            _logger.LogDebug($"领料出库 -> Request: {requestDto.ToSerialize()}");
+            var requestBody = new DeliveryRequest
             {
-                Type = request.Type,
-                WarehouseCode = request.WarehouseCode,
-                SyncCode = request.SyncCode,
-                SendOn = request.SendOn,
-                SupplierCode = request.SupplierCode,
-                CustomerCode = request.CustomerCode,
-                StockOutCategory = request.StockOutCategory,
-                IsAutoExecute = request.IsAutoExecute,
-                CreatedBy = request.CreatedBy,
-                Remark = request.Remark,
-                Details = request.Details
+                Type = requestDto.Type,
+                WarehouseCode = requestDto.WarehouseCode,
+                SyncCode = requestDto.SyncCode,
+                SendOn = requestDto.SendOn,
+                SupplierCode = requestDto.SupplierCode,
+                CustomerCode = requestDto.CustomerCode,
+                StockOutCategory = requestDto.StockOutCategory,
+                IsAutoExecute = requestDto.IsAutoExecute,
+                CreatedBy = requestDto.CreatedBy,
+                Remark = requestDto.Remark,
+                Details = requestDto.Details
             };
 
-            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.Delivery.Route, deliveryRequest);
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.Delivery.Route, requestBody);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
             _logger.LogDebug($"领料出库 -> Response: {jsonResponse}");
 
-            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse>();
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse?>();
+        }
+
+        /// <summary>
+        /// 取消领料申请
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<BaseResponse?> MaterialPickingCancelAsync(MaterialPickingCancelDto requestDto)
+        {
+            _logger.LogDebug($"取消领料申请 -> Request: {requestDto.ToSerialize()}");
+            var requestBody = new MaterialPickingCancel
+            {
+                SyncCode = requestDto.SyncCode,
+                UpdatedBy = requestDto.UpdatedBy
+            };
+
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.Delivery.Route, requestBody);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"取消领料申请 -> Response: {jsonResponse}");
+
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse?>();
         }
 
 
@@ -158,21 +181,6 @@ namespace Hymson.MES.HttpClients
 
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
-            return httpResponse.IsSuccessStatusCode;
-        }
-
-        public async Task<bool> MaterialPickingCancelAsync(MaterialPickingCancelDto request)
-        {
-
-            MaterialPickingCancel materialPickingCancel = new()
-            {
-                SendOn = request.SendOn,
-                SyncCode = request.SyncCode,
-                Type = _options.Value.Delivery.Type,
-                WarehouseCode = _options.Value.Delivery.WarehouseCode
-            };
-            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.Delivery.Route, materialPickingCancel);
-            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
             return httpResponse.IsSuccessStatusCode;
         }
 

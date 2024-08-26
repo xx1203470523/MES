@@ -8,13 +8,13 @@ namespace Hymson.MES.Core.Enums.Warehouse
     public enum WhMaterialPickingStatusEnum : sbyte
     {
         /// <summary>
-        /// 申请成功待检验
+        /// 申请成功待发料
         /// </summary>
         [Description("申请成功待发料")]
         ApplicationSuccessful = 1,
 
         /// <summary>
-        /// 检验中
+        /// 发料中
         /// </summary>
         [Description("发料中")]
         Inspectioning = 2,
@@ -26,7 +26,7 @@ namespace Hymson.MES.Core.Enums.Warehouse
         Completed = 3,
 
         /// <summary>
-        /// 取消退料
+        /// 取消发料
         /// </summary>
         [Description("取消发料")]
         CancelMaterialReturn = 4

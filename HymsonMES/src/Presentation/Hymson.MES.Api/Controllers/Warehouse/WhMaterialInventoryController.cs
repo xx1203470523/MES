@@ -183,7 +183,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [HttpPost]
         [Route("updateOutsideWhMaterialInventory")]
         [LogDescription("修改外部来源库存", BusinessType.UPDATE)]
-        public async Task UpdateOutsideWhMaterialInventoryAsync(OutsideWhMaterialInventoryModifyDto modifyDto) 
+        public async Task UpdateOutsideWhMaterialInventoryAsync(OutsideWhMaterialInventoryModifyDto modifyDto)
         {
             await _whMaterialInventoryService.UpdateOutsideWhMaterialInventoryAsync(modifyDto);
         }
@@ -213,6 +213,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.BarcodeMergeAdjustAsync(adjustDto);
         }
+
         /// <summary>
         /// 领料申请 按照工单数量领料
         /// </summary>
@@ -223,6 +224,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             await _whMaterialInventoryService.PickMaterialsRequestAsync(request);
         }
+
         /// <summary>
         /// 领料申请  按照物料明细领料
         /// </summary>
@@ -233,6 +235,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             await _whMaterialInventoryService.PickMaterialsRequestAsync(request);
         }
+
         /// <summary>
         /// 取消领料
         /// </summary>
@@ -243,6 +246,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.PickMaterialsCancelAsync(request);
         }
+
         /// <summary>
         /// 退料申请
         /// </summary>
@@ -253,6 +257,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             await _whMaterialInventoryService.MaterialReturnRequestAsync(request);
         }
+
         /// <summary>
         /// 取消退料
         /// </summary>
@@ -274,6 +279,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             await _whMaterialInventoryService.ProductReceiptRequestAsync(request);
         }
+
         /// <summary>
         /// 取消入库
         /// </summary>
@@ -284,7 +290,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.ProductReceiptCancelAsync(request);
         }
-      /// <summary>
+
+        /// <summary>
         /// 根据工单查询工单的领料列表
         /// </summary>
         /// <param name="id"></param>

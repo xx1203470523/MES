@@ -11,6 +11,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
@@ -282,7 +283,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
 
             #endregion
 
-            List<UpdateStatusCommand> planWorkOrderEntities = new List<UpdateStatusCommand>();
+            List<UpdateStatusNewCommand> planWorkOrderEntities = new List<UpdateStatusNewCommand>();
             List<long> updateWorkOrderRealEndList = new List<long>();
             List<long> deleteActivationWorkOrderIds = new List<long>();//需要取消激活工单
 
@@ -291,7 +292,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 var workOrder = workOrders.FirstOrDefault(x => x.Id == item.Id);
                 if (workOrder != null)
                 {
-                    planWorkOrderEntities.Add(new UpdateStatusCommand()
+                    planWorkOrderEntities.Add(new UpdateStatusNewCommand()
                     {
                         Id = item.Id,
                         Status = item.Status,

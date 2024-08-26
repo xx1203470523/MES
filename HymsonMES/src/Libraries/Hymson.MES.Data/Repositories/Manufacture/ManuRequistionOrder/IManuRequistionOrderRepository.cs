@@ -89,6 +89,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         Task<IEnumerable<ManuRequistionOrderEntity>> GetManuRequistionOrderEntitiesAsync(ManuRequistionQueryByWorkOrders manuRequistionOrderQuery);
 
         /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuRequistionOrderEntity>> GetEntitiesAsync(ManuRequistionOrderQuery query);
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuRequistionOrderPagedQuery"></param>

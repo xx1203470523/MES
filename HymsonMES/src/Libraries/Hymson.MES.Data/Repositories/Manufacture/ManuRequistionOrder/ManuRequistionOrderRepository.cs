@@ -20,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
     /// <summary>
     /// 生产领料单仓储
     /// </summary>
-    public partial class ManuRequistionOrderRepository :BaseRepository, IManuRequistionOrderRepository
+    public partial class ManuRequistionOrderRepository : BaseRepository, IManuRequistionOrderRepository
     {
 
-        public ManuRequistionOrderRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuRequistionOrderRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         public async Task<ManuRequistionOrderEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuRequistionOrderEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuRequistionOrderEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -66,15 +66,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuRequistionOrderEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuRequistionOrderEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByIdsSql, new { Ids = ids });
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ManuRequistionOrderEntity>> GetByOrderCodeAsync(long orderId, long siteId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByOrderIdSql, new { WorkOrderId = orderId, SiteId= siteId });
+            return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByOrderIdSql, new { WorkOrderId = orderId, SiteId = siteId });
         }
 
         /// <summary>
@@ -94,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (manuRequistionOrderPagedQuery.PageIndex - 1) * manuRequistionOrderPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuRequistionOrderPagedQuery.PageSize });
@@ -120,7 +127,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
-            if (manuRequistionOrderQuery.WorkOrderIds!=null&&manuRequistionOrderQuery.WorkOrderIds.Any())
+            if (manuRequistionOrderQuery.WorkOrderIds != null && manuRequistionOrderQuery.WorkOrderIds.Any())
             {
                 sqlBuilder.Where("WorkOrderId IN @WorkOrderIds");
             }
@@ -131,6 +138,35 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             sqlBuilder.AddParameters(manuRequistionOrderQuery);
             using var conn = GetMESDbConnection();
             var manuRequistionOrderEntities = await conn.QueryAsync<ManuRequistionOrderEntity>(template.RawSql, manuRequistionOrderQuery);
+            return manuRequistionOrderEntities;
+        }
+        
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuRequistionOrderEntity>> GetEntitiesAsync(ManuRequistionOrderQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetManuRequistionOrderEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (query.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where("WorkOrderId = @WorkOrderId");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.ReqOrderCode))
+            {
+                sqlBuilder.Where("ReqOrderCode = @ReqOrderCode");
+            }
+
+            sqlBuilder.AddParameters(query);
+            using var conn = GetMESDbConnection();
+            var manuRequistionOrderEntities = await conn.QueryAsync<ManuRequistionOrderEntity>(template.RawSql, query);
             return manuRequistionOrderEntities;
         }
 
