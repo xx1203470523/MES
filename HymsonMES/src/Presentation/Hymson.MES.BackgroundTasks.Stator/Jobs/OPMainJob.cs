@@ -93,10 +93,7 @@ namespace Hymson.MES.BackgroundTasks.Stator
         public async Task Execute(IJobExecutionContext context)
         {
             try
-            { // 创建计时器实例
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
+            {
                 // 顺序不要随意调整
                 var mainLimit = 1000;
                 var defaultLimit = 200;
@@ -106,11 +103,6 @@ namespace Hymson.MES.BackgroundTasks.Stator
                 await LoopExecuteAsync(() => _op050Service.ExecuteAsync(defaultLimit));
                 await LoopExecuteAsync(() => _op060Service.ExecuteAsync(defaultLimit));
                 await LoopExecuteAsync(() => _op070Service.ExecuteAsync(mainLimit));
-                stopwatch.Stop();
-                Console.WriteLine($"10-70 -> 执行完毕，耗时：{stopwatch.ElapsedMilliseconds}毫秒");
-
-                stopwatch.Reset();
-                stopwatch.Start();
                 await LoopExecuteAsync(() => _op080Service.ExecuteAsync(mainLimit));
                 await LoopExecuteAsync(() => _op090Service.ExecuteAsync(defaultLimit));
                 await LoopExecuteAsync(() => _op100Service.ExecuteAsync(defaultLimit));
@@ -120,8 +112,6 @@ namespace Hymson.MES.BackgroundTasks.Stator
                 await LoopExecuteAsync(() => _op210Service.ExecuteAsync(mainLimit));
                 await LoopExecuteAsync(() => _op340Service.ExecuteAsync(mainLimit));
                 await LoopExecuteAsync(() => _op490Service.ExecuteAsync(mainLimit));
-                stopwatch.Stop();
-                Console.WriteLine($"80-490 -> 执行完毕，耗时：{stopwatch.ElapsedMilliseconds}毫秒");
 
             }
             catch (Exception ex)
@@ -135,16 +125,21 @@ namespace Hymson.MES.BackgroundTasks.Stator
         /// </summary>
         /// <param name="asyncMethod"></param>
         /// <returns></returns>
-        private static async Task LoopExecuteAsync(Func<Task<int>> asyncMethod)
+        private async Task LoopExecuteAsync(Func<Task<int>> asyncMethod)
         {
+            // 创建计时器实例
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             while (true)
             {
                 var rows = await asyncMethod();
                 if (rows <= 0) break;
             }
+
+            stopwatch.Stop();
+            _logger.LogDebug($"【{asyncMethod}】执行完毕，耗时：{stopwatch.ElapsedMilliseconds}毫秒");
         }
-
-
 
     }
 }
