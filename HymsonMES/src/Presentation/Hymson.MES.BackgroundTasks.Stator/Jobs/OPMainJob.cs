@@ -19,7 +19,6 @@ namespace Hymson.MES.BackgroundTasks.Stator
         private readonly IOP020Service _op020Service;
         private readonly IOP030Service _op030Service;
         private readonly IOP050Service _op050Service;
-        private readonly IOP080Service _op080Service;
         private readonly IOP090Service _op090Service;
         private readonly IOP100Service _op100Service;
         private readonly IOP120Service _op120Service;
@@ -37,7 +36,6 @@ namespace Hymson.MES.BackgroundTasks.Stator
         /// <param name="op020Service"></param>
         /// <param name="op030Service"></param>
         /// <param name="op050Service"></param>
-        /// <param name="op080Service"></param>
         /// <param name="op090Service"></param>
         /// <param name="op100Service"></param>
         /// <param name="op120Service"></param>
@@ -51,7 +49,6 @@ namespace Hymson.MES.BackgroundTasks.Stator
             IOP020Service op020Service,
             IOP030Service op030Service,
             IOP050Service op050Service,
-            IOP080Service op080Service,
             IOP090Service op090Service,
             IOP100Service op100Service,
             IOP120Service op120Service,
@@ -66,7 +63,6 @@ namespace Hymson.MES.BackgroundTasks.Stator
             _op020Service = op020Service;
             _op030Service = op030Service;
             _op050Service = op050Service;
-            _op080Service = op080Service;
             _op090Service = op090Service;
             _op100Service = op100Service;
             _op120Service = op120Service;
@@ -93,7 +89,6 @@ namespace Hymson.MES.BackgroundTasks.Stator
                 await LoopExecuteAsync(() => _op020Service.ExecuteAsync(mainLimit), "OP020");
                 await LoopExecuteAsync(() => _op030Service.ExecuteAsync(defaultLimit), "OP030");
                 await LoopExecuteAsync(() => _op050Service.ExecuteAsync(defaultLimit), "OP050");
-                await LoopExecuteAsync(() => _op080Service.ExecuteAsync(mainLimit), "OP080");
                 await LoopExecuteAsync(() => _op090Service.ExecuteAsync(defaultLimit), "OP090");
                 await LoopExecuteAsync(() => _op100Service.ExecuteAsync(defaultLimit), "OP100");
                 await LoopExecuteAsync(() => _op120Service.ExecuteAsync(mainLimit), "OP120");

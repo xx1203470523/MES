@@ -71,7 +71,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             }, tableName);
             if (entities == null || !entities.Any())
             {
-                _logger.LogDebug($"【{producreCode}】没有要拉取的数据！");
+                _logger.LogDebug($"【{tableName}】没有要拉取的数据！");
                 return 0;
             }
 
@@ -79,7 +79,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var barCodes = entities.Select(s => s.Barcode);
 
             // 获取转换数据（基础数据）
-            var summaryBo = await ConvertDataListAsync(entities, barCodes, _parameterCodes);
+            var summaryBo = await ConvertDataListAsync(tableName, entities, barCodes, _parameterCodes);
 
             // 保存数据
             return await _mainService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
@@ -88,11 +88,12 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <summary>
         /// 保存转换数据（附带参数）
         /// </summary>
+        /// <param name="tableName"></param>
         /// <param name="entities"></param>
         /// <param name="barCodes"></param>
         /// <param name="parameterCodes"></param>
         /// <returns></returns>
-        private async Task<StatorSummaryBo> ConvertDataListAsync<T>(IEnumerable<T> entities, IEnumerable<string> barCodes, IEnumerable<string>? parameterCodes = null) where T : BaseOPEntity
+        private async Task<StatorSummaryBo> ConvertDataListAsync<T>(string tableName, IEnumerable<T> entities, IEnumerable<string> barCodes, IEnumerable<string>? parameterCodes = null) where T : BaseOPEntity
         {
             var producreCode = $"{typeof(T).Name}";
 
@@ -124,7 +125,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var summaryBo = new StatorSummaryBo { };
             foreach (var opEntity in entities)
             {
-                _logger.LogDebug($"【{producreCode}】{opEntity.index}：{opEntity.ID}, {opEntity.Barcode}");
+                _logger.LogDebug($"【{tableName}】{opEntity.index}：{opEntity.ID}, {opEntity.Barcode}");
 
                 // ID是否无效数据
                 var id = opEntity.ID.ParseToLong();
