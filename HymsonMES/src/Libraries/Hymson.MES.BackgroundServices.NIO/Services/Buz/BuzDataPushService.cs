@@ -193,6 +193,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly string PRODUCRE_END = "R01OP150";
 
         /// <summary>
+        /// 定子末工序
+        /// </summary>
+        private readonly string PRODUCRE_END_STATOR = "S01OP520";
+
+        /// <summary>
         /// 小数精度
         /// </summary>
         private readonly int NIO_NUM_LEN = 4;
@@ -271,7 +276,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             ProcParameterQuery paramQuery = new ProcParameterQuery() { SiteId = siteId };
             var baseParamList = await _procParameterRepository.GetProcParameterEntitiesAsync(paramQuery);
             if (baseParamList == null || baseParamList.Any() == false) return;
-            //获取工序参数
+            //获取工序
             ProcProcedureQuery procedureQuery = new ProcProcedureQuery() { SiteId = siteId };
             var procedureList = await _procProcedureRepository.GetEntitiesAsync(procedureQuery);
             if (procedureList == null || procedureList.Any() == false) return;
@@ -521,12 +526,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             {
                 return;
             }
+            //获取工序
+            ProcProcedureQuery procedureQuery = new ProcProcedureQuery() { SiteId = siteId };
+            var procedureList = await _procProcedureRepository.GetEntitiesAsync(procedureQuery);
+            if (procedureList == null || procedureList.Any() == false) return;
             //工单
             List<long> orderIdList = stepList.Where(m => m.WorkOrderId != 0).Select(m => m.WorkOrderId).Distinct().ToList();
             IEnumerable<PlanWorkOrderEntity> orderList = await _planWorkOrderRepository.GetByIdsAsync(orderIdList);
-            //获取批次信息
             List<string> sfcList = stepList.Select(m => m.SFC).Distinct().ToList();
-            List<SfcBatchDto> sfcBatchList = await GetSfcBatchListAsync(siteId, sfcList);
+            ////获取批次信息
+            //List<SfcBatchDto> sfcBatchList = await GetSfcBatchListAsync(siteId, sfcList);
             //成品码信息
             ZSfcQuery zSfcQuery = new ZSfcQuery();
             zSfcQuery.SiteId = siteId;
@@ -536,11 +545,20 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var dtos = new List<ProductionDto> { };
             foreach (var item in stepList)
             {
-                if (string.IsNullOrEmpty(item.Remark) == true)
+                var curOp = procedureList.Where(m => m.Id == item.ProcedureId).FirstOrDefault();
+                if(curOp == null)
                 {
                     continue;
                 }
-                string procedureCode = item.Remark;
+                string procedureCode = string.Empty;
+
+                //if (string.IsNullOrEmpty(item.Remark) == true)
+                //{
+                //    continue;
+                //}
+                //procedureCode = item.Remark;
+                procedureCode = curOp.Code;
+
                 NIOConfigBaseDto curConfig = new NIOConfigBaseDto();
                 if (procedureCode[0] == ROTOR_CHAR)
                 {
@@ -557,13 +575,13 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 {
                     curOrderCode = curOrder.OrderCode;
                 }
-                //条码批次
-                string sfcBatch = string.Empty;
-                var sfcBatchModel = sfcBatchList.Where(m => m.Sfc == item.SFC).FirstOrDefault();
-                if (sfcBatchModel != null)
-                {
-                    sfcBatch = sfcBatchModel.Batch;
-                }
+                ////条码批次
+                //string sfcBatch = string.Empty;
+                //var sfcBatchModel = sfcBatchList.Where(m => m.Sfc == item.SFC).FirstOrDefault();
+                //if (sfcBatchModel != null)
+                //{
+                //    sfcBatch = sfcBatchModel.Batch;
+                //}
                 //总成码,指定工序才有总成码
                 string nioSfc = string.Empty;
                 if (ROTOR_NIOSN_OP.Contains(procedureCode) == true && nioSfcList != null)
@@ -870,7 +888,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery()
             //{ Rows = WATER_ALL_ROWS, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
             EntityByDateSiteIdQuery stepQuery = new EntityByDateSiteIdQuery();
-            stepQuery.ProcedureCodeList = new List<string>() { PRODUCRE_END };
+            stepQuery.ProcedureCodeList = new List<string>() { PRODUCRE_END, PRODUCRE_END_STATOR };
             stepQuery.BeginDate = Convert.ToDateTime(nowStr);
             stepQuery.EndDate = stepQuery.BeginDate.AddDays(1);
             stepQuery.SiteId = siteId;
