@@ -12,8 +12,8 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// <summary>
         /// 水位查询SQL
         /// </summary>
-        //const string QuerySql = @"SELECT * FROM `{0}` WHERE RDate > '{1}' AND `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
-        const string QuerySql = @"SELECT * FROM `{0}` WHERE `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
+        const string QuerySql = @"SELECT * FROM `{0}` WHERE RDate >= '2024-08-11 08:30:00' AND `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
+        //const string QuerySql = @"SELECT * FROM `{0}` WHERE `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
 
         /// <summary>
         /// 构造函数
