@@ -809,6 +809,7 @@ namespace Hymson.MES.Services.Services.Process
                     Version = procMaterialEntity.Version ?? "",
                     Unit = procMaterialEntity.Unit ?? "",
                     Usages = needQty - receiveQty,
+                    BomId = planMaterial?.BomId ?? 0,
                     Batch = procMaterialEntity.Batch ?? 0
                 });
             }
