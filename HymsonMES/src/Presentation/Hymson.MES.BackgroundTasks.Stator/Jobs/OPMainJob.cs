@@ -97,21 +97,21 @@ namespace Hymson.MES.BackgroundTasks.Stator
                 // 顺序不要随意调整
                 var mainLimit = 1000;
                 var defaultLimit = 200;
-                await LoopExecuteAsync(() => _op010Service.ExecuteAsync(mainLimit));
-                await LoopExecuteAsync(() => _op020Service.ExecuteAsync(mainLimit));
-                await LoopExecuteAsync(() => _op030Service.ExecuteAsync(defaultLimit));
-                await LoopExecuteAsync(() => _op050Service.ExecuteAsync(defaultLimit));
-                await LoopExecuteAsync(() => _op060Service.ExecuteAsync(defaultLimit));
-                await LoopExecuteAsync(() => _op070Service.ExecuteAsync(mainLimit));
-                await LoopExecuteAsync(() => _op080Service.ExecuteAsync(mainLimit));
-                await LoopExecuteAsync(() => _op090Service.ExecuteAsync(defaultLimit));
-                await LoopExecuteAsync(() => _op100Service.ExecuteAsync(defaultLimit));
-                await LoopExecuteAsync(() => _op120Service.ExecuteAsync(mainLimit));
-                await LoopExecuteAsync(() => _op160Service.ExecuteAsync(mainLimit));
-                await LoopExecuteAsync(() => _op190Service.ExecuteAsync(mainLimit));
-                await LoopExecuteAsync(() => _op210Service.ExecuteAsync(mainLimit));
-                await LoopExecuteAsync(() => _op340Service.ExecuteAsync(mainLimit));
-                await LoopExecuteAsync(() => _op490Service.ExecuteAsync(mainLimit));
+                await LoopExecuteAsync(() => _op010Service.ExecuteAsync(mainLimit), "OP010");
+                await LoopExecuteAsync(() => _op020Service.ExecuteAsync(mainLimit), "OP020");
+                await LoopExecuteAsync(() => _op030Service.ExecuteAsync(defaultLimit), "OP030");
+                await LoopExecuteAsync(() => _op050Service.ExecuteAsync(defaultLimit), "OP050");
+                await LoopExecuteAsync(() => _op060Service.ExecuteAsync(defaultLimit), "OP060");
+                await LoopExecuteAsync(() => _op070Service.ExecuteAsync(mainLimit), "OP070");
+                await LoopExecuteAsync(() => _op080Service.ExecuteAsync(mainLimit), "OP080");
+                await LoopExecuteAsync(() => _op090Service.ExecuteAsync(defaultLimit), "OP090");
+                await LoopExecuteAsync(() => _op100Service.ExecuteAsync(defaultLimit), "OP100");
+                await LoopExecuteAsync(() => _op120Service.ExecuteAsync(mainLimit), "OP120");
+                await LoopExecuteAsync(() => _op160Service.ExecuteAsync(mainLimit), "OP160");
+                await LoopExecuteAsync(() => _op190Service.ExecuteAsync(mainLimit), "OP190");
+                await LoopExecuteAsync(() => _op210Service.ExecuteAsync(mainLimit), "OP210");
+                await LoopExecuteAsync(() => _op340Service.ExecuteAsync(mainLimit), "OP340");
+                await LoopExecuteAsync(() => _op490Service.ExecuteAsync(mainLimit), "OP490");
 
             }
             catch (Exception ex)
@@ -124,8 +124,9 @@ namespace Hymson.MES.BackgroundTasks.Stator
         /// 循环执行
         /// </summary>
         /// <param name="asyncMethod"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
-        private async Task LoopExecuteAsync(Func<Task<int>> asyncMethod)
+        private async Task LoopExecuteAsync(Func<Task<int>> asyncMethod, string name = "")
         {
             // 创建计时器实例
             Stopwatch stopwatch = new Stopwatch();
@@ -138,7 +139,7 @@ namespace Hymson.MES.BackgroundTasks.Stator
             }
 
             stopwatch.Stop();
-            _logger.LogDebug($"【{asyncMethod}】执行完毕，耗时：{stopwatch.ElapsedMilliseconds}毫秒");
+            _logger.LogDebug($"【{name}】执行完毕，耗时：{stopwatch.ElapsedMilliseconds}毫秒");
         }
 
     }

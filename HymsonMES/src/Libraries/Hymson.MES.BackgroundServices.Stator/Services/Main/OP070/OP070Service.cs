@@ -163,6 +163,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var summaryBo = new StatorSummaryBo { };
             foreach (var opEntity in entities)
             {
+                _logger.LogDebug($"【{producreCode}】{opEntity.index}：{opEntity.ID}, {opEntity.Barcode}");
+
                 // ID是否无效数据
                 var id = opEntity.ID.ParseToLong();
                 if (id == 0) continue;
