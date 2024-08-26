@@ -62,5 +62,9 @@ namespace Hymson.MES.Core.Domain.Quality
         /// </summary>
         public string Remark { get; set; }
 
+        /// <summary>
+        /// bomid
+        /// </summary>
+        public long BomId {  get; set; }
     }
 }

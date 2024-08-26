@@ -138,5 +138,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 单位
         /// </summary>
         public string Unit {  get; set; }
+
+        /// <summary>
+        /// bomID
+        /// </summary>
+        public long BomId {  get; set; }
     }
 }

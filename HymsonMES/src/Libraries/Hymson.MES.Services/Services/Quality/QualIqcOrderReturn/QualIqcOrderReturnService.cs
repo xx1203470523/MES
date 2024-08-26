@@ -383,7 +383,7 @@ namespace Hymson.MES.Services.Services.Quality
                 detailEntity.ProcessedOn = time;
                 detailEntity.UpdatedBy = user;
                 detailEntity.UpdatedOn = time;
-
+                detailEntity.BomId = dto.BomId ?? 0;
                 updateDetailEntities.Add(detailEntity);
             }
 
@@ -579,6 +579,20 @@ namespace Hymson.MES.Services.Services.Quality
                 ReturnOrderId = orderEntity.ReturnOrderId
             });
 
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderEntity.WorkOrderId ?? 0)
+              ?? throw new CustomerValidationException(nameof(ErrorCode.MES15151));
+
+            // 查询生产计划
+            var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+
+            var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                PlanId = planWorkPlanEntity.Id,
+                PlanProductId = planWorkOrderEntity.WorkPlanProductId ?? 0
+            });
+
             // 读取产品
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(detailEntities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
             var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
@@ -606,7 +620,8 @@ namespace Hymson.MES.Services.Services.Quality
                         dto.MaterialCode = materialEntity.MaterialCode;
                         dto.MaterialName = materialEntity.MaterialName;
                         dto.MaterialVersion = materialEntity.Version ?? "";
-                        //dto.Unit = materialEntity.Unit ?? "";
+                        var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == materialEntity.Id);
+                        dto.BomId = planWorkPlanMaterialEntity?.BomId ?? 0;
                     }
                 }
                 else
@@ -909,7 +924,7 @@ namespace Hymson.MES.Services.Services.Quality
                         {
                             ProductionOrder = planWorkPlanEntity.WorkPlanCode,
                             ProductionOrderDetailID = planWorkOrderEntity?.WorkPlanProductId,
-                            ProductionOrderComponentID = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId)?.Id,
+                            ProductionOrderComponentID = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId && x.BomId == item.BomId)?.Id,
 
                             ProductionOrderNumber = planWorkPlanEntity.WorkPlanCode,
                             WorkOrderCode = planWorkOrderEntity?.OrderCode,
