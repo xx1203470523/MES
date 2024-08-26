@@ -21,7 +21,14 @@ namespace Hymson.MES.BackgroundServices.NIO.Utils
         /// <returns></returns>
         public static long GetTimestamp(DateTime date)
         {
-            return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
+            DateTime utcDateTime = ((DateTime)date).ToUniversalTime();
+            // 然后计算UTC时间与Unix纪元（1970年1月1日UTC）之间的差值  
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan timeSpan = utcDateTime - epoch;
+            return (long)timeSpan.TotalSeconds;
+
+            //date = date.AddHours(8);
+            //return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
         }
 
         /// <summary>

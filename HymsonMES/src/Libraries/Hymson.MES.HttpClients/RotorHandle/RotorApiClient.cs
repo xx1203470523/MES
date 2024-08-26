@@ -73,14 +73,14 @@ namespace Hymson.MES.HttpClients.RotorHandle
             var tokenList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorLmsToken });
             if (tokenList == null || !tokenList.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.NioMaterial.ToString());
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.RotorLmsToken.ToString());
             }
             _httpClient.DefaultRequestHeaders.Add("SYSTOKEN", tokenList.ElementAt(0).Value);
 
             var urlList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorLmsUrl });
             if (urlList == null || !urlList.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.NioMaterial.ToString());
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.RotorLmsUrl.ToString());
             }
             _httpClient.BaseAddress = new Uri(urlList.ElementAt(0).Value);
         }
