@@ -46,9 +46,12 @@ namespace Hymson.MES.BackgroundTasks.Stator
 
             try
             {
+                await Task.CompletedTask;
+                /*
                 await _op070Service.ExecuteAsync(300, "op070_1");
                 await _op070Service.ExecuteAsync(300, "op070_2");
                 await _op080Service.ExecuteAsync(200);
+                */
             }
             catch (Exception ex)
             {
