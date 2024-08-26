@@ -590,7 +590,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.OperatorId = NIO_USER_ID;
                 model.OperatorName = NIO_USER_NAME;
                 model.InputTime = GetTimestamp(item.CreatedOn);
-                model.OutputTime = model.InputTime; //GetTimestamp(item.UpdatedOn ?? item.CreatedOn);
+                model.OutputTime = GetTimestamp(item.UpdatedOn ?? item.CreatedOn);
                 //model.DeviceDeterminedStatus = item.ScrapQty > 0;
                 if (item.ScrapQty != null && item.ScrapQty > 0)
                 {
