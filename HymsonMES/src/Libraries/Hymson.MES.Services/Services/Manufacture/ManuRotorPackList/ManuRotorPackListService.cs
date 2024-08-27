@@ -219,7 +219,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     if (!string.IsNullOrEmpty(query.Sfc))
                     {
-
                         //成品码信息
                         ZSfcQuery zSfcQuery = new ZSfcQuery();
                         zSfcQuery.SiteId = _currentSite.SiteId ?? 0;
@@ -236,12 +235,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                         }
                         else
                         {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES10542)).WithData("sfc", query.Sfc);
+
                             return manuRotors;
                         }
                     }
                     else
                     {
-                        return manuRotors;
+                        //return manuRotors;
                     }
                 }
 
@@ -267,7 +268,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                     else
                     {
-                        return manuRotors;
+                        throw new CustomerValidationException(nameof(ErrorCode.MES10542)).WithData("sfc", query.Sfc);
+                        //return manuRotors;
                     }
                 }
                 else
@@ -275,6 +277,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                     return manuRotors;
                 }
             }
+
+            //if(string.IsNullOrEmpty(query.Sfc) == false && (manuRotors == null || manuRotors.Count == 0))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10542)).WithData("sfc", query.Sfc);
+            //}
 
             var sfcs = manuRotorPackLists.Select(x => x.ProductCode).ToList();
             var qualFqcs = await _qualFqcInspectionMavalRepository.GetQualFqcInspectionMavalEntitiesAsync(new QualFqcInspectionMavalQuery

@@ -195,7 +195,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <summary>
         /// 定子末工序
         /// </summary>
-        private readonly string PRODUCRE_END_STATOR = "S01OP520";
+        private readonly string PRODUCRE_END_STATOR = "S01OP530";
 
         /// <summary>
         /// 小数精度
