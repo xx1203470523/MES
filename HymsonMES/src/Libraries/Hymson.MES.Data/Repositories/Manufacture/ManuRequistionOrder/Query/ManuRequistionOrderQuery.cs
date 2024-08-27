@@ -5,21 +5,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuRequistionOrderQuery
     {
-
         /// <summary>
-        /// 工厂
+        /// 站点
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 退料工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
 
         // <summary>
         /// 领料单据号
         /// </summary>
         public string ReqOrderCode { get; set; }
-
-        /// <summary>
-        /// 工单Id
-        /// </summary>
-        public long? WorkOrderId { get; set; }
 
         /// <summary>
         /// 工单编码

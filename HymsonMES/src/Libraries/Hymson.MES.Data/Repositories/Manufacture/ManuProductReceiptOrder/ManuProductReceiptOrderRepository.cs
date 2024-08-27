@@ -80,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -102,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductReceiptOrderEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuProductReceiptOrderEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuProductReceiptOrderEntity>(GetByIdsSql, new { Ids = ids });
@@ -117,6 +117,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where("WorkOrderCode = @WorkOrderId");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.CompletionOrderCode))
+            {
+                sqlBuilder.Where("CompletionOrderCode = @CompletionOrderCode");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuProductReceiptOrderEntity>(template.RawSql, query);
         }
@@ -170,7 +184,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuProductReceiptOrderEntity>(GetByCompletionOrderCodeSql, new { CompletionOrderCode = CompletionOrderCode });
         }
-        
+
     }
 
 

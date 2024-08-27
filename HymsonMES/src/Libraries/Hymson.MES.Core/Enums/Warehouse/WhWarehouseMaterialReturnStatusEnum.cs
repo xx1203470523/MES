@@ -47,6 +47,13 @@ namespace Hymson.MES.Core.Enums.Warehouse
         /// 取消退料
         /// </summary>
         [Description("取消退料")]
-        CancelMaterialReturn = 7
+        CancelMaterialReturn = 7,
+
+        /// <summary>
+        /// 取消申请
+        /// </summary>
+        [Description("取消申请")]
+        CancelApply = 8
+
     }
 }

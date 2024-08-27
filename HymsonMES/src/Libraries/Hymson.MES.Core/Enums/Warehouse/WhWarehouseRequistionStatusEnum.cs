@@ -42,7 +42,7 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("已收料")]
         Picked = 6
-       
+
     }
     /// <summary>
     /// 退料申请状态 1、申请成功待检验 2、检验中 3、检验完成待入库 4、退料入库中 5、退料入库完成 6、取消退料
@@ -125,6 +125,12 @@ namespace Hymson.MES.Core.Enums
         /// 已入库
         /// </summary>
         [Description("已入库")]
-        Receipt = 6
+        Receipt = 6,
+
+        /// <summary>
+        /// 取消申请
+        /// </summary>
+        [Description("取消申请")]
+        CancelApply = 7
     }
 }

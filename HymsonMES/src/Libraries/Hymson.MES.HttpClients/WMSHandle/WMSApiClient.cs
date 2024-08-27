@@ -141,24 +141,37 @@ namespace Hymson.MES.HttpClients
         }
 
         /// <summary>
-        /// 取消领料申请
+        /// 取消入库申请
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<BaseResponse?> MaterialPickingCancelAsync(MaterialPickingCancelDto requestDto)
+        public async Task<BaseResponse?> CancelEntryAsync(CancelEntryDto requestBody)
         {
-            _logger.LogDebug($"取消领料申请 -> Request: {requestDto.ToSerialize()}");
-            var requestBody = new MaterialPickingCancel
-            {
-                SyncCode = requestDto.SyncCode,
-                UpdatedBy = requestDto.UpdatedBy
-            };
+            _logger.LogDebug($"取消入库申请 -> Request: {requestBody.ToSerialize()}");
 
-            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.Delivery.Route, requestBody);
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.ReceiptCancel.Route, requestBody);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
-            _logger.LogDebug($"取消领料申请 -> Response: {jsonResponse}");
+            _logger.LogDebug($"取消入库申请 -> Response: {jsonResponse}");
+
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse?>();
+        }
+
+        /// <summary>
+        /// 取消出库申请
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<BaseResponse?> CancelDeliveryAsync(CancelDeliveryDto requestBody)
+        {
+            _logger.LogDebug($"取消出库申请 -> Request: {requestBody.ToSerialize()}");
+
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.DeliveryCancel.Route, requestBody);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"取消出库申请 -> Response: {jsonResponse}");
 
             return await httpResponse.Content.ReadFromJsonAsync<BaseResponse?>();
         }

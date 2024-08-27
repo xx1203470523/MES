@@ -32,11 +32,18 @@ namespace Hymson.MES.HttpClients
         Task<BaseResponse?> WarehousingDeliveryRequestAsync(DeliveryDto request);
 
         /// <summary>
-        /// 领料取消
+        /// 取消入库申请
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<BaseResponse?> MaterialPickingCancelAsync(MaterialPickingCancelDto request);
+        Task<BaseResponse?> CancelEntryAsync(CancelEntryDto requestBody);
+
+        /// <summary>
+        /// 取消出库申请
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<BaseResponse?> CancelDeliveryAsync(CancelDeliveryDto requestBody);
 
 
 

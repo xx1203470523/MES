@@ -30,6 +30,7 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Options;
+using Hymson.MES.HttpClients.Requests.WMS;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -1404,58 +1405,6 @@ namespace Hymson.MES.Services.Services.Warehouse
         }
 
         /// <summary>
-        /// 取消领料申请
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public async Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request)
-        {
-            var siteId = _currentSite.SiteId ?? 0;
-
-            // 读取工单
-            var workOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
-            {
-                SiteId = siteId,
-                OrderCode = request.WorkOrderCode
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", request.WorkOrderCode);
-
-            // 读取领料单
-            var requistionOrderEntities = await _manuRequistionOrderRepository.GetEntitiesAsync(new ManuRequistionOrderQuery
-            {
-                SiteId = siteId,
-                WorkOrderId = workOrderEntity.Id,
-                ReqOrderCode = request.ReqOrderCode
-            });
-            if (requistionOrderEntities == null || !requistionOrderEntities.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16050)).WithData("orderId", workOrderEntity.Id);
-            }
-
-            // 判断领料单状态是否允许取消
-            if (requistionOrderEntities.Any(a => a.Status == WhMaterialPickingStatusEnum.Inspectioning))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16062)).WithData("Status", WhMaterialPickingStatusEnum.Inspectioning.GetDescription());
-            }
-
-            // 如果存在多个，就表示数据已经有问题了
-            var requistionOrderEntity = requistionOrderEntities.FirstOrDefault();
-            if (requistionOrderEntity == null) return false;
-
-            /*
-            // 下达WMS取消领料申请
-            var response = await _wmsRequest.MaterialPickingCancelAsync(new HttpClients.Requests.MaterialPickingCancelDto
-            {
-                SyncCode = requistionOrderEntity.ReqOrderCode,
-                UpdatedBy = _currentUser.UserName,
-            });
-            */
-
-            // TODO 修改领料单状态
-
-            return false;
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="request"></param>
@@ -1672,47 +1621,166 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
         }
 
+
         /// <summary>
-        /// 成品入库取消
+        /// 取消领料申请
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> CancelPickApplyAsync(CancelPickApplyDto requestDto)
+        {
+            var siteId = _currentSite.SiteId ?? 0;
+
+            // 读取工单
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.WorkOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", requestDto.WorkOrderCode);
+
+            // 读取领料单
+            var requistionOrderEntities = await _manuRequistionOrderRepository.GetEntitiesAsync(new ManuRequistionOrderQuery
+            {
+                SiteId = siteId,
+                WorkOrderId = workOrderEntity.Id,
+                ReqOrderCode = requestDto.ReqOrderCode
+            });
+            if (requistionOrderEntities == null || !requistionOrderEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16066)).WithData("Code", workOrderEntity.OrderCode);
+            }
+
+            // 判断领料单状态是否允许取消
+            if (requistionOrderEntities.Any(a => a.Status == WhMaterialPickingStatusEnum.Inspectioning))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16062)).WithData("Status", WhMaterialPickingStatusEnum.Inspectioning.GetDescription());
+            }
+
+            // 如果存在多个，就表示数据已经有问题
+            var requistionOrderEntity = requistionOrderEntities.FirstOrDefault();
+            if (requistionOrderEntity == null) return 0;
+
+            // 通知WMS取消领料申请
+            var response = await _wmsRequest.CancelDeliveryAsync(new CancelDeliveryDto
+            {
+                SyncCode = requistionOrderEntity.ReqOrderCode,
+                UpdatedBy = _currentUser.UserName,
+            });
+
+            // 修改领料单状态
+            requistionOrderEntity.Status = WhMaterialPickingStatusEnum.CancelApply;
+            requistionOrderEntity.UpdatedBy = _currentUser.UserName;
+            requistionOrderEntity.UpdatedOn = HymsonClock.Now();
+
+            return await _manuRequistionOrderRepository.UpdateAsync(requistionOrderEntity);
+        }
+
+        /// <summary>
+        /// 取消退料申请
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> CancelReturnApplyAsync(CancelReturnApplyDto requestDto)
+        {
+            var siteId = _currentSite.SiteId ?? 0;
+
+            // 读取工单
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.WorkOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", requestDto.WorkOrderCode);
+
+            // 读取退料单
+            var returnOrderEntities = await _manuReturnOrderRepository.GetEntitiesAsync(new ManuReturnOrderQuery
+            {
+                SiteId = siteId,
+                WorkOrderId = workOrderEntity.Id,
+                ReturnOrderCodeValue = requestDto.ReturnOrderCode
+            });
+            if (returnOrderEntities == null || !returnOrderEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16063)).WithData("Code", workOrderEntity.OrderCode);
+            }
+
+            // 判断领料单状态是否允许取消
+            if (returnOrderEntities.Any(a => a.Status == WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16064))
+                    .WithData("Status", WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful.GetDescription());
+            }
+
+            // 如果存在多个，就表示数据已经有问题
+            var returnOrderEntity = returnOrderEntities.FirstOrDefault();
+            if (returnOrderEntity == null) return 0;
+
+            // 通知WMS取消退料申请
+            var response = await _wmsRequest.CancelEntryAsync(new CancelEntryDto
+            {
+                SyncCode = returnOrderEntity.ReturnOrderCode,
+                UpdatedBy = _currentUser.UserName,
+            });
+
+            // 修改退料单状态
+            returnOrderEntity.Status = WhWarehouseMaterialReturnStatusEnum.CancelApply;
+            returnOrderEntity.UpdatedBy = _currentUser.UserName;
+            returnOrderEntity.UpdatedOn = HymsonClock.Now();
+
+            return await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
+        }
+
+        /// <summary>
+        /// 取消成品入库
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> CancelProductReceiptApplyAsync(CancelProductReceiptApplyDto requestDto)
+        {
+            var siteId = _currentSite.SiteId ?? 0;
+
+            // 读取工单
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.WorkOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", requestDto.WorkOrderCode);
+
+            // 读取成品入库单
+            var entryOrderEntities = await _manuProductReceiptOrderRepository.GetEntitiesAsync(new ManuProductReceiptOrderQuery
+            {
+                SiteId = siteId,
+                WorkOrderId = workOrderEntity.Id,
+                CompletionOrderCode = requestDto.CompletionOrderCode
+            });
+            if (entryOrderEntities == null || !entryOrderEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16065)).WithData("Code", workOrderEntity.OrderCode);
+            }
+
+            // 判断成品入库单状态是否允许取消
+            if (entryOrderEntities.Any(a => a.Status == ProductReceiptStatusEnum.Approvaling))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16067))
+                    .WithData("Status", WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful.GetDescription());
+            }
+
+            // 如果存在多个，就表示数据已经有问题
+            var entryOrderEntity = entryOrderEntities.FirstOrDefault();
+            if (entryOrderEntity == null) return 0;
+
+            // 通知WMS取消成品入库申请
+            var response = await _wmsRequest.CancelEntryAsync(new CancelEntryDto
+            {
+                SyncCode = entryOrderEntity.CompletionOrderCode,
+                UpdatedBy = _currentUser.UserName,
+            });
+
+            // 修改退料单状态
+            entryOrderEntity.Status = ProductReceiptStatusEnum.CancelApply;
+            entryOrderEntity.UpdatedBy = _currentUser.UserName;
+            entryOrderEntity.UpdatedOn = HymsonClock.Now();
+
+            return await _manuProductReceiptOrderRepository.UpdateAsync(entryOrderEntity);
+        }
+
+
+        /// <summary>
+        /// 
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<bool> ProductReceiptCancelAsync(MaterialReturnCancel request)
-        {
-            var manuProductReceiptOrder = await _manuProductReceiptOrderRepository.GetByIdAsync(request.ReturnOrderId);
-            if (manuProductReceiptOrder.Status == ProductReceiptStatusEnum.Approvaling)
-            {
-                var response = await _wmsRequest.ProductReceiptCancelAsync(new HttpClients.Requests.ProductReceiptCancelDto
-                {
-                    SendOn = HymsonClock.Now().ToDateTime(),//TODO：这个信息需要调研
-                    SyncCode = $"{request.WorkCode}_{request.ReturnOrderId}",
-                });
-                return response;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public async Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request)
-        {
-            var returnOrderEntity = await _manuReturnOrderRepository.GetByIdAsync(request.ReturnOrderId);
-            if (returnOrderEntity.Status == WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful)
-            {
-                var response = await _wmsRequest.MaterialReturnCancelAsync(new HttpClients.Requests.MaterialReturnCancelDto
-                {
-                    SendOn = HymsonClock.Now().ToDateTime(),//TODO：这个信息需要调研
-                    SyncCode = $"{request.WorkCode}_{request.ReturnOrderId}",
-                });
-                return response;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
+        /// <exception cref="ValidationException"></exception>
         public async Task PickMaterialsRequestAsync(PickMaterialsRequestV2 request)
         {
             //派工单校验
@@ -1965,5 +2033,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES16059)).WithData("msg", response.Message);
             }
         }
+
     }
 }

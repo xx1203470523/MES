@@ -242,9 +242,9 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <param name="request"></param>
         [HttpPost("PickMaterialsCancel")]
         [LogDescription("取消领料", BusinessType.INSERT)]
-        public async Task<bool> PickMaterialsCancelAsync([FromBody] PickMaterialsCancel request)
+        public async Task<int> PickMaterialsCancelAsync([FromBody] CancelPickApplyDto request)
         {
-            return await _whMaterialInventoryService.PickMaterialsCancelAsync(request);
+            return await _whMaterialInventoryService.CancelPickApplyAsync(request);
         }
 
         /// <summary>
@@ -264,9 +264,9 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <param name="request"></param>
         [HttpPost("MaterialReturnCancel")]
         [LogDescription("取消退料", BusinessType.INSERT)]
-        public async Task<bool> MaterialReturnCancelAsync([FromBody] MaterialReturnCancel request)
+        public async Task<int> MaterialReturnCancelAsync([FromBody] CancelReturnApplyDto request)
         {
-            return await _whMaterialInventoryService.MaterialReturnCancelAsync(request);
+            return await _whMaterialInventoryService.CancelReturnApplyAsync(request);
         }
 
         /// <summary>
@@ -286,9 +286,9 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <param name="request"></param>
         [HttpPost("ProductReceiptCancel")]
         [LogDescription("取消入库", BusinessType.INSERT)]
-        public async Task<bool> ProductReceiptCancelAsync([FromBody] MaterialReturnCancel request)
+        public async Task<int> ProductReceiptCancelAsync([FromBody] CancelProductReceiptApplyDto request)
         {
-            return await _whMaterialInventoryService.ProductReceiptCancelAsync(request);
+            return await _whMaterialInventoryService.CancelProductReceiptApplyAsync(request);
         }
 
         /// <summary>

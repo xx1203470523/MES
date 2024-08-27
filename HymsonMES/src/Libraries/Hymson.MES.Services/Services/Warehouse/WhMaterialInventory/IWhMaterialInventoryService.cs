@@ -138,24 +138,27 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         Task PickMaterialsRequestAsync(PickMaterialsRequest request);
         Task PickMaterialsRequestAsync(PickMaterialsRequestV2 request);
+
         /// <summary>
         /// 取消领料
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request);
+        Task<int> CancelPickApplyAsync(CancelPickApplyDto request);
+
         /// <summary>
         ///  领料申请
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         Task MaterialReturnRequestAsync(MaterialReturnRequest request);
+
         /// <summary>
-        /// 取消领料
+        /// 取消退料申请
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request);
+        Task<int> CancelReturnApplyAsync(CancelReturnApplyDto request);
 
         /// <summary>
         /// 成品入库
@@ -169,7 +172,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<bool> ProductReceiptCancelAsync(MaterialReturnCancel request);
+        Task<int> CancelProductReceiptApplyAsync(CancelProductReceiptApplyDto request);
 
         /// <summary>
         /// 根据工单查询工单的领料列表

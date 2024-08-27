@@ -684,17 +684,22 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     /// <summary>
     /// 派工单领料申请
     /// </summary>
-    public record PickMaterialsCancel : BaseEntityDto
+    public record CancelPickApplyDto : BaseEntityDto
     {
         /// <summary>
-        /// 派工单编码
+        /// 派工单Id
         /// </summary>
-        public string WorkOrderCode { get; set; } = "";
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 领料单据号
+        /// </summary>
+        public string ReqOrderCode { get; set; }
 
         /// <summary>
         /// 领料单Id
         /// </summary>
-        public string ReqOrderCode { get; set; }
+        public long? ReqOrderId { get; set; }
 
     }
 
@@ -782,22 +787,47 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string? WarehouseCode { get; set; }
     }
 
-
     /// <summary>
     /// 取消退料
     /// </summary>
-    public record MaterialReturnCancel : BaseEntityDto
+    public record CancelReturnApplyDto : BaseEntityDto
     {
         /// <summary>
-        /// 派工单编码
+        /// 派工单Id
         /// </summary>
-        public string WorkCode { get; set; }
+        public long WorkOrderId { get; set; }
+
         /// <summary>
-        /// 领料单Id
+        /// 退料单据号
         /// </summary>
-        public long ReturnOrderId { get; set; }
+        public string ReturnOrderCode { get; set; }
 
+        /// <summary>
+        /// 退料单Id
+        /// </summary>
+        public long? ReturnOrderId { get; set; }
 
+    }
+
+    /// <summary>
+    /// 取消成品入库
+    /// </summary>
+    public record CancelProductReceiptApplyDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 派工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 成品入库单号
+        /// </summary>
+        public string CompletionOrderCode { get; set; }
+
+        /// <summary>
+        /// 成品入库单Id
+        /// </summary>
+        public long? CompletionOrderId { get; set; }
 
     }
 

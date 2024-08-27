@@ -1255,7 +1255,7 @@
         public const string MES16047 = "条码{SFC}超过最大复投次数{Cycle}，当前复投次数{RepeatedCount}，不允许生产！";
         public const string MES16048 = "工单【{WorkOrder}】已完成,不允许申请领料。";
         public const string MES16049 = "领料单申请失败,错误原因：【{msg}】。";
-        public const string MES16050 = "领料单未找到,发送的请求标识为：【{orderId}】。";
+        public const string MES16050 = "领料单未找到，发送的请求标识为：【{orderId}】。";
         public const string MES16051 = "退料单申请失败,错误原因：【{msg}】。";
 
         public const string MES16052 = "指定生产计划未找到,工单编码为：【{WorkOrder}】。";
@@ -1270,6 +1270,11 @@
         public const string MES16061 = "废成品入库明细不能为空！";
 
         public const string MES16062 = "存在状态为【{Status}】的领料单，不允许取消！";
+        public const string MES16063 = "退料单未找到，发送的请求标识为：【{Code}】。";
+        public const string MES16064 = "只允许取消【{Status}】的退料单！";
+        public const string MES16065 = "完工入库单未找到，发送的请求标识为：【{Code}】。";
+        public const string MES16066 = "领料单未找到，发送的请求标识为：【{Code}】。";
+        public const string MES16067 = "只允许取消【{Status}】的完工入库单！";
         #endregion
 
         #region 条码接收 16100
