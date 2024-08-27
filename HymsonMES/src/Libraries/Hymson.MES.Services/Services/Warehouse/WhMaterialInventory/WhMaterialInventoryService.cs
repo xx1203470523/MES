@@ -1633,7 +1633,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             // 读取工单
             var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.WorkOrderId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", requestDto.WorkOrderCode);
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16000));
 
             // 读取领料单
             var requistionOrderEntities = await _manuRequistionOrderRepository.GetEntitiesAsync(new ManuRequistionOrderQuery
@@ -1683,7 +1683,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             // 读取工单
             var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.WorkOrderId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", requestDto.WorkOrderCode);
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16000));
 
             // 读取退料单
             var returnOrderEntities = await _manuReturnOrderRepository.GetEntitiesAsync(new ManuReturnOrderQuery
@@ -1734,7 +1734,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             // 读取工单
             var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.WorkOrderId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", requestDto.WorkOrderCode);
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16000));
 
             // 读取成品入库单
             var entryOrderEntities = await _manuProductReceiptOrderRepository.GetEntitiesAsync(new ManuProductReceiptOrderQuery
