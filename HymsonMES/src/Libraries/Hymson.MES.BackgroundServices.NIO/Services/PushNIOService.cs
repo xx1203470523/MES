@@ -598,9 +598,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
             else if (scene == BuzSceneEnum.Buz_Material || scene == BuzSceneEnum.Buz_Material_Summary)
             {
-                NioMaterialDto dto = JsonConvert.DeserializeObject<NioMaterialDto>(content);
-                dto.List.ForEach(m => m.UpdateTime = timestmap);
-                result = JsonConvert.SerializeObject(dto, settings);
+                //备注说明：update_time是子节点扣料时间，不是上传时间
+
+                //NioMaterialDto dto = JsonConvert.DeserializeObject<NioMaterialDto>(content);
+                //dto.List.ForEach(m => m.UpdateTime = timestmap);
+                //result = JsonConvert.SerializeObject(dto, settings);
             }
             else if (scene == BuzSceneEnum.Buz_WorkOrder || scene == BuzSceneEnum.Buz_WorkOrder_Summary)
             {
