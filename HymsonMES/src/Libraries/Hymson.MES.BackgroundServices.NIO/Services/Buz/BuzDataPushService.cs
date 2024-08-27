@@ -635,10 +635,28 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
         /// <summary>
         /// 业务数据（材料清单）
-        /// 只适用于转子线
         /// </summary>
         /// <returns></returns>
         public async Task MaterialAsync()
+        {
+            //转子线材料清单
+            try
+            {
+                await RotorMaterialAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"业务数据（材料清单）RotorMaterialAsync发生异常：{ex}。异常:{ex.StackTrace}");
+            }
+            //定子线材料清单
+        }
+
+        /// <summary>
+        /// 业务数据（材料清单）
+        /// 只适用于转子线
+        /// </summary>
+        /// <returns></returns>
+        private async Task RotorMaterialAsync()
         {
             _logger.LogInformation($"业务数据（材料清单）MaterialAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
@@ -669,7 +687,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取已经走完的追溯记录
             EntityByWaterMarkTimeQuery rotorQuery = new EntityByWaterMarkTimeQuery();
             rotorQuery.StartWaterMarkTime = startWaterMarkTime;
-            rotorQuery.Rows = 10;
+            rotorQuery.Rows = 5;
             var rotorSfcList = await _manuRotorSfcRepository.GetListAsync(rotorQuery);
             if (rotorSfcList == null || rotorSfcList.Count() == 0)
             {
@@ -683,7 +701,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             List<string> allSfcList = new List<string>();
             allSfcList.AddRange(txSfcList);
             allSfcList.AddRange(zSfcList);
-            //查询铁芯码和轴码所有的上料记录
+            //查询铁芯码的大小磁钢上料
             ManuSfcCirculationBySfcsQuery cirQuery = new ManuSfcCirculationBySfcsQuery();
             cirQuery.SiteId = siteId;
             cirQuery.Sfc = allSfcList;
@@ -709,11 +727,6 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //查询上料物料信息
             List<long> upMatIdList = cirSfcList.Select(m => m.CirculationProductId).Distinct().ToList();
             var upMaterialList = await _procMaterialRepository.GetByIdsAsync(upMatIdList);
-            //获取批次信息
-            List<string> batchSfcList = new List<string>();
-            batchSfcList.AddRange(allSfcList);
-            batchSfcList.AddRange(nioSfcList);
-            //List<SfcBatchDto> sfcBatchList = await GetSfcBatchListAsync(siteId, batchSfcList);
 
             // TODO: 替换为实际数据
             var dtos = new List<MaterialDto> { };
@@ -722,13 +735,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             {
                 string sfc = item.Sfc;
                 var sfcMaterial = materialList.Where(m => m.MaterialCode == item.SfcMaterialCode).FirstOrDefault();
-                //var sfcBatch = sfcBatchList.Where(m => m.Sfc == sfc).FirstOrDefault();
                 string txSfc = item.TxSfc;
                 var txSfcMaterial = materialList.Where(m => m.MaterialCode == item.TxSfcMaterialCode).FirstOrDefault();
-                //var txSfcBatch = sfcBatchList.Where(m => m.Sfc == txSfc).FirstOrDefault();
                 string zSfc = item.ZSfc;
                 var zSfcMaterial = materialList.Where(m => m.MaterialCode == item.ZSfcMaterialCode).FirstOrDefault();
-                //var zSfcBatch = sfcBatchList.Where(m => m.Sfc == zSfc).FirstOrDefault();
 
                 MaterialDto model = new MaterialDto();
                 model.VendorProductNum = sfcMaterial == null ? "010301000001" : sfcMaterial.MaterialCode;
@@ -748,100 +758,50 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 zModel.UpdateTime = GetTimestamp((DateTime)item.UpdatedOn);
                 dtos.Add(zModel);
 
-                #region 是否追溯明细
+                //大小磁钢
+                var ciList = cirSfcList.Where(m => m.SFC == txSfc && m.Location == "R01OP020").ToList();
+                if(ciList != null && ciList.Count > 0)
+                {
+                    foreach( var ci in ciList)
+                    {
+                        MaterialDto ciModel = new MaterialDto();
+                        ciModel.VendorProductNum = sfcMaterial == null ? "010301000001" : sfcMaterial.MaterialCode;
+                        ciModel.VendorProductSn = sfc;
+                        ciModel.ChildSn = ci.CirculationBarCode;
+                        ciModel.UpdateTime = GetTimestamp(ci.CreatedOn);
+                        var curCiMat = upMaterialList.Where(m => m.Id == ci.CirculationProductId).FirstOrDefault();
+                        if (curCiMat == null)
+                        {
+                            continue;
+                        }
+                        //异常数据处理
+                        if(curCiMat.MaterialName.Contains("转子") == true || curCiMat.MaterialName.Contains("总成") == true)
+                        {
+                            if(ciModel.ChildSn.Contains("-412-") == true) //大磁钢
+                            {
+                                ciModel.ChildName = "48UH+4分段-31mm*16.8mm*2.91mm";
+                                ciModel.ChildNum = "030202000003";
+                            }
+                            else if (ciModel.ChildSn.Contains("-411-") == true) //小磁钢
+                            {
+                                ciModel.ChildName = "48UH+2分段-31mm*8.4mm*2.91mm";
+                                ciModel.ChildNum = "030202000004";
+                            }
+                            else
+                            {
+                                ciModel.ChildName = curCiMat.MaterialName;
+                                ciModel.ChildNum = curCiMat.MaterialCode;
+                            }
+                        }
+                        else //正常流程
+                        {
+                            ciModel.ChildName = curCiMat.MaterialName;
+                            ciModel.ChildNum = curCiMat.MaterialCode;
+                        }
 
-                //if (false)
-                //{
-                //    //查铁芯上料数据
-                //    List<string> existTxList = new List<string>();
-                //    var curTxSfcList = cirSfcList.Where(m => m.SFC == txSfc).ToList();
-                //    foreach (var txItem in curTxSfcList)
-                //    {
-                //        if (existTxList.Contains(txItem.CirculationBarCode) == true)
-                //        {
-                //            continue;
-                //        }
-                //        existTxList.Add(txItem.CirculationBarCode);
-
-                //        MaterialDto txModel = new MaterialDto();
-                //        txModel.VendorProductNum = sfcMaterial?.MaterialCode;
-                //        txModel.VendorProductName = sfcMaterial?.MaterialName;
-                //        txModel.VendorProductSn = sfc;
-                //        txModel.VendorProductCode = txModel.VendorProductNum;
-                //        txModel.VendorProductBatch = txModel.VendorProductNum;
-
-                //        var parentModel = upMaterialList.Where(m => m.Id == txItem.CirculationProductId).FirstOrDefault();
-                //        txModel.ParentCode = txItem.CirculationBarCode;
-                //        txModel.ParentName = parentModel?.MaterialName;
-                //        txModel.ParentBatch = txItem.CirculationBarCode;
-                //        txModel.ParentNum = txItem.CirculationBarCode;
-                //        txModel.ParentHardwareRevision = "1.0";
-                //        txModel.ParentSoftwareRevision = "1.0";
-
-                //        txModel.ChildCode = txSfc;
-                //        txModel.ChildBatch = txSfc;
-                //        txModel.ChildName = txSfcMaterial?.MaterialName;
-                //        txModel.ChildCode = txSfcMaterial?.MaterialCode;
-                //        //txModel.ChildSn = txSfc;
-                //        txModel.ChildQualityControl = "";
-                //        txModel.ChildHardwareRevision = "1.0";
-                //        txModel.ChildSoftwareRevision = "1.0";
-                //        txModel.ChildType = "转子";
-                //        txModel.ChildProductionTime = GetTimestamp(HymsonClock.Now());
-                //        txModel.ChildVendorName = "无";
-                //        txModel.UpdateTime = GetTimestamp(HymsonClock.Now());
-                //        txModel.Debug = NIO_DEBUG;
-
-                //        dtos.Add(txModel);
-                //    }
-
-                //    //查轴码上料数据
-                //    List<string> zExistList = new List<string>();
-                //    var curZSfcList = cirSfcList.Where(m => m.SFC == zSfc).ToList();
-                //    foreach (var zItem in curZSfcList)
-                //    {
-                //        if (zExistList.Contains(zItem.CirculationBarCode) == true)
-                //        {
-                //            continue;
-                //        }
-                //        zExistList.Add(zItem.CirculationBarCode);
-
-                //        MaterialDto zModel = new MaterialDto();
-
-                //        zModel.VendorProductNum = sfcMaterial?.MaterialCode;
-                //        zModel.VendorProductName = sfcMaterial?.MaterialName;
-                //        zModel.VendorProductSn = sfc;
-                //        zModel.VendorProductCode = zModel.VendorProductNum;
-                //        zModel.VendorProductBatch = zModel.VendorProductNum;
-
-                //        var parentModel = upMaterialList.Where(m => m.Id == zItem.CirculationProductId).FirstOrDefault();
-                //        zModel.ParentCode = zItem.CirculationBarCode;
-                //        zModel.ParentName = parentModel?.MaterialName;
-                //        zModel.ParentBatch = zItem.CirculationBarCode;
-                //        zModel.ParentNum = zItem.CirculationBarCode;
-                //        zModel.ParentHardwareRevision = "1.0";
-                //        zModel.ParentSoftwareRevision = "1.0";
-
-                //        zModel.ChildCode = zSfc;
-                //        zModel.ChildBatch = zSfc;
-                //        zModel.ChildName = zSfcMaterial?.MaterialName;
-                //        zModel.ChildCode = zSfcMaterial?.MaterialCode;
-                //        //zModel.ChildSn = txSfc;
-                //        zModel.ChildQualityControl = "";
-                //        zModel.ChildHardwareRevision = "1.0";
-                //        zModel.ChildSoftwareRevision = "1.0";
-                //        zModel.ChildType = "转子";
-                //        zModel.ChildProductionTime = GetTimestamp(HymsonClock.Now());
-                //        zModel.ChildVendorName = "无";
-                //        zModel.UpdateTime = GetTimestamp(HymsonClock.Now());
-                //        zModel.Debug = NIO_DEBUG;
-
-                //        dtos.Add(zModel);
-                //    }
-
-                //}
-
-                #endregion
+                        dtos.Add(ciModel);
+                    }
+                }
             }
 
             DateTime? maxUpdateTime = rotorSfcList.Max(x => x.UpdatedOn);
