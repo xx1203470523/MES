@@ -317,42 +317,13 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var manuSFCInfoEntity = manuSFCInfoEntities.FirstOrDefault(f => f.SfcId == manuSFCEntity.Id);
                 if (manuSFCInfoEntity == null) continue;
 
-                // 插入步骤表
-                var stepEntity = new ManuSfcStepEntity
-                {
-                    Id = manuSFCStepId,
-                    Operatetype = ManuSfcStepTypeEnum.OutStock,
-                    CurrentStatus = SfcStatusEnum.Activity,
-                    SFC = barCode,
-                    ProductId = statorBo.ProductId,
-                    WorkOrderId = statorBo.WorkOrderId,
-                    WorkCenterId = statorBo.WorkLineId,
-                    ProductBOMId = statorBo.ProductBOMId,
-                    ProcessRouteId = statorBo.ProcessRouteId,
-                    SFCInfoId = manuSFCInfoEntity.Id,
-                    Qty = StatorConst.QTY,
-                    VehicleCode = "",
-                    ProcedureId = statorBo.ProcedureId,
-                    ResourceId = null,
-                    EquipmentId = null,
-                    OperationProcedureId = statorBo.ProcedureId,
-                    OperationResourceId = null,
-                    OperationEquipmentId = null,
-
-                    Remark = $"{dr["index"]}",   // 这个ID是为了外层找到对应记录
-
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = time
-                };
-                summaryBo.ManuSfcStepEntities.Add(stepEntity);
-
                 // 如果是不合格
+                var scrapQty = 0m;
                 var isOk = $"{dr["Result"]}" == "OK";
                 if (!isOk)
                 {
+                    scrapQty = -StatorConst.QTY;
+
                     // 插入不良记录
                     summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
                     {
@@ -390,6 +361,39 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         UpdatedOn = time
                     });
                 }
+
+                // 插入步骤表
+                var stepEntity = new ManuSfcStepEntity
+                {
+                    Id = manuSFCStepId,
+                    Operatetype = ManuSfcStepTypeEnum.OutStock,
+                    CurrentStatus = SfcStatusEnum.Activity,
+                    SFC = barCode,
+                    ProductId = statorBo.ProductId,
+                    WorkOrderId = statorBo.WorkOrderId,
+                    WorkCenterId = statorBo.WorkLineId,
+                    ProductBOMId = statorBo.ProductBOMId,
+                    ProcessRouteId = statorBo.ProcessRouteId,
+                    SFCInfoId = manuSFCInfoEntity.Id,
+                    Qty = StatorConst.QTY,
+                    ScrapQty = scrapQty,
+                    VehicleCode = "",
+                    ProcedureId = statorBo.ProcedureId,
+                    ResourceId = null,
+                    EquipmentId = null,
+                    OperationProcedureId = statorBo.ProcedureId,
+                    OperationResourceId = null,
+                    OperationEquipmentId = null,
+
+                    Remark = $"{dr["index"]}",   // 这个ID是为了外层找到对应记录
+
+                    SiteId = statorBo.SiteId,
+                    CreatedBy = statorBo.User,
+                    CreatedOn = statorBo.Time,
+                    UpdatedBy = StatorConst.USER,
+                    UpdatedOn = time
+                };
+                summaryBo.ManuSfcStepEntities.Add(stepEntity);
 
                 // 如果没有需要解析的参数
                 if (parameterCodes == null || !parameterCodes.Any()) continue;
@@ -479,42 +483,13 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var manuSFCInfoEntity = manuSFCInfoEntities.FirstOrDefault(f => f.SfcId == manuSFCEntity.Id);
                 if (manuSFCInfoEntity == null) continue;
 
-                // 插入步骤表
-                var stepEntity = new ManuSfcStepEntity
-                {
-                    Id = manuSFCStepId,
-                    Operatetype = ManuSfcStepTypeEnum.OutStock,
-                    CurrentStatus = SfcStatusEnum.Activity,
-                    SFC = barCode,
-                    ProductId = statorBo.ProductId,
-                    WorkOrderId = statorBo.WorkOrderId,
-                    WorkCenterId = statorBo.WorkLineId,
-                    ProductBOMId = statorBo.ProductBOMId,
-                    ProcessRouteId = statorBo.ProcessRouteId,
-                    SFCInfoId = manuSFCInfoEntity.Id,
-                    Qty = StatorConst.QTY,
-                    VehicleCode = "",
-                    ProcedureId = statorBo.ProcedureId,
-                    ResourceId = null,
-                    EquipmentId = null,
-                    OperationProcedureId = statorBo.ProcedureId,
-                    OperationResourceId = null,
-                    OperationEquipmentId = null,
-
-                    Remark = $"{dr["index"]}",   // 这个ID是为了外层找到对应记录
-
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = time
-                };
-                summaryBo.ManuSfcStepEntities.Add(stepEntity);
-
                 // 如果是不合格
+                var scrapQty = 0m;
                 var isOk = $"{dr["Result"]}" == "OK";
                 if (!isOk)
                 {
+                    scrapQty = -StatorConst.QTY;
+
                     // 插入不良记录
                     summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
                     {
@@ -552,6 +527,39 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         UpdatedOn = time
                     });
                 }
+
+                // 插入步骤表
+                var stepEntity = new ManuSfcStepEntity
+                {
+                    Id = manuSFCStepId,
+                    Operatetype = ManuSfcStepTypeEnum.OutStock,
+                    CurrentStatus = SfcStatusEnum.Activity,
+                    SFC = barCode,
+                    ProductId = statorBo.ProductId,
+                    WorkOrderId = statorBo.WorkOrderId,
+                    WorkCenterId = statorBo.WorkLineId,
+                    ProductBOMId = statorBo.ProductBOMId,
+                    ProcessRouteId = statorBo.ProcessRouteId,
+                    SFCInfoId = manuSFCInfoEntity.Id,
+                    Qty = StatorConst.QTY,
+                    ScrapQty = scrapQty,
+                    VehicleCode = "",
+                    ProcedureId = statorBo.ProcedureId,
+                    ResourceId = null,
+                    EquipmentId = null,
+                    OperationProcedureId = statorBo.ProcedureId,
+                    OperationResourceId = null,
+                    OperationEquipmentId = null,
+
+                    Remark = $"{dr["index"]}",   // 这个ID是为了外层找到对应记录
+
+                    SiteId = statorBo.SiteId,
+                    CreatedBy = statorBo.User,
+                    CreatedOn = statorBo.Time,
+                    UpdatedBy = StatorConst.USER,
+                    UpdatedOn = time
+                };
+                summaryBo.ManuSfcStepEntities.Add(stepEntity);
 
                 // 如果没有需要解析的参数
                 if (parameterCodes == null || !parameterCodes.Any()) continue;
@@ -640,42 +648,13 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var manuSFCInfoEntity = manuSFCInfoEntities.FirstOrDefault(f => f.SfcId == manuSFCEntity.Id);
                 if (manuSFCInfoEntity == null) continue;
 
-                // 插入步骤表
-                var stepEntity = new ManuSfcStepEntity
-                {
-                    Id = manuSFCStepId,
-                    Operatetype = ManuSfcStepTypeEnum.OutStock,
-                    CurrentStatus = SfcStatusEnum.Activity,
-                    SFC = barCode,
-                    ProductId = statorBo.ProductId,
-                    WorkOrderId = statorBo.WorkOrderId,
-                    WorkCenterId = statorBo.WorkLineId,
-                    ProductBOMId = statorBo.ProductBOMId,
-                    ProcessRouteId = statorBo.ProcessRouteId,
-                    SFCInfoId = manuSFCInfoEntity.Id,
-                    Qty = StatorConst.QTY,
-                    VehicleCode = "",
-                    ProcedureId = statorBo.ProcedureId,
-                    ResourceId = null,
-                    EquipmentId = null,
-                    OperationProcedureId = statorBo.ProcedureId,
-                    OperationResourceId = null,
-                    OperationEquipmentId = null,
-
-                    Remark = $"{dr["index"]}",   // 这个ID是为了外层找到对应记录
-
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = time
-                };
-                summaryBo.ManuSfcStepEntities.Add(stepEntity);
-
                 // 如果是不合格
+                var scrapQty = 0m;
                 var isOk = $"{dr["Result"]}" == "OK";
                 if (!isOk)
                 {
+                    scrapQty = -StatorConst.QTY;
+
                     // 插入不良记录
                     summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
                     {
@@ -713,6 +692,39 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         UpdatedOn = time
                     });
                 }
+
+                // 插入步骤表
+                var stepEntity = new ManuSfcStepEntity
+                {
+                    Id = manuSFCStepId,
+                    Operatetype = ManuSfcStepTypeEnum.OutStock,
+                    CurrentStatus = SfcStatusEnum.Activity,
+                    SFC = barCode,
+                    ProductId = statorBo.ProductId,
+                    WorkOrderId = statorBo.WorkOrderId,
+                    WorkCenterId = statorBo.WorkLineId,
+                    ProductBOMId = statorBo.ProductBOMId,
+                    ProcessRouteId = statorBo.ProcessRouteId,
+                    SFCInfoId = manuSFCInfoEntity.Id,
+                    Qty = StatorConst.QTY,
+                    ScrapQty = scrapQty,
+                    VehicleCode = "",
+                    ProcedureId = statorBo.ProcedureId,
+                    ResourceId = null,
+                    EquipmentId = null,
+                    OperationProcedureId = statorBo.ProcedureId,
+                    OperationResourceId = null,
+                    OperationEquipmentId = null,
+
+                    Remark = $"{dr["index"]}",   // 这个ID是为了外层找到对应记录
+
+                    SiteId = statorBo.SiteId,
+                    CreatedBy = statorBo.User,
+                    CreatedOn = statorBo.Time,
+                    UpdatedBy = StatorConst.USER,
+                    UpdatedOn = time
+                };
+                summaryBo.ManuSfcStepEntities.Add(stepEntity);
 
                 // 如果没有需要解析的参数
                 if (parameterCodes == null || !parameterCodes.Any()) continue;
