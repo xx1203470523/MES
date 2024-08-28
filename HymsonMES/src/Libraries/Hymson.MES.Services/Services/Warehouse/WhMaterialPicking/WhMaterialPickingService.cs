@@ -209,10 +209,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             await _manuRequistionOrderDetailRepository.InsertsAsync(manuRequistionOrderDetailEntities);
 
             var response = await _wmsRequest.WarehousingDeliveryRequestAsync(deliveryDto);
-            if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "WMS结果返回异常，请检查！");
-            if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15152))
-                    .WithData("System", "WMS")
-                    .WithData("Msg", response.Message);
+            if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "结果返回异常，请检查！");
+            if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
 
             trans.Complete();
 

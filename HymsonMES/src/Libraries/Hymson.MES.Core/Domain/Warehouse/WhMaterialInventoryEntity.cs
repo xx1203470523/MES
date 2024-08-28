@@ -77,5 +77,12 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// </summary>
         public long? WorkOrderId { get; set; }
 
+
+        // 2024.08.28 add
+        /// <summary>
+        /// 生产订单子件ID
+        /// </summary>
+        public long? ProductionOrderComponentID { get; set; }
+
     }
 }

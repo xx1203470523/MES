@@ -924,7 +924,7 @@ namespace Hymson.MES.Services.Services.Quality
                         {
                             ProductionOrder = planWorkPlanEntity.WorkPlanCode,
                             ProductionOrderDetailID = planWorkOrderEntity?.WorkPlanProductId,
-                            ProductionOrderComponentID = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId && x.BomId == item.BomId)?.Id,
+                            ProductionOrderComponentID = whMaterialInventoryEntity.ProductionOrderComponentID,
 
                             ProductionOrderNumber = planWorkPlanEntity.WorkPlanCode,
                             WorkOrderCode = planWorkOrderEntity?.OrderCode,
@@ -947,10 +947,8 @@ namespace Hymson.MES.Services.Services.Quality
             foreach (var item in warehousingEntries)
             {
                 var response = await _wmsApiClient.WarehousingEntryRequestAsync(item);
-                if (response.Code != 0)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS").WithData("Msg", response.Message);
-                }
+                if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "结果返回异常，请检查！");
+                if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
             }
         }
 

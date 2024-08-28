@@ -979,6 +979,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                     WorkOrderId = requistionOrderEntity.WorkOrderId,
                     SupplierId = detailDto.SupplierId,
                     MaterialId = detailDto.MaterialId,
+                    ProductionOrderComponentID = detailDto.ProductionOrderComponentID,
                     MaterialBarCode = detailDto.MaterialBarCode,
                     QuantityResidue = detailDto.Qty,
                     ReceivedQty = detailDto.Qty,
