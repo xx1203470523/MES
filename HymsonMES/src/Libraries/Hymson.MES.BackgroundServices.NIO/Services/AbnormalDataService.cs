@@ -173,7 +173,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             trans.Complete();
 
-            _logger.LogError($"重复参数处理结束");
+            _logger.LogError($"重复参数处理结束:数据条数{delList.Count}");
 
             return 0;
         }

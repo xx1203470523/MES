@@ -5,7 +5,15 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection.Query
     /// </summary>
     public class NioPushCollectionQuery
     {
-    
+        /// <summary>
+        /// 水位ID
+        /// </summary>
+        public long WaterId { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int Num { get; set; }
     }
 
     /// <summary>

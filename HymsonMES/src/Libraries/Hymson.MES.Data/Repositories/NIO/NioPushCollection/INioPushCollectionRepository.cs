@@ -101,5 +101,12 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<NioPushCollectionSfcView>> GetEntitiesBySfcAsync(NioPushCollectionSfcQuery query);
+
+        /// <summary>
+        /// 获取List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<NioPushCollectionEntity>> GetNgEntitiesAsync(NioPushCollectionQuery query);
     }
 }

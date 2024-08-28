@@ -250,6 +250,26 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<NioPushCollectionSfcView>(sql, query);
         }
+
+        /// <summary>
+        /// 获取List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<NioPushCollectionEntity>> GetNgEntitiesAsync(NioPushCollectionQuery query)
+        {
+            string sql = $@"
+                select * from nio_push_collection npc 
+                where IsOk  = 0
+                and id > {query.WaterId}
+                and IsDeleted = 0
+                order by id asc
+                limit 0,{query.Num}
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<NioPushCollectionEntity>(sql, query);
+        }
     }
 
 
