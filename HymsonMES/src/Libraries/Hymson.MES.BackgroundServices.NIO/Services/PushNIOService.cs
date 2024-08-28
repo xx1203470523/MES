@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using Hymson.MES.BackgroundServices.NIO.Utils;
 using Hymson.MES.BackgroundServices.NIO.Dtos.Buz;
 using Hymson.MES.BackgroundServices.NIO.Dtos.Master;
+using Hymson.MES.Data.Repositories.NioPushCollection;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -50,6 +51,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly ISysConfigRepository _sysConfigRepository;
 
         /// <summary>
+        /// NIO参数
+        /// </summary>
+        private readonly INioPushCollectionRepository _nioPushCollectionRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="waterMarkService"></param>
@@ -58,12 +64,14 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         public PushNIOService(IWaterMarkService waterMarkService,
             INioPushSwitchRepository nioPushSwitchRepository,
             INioPushRepository nioPushRepository,
-            ISysConfigRepository sysConfigRepository)
+            ISysConfigRepository sysConfigRepository,
+            INioPushCollectionRepository nioPushCollectionRepository)
         {
             _waterMarkService = waterMarkService;
             _nioPushSwitchRepository = nioPushSwitchRepository;
             _nioPushRepository = nioPushRepository;
             _sysConfigRepository = sysConfigRepository;
+            _nioPushCollectionRepository = nioPushCollectionRepository;
         }
 
         /// <summary>
@@ -356,11 +364,19 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
                     if (config.IsEnabled == TrueOrFalseEnum.Yes)
                     {
-                        //这里将数据序列化在反序列化，更新时间戳字段
-                        string pusuContent = NioUpdateTime(data.BuzScene, data.Content);
+                        string pushContent = string.Empty;
+                        if (data.BuzScene == BuzSceneEnum.Buz_Collection || data.BuzScene == BuzSceneEnum.Buz_Collection_Summary)
+                        {
+                            pushContent = await GetCollectionData(data.Id, data.SchemaCode);
+                        }
+                        else
+                        {
+                            //这里将数据序列化在反序列化，更新时间戳字段
+                            pushContent = NioUpdateTime(data.BuzScene, data.Content);
+                        }
 
                         // 推送
-                        var restResponse = await config.ExecuteAsync(pusuContent, host, hostsuffix);
+                        var restResponse = await config.ExecuteAsync(pushContent, host, hostsuffix);
 
                         // 处理推送结果
                         data.Status = PushStatusEnum.Failure;
@@ -614,6 +630,28 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             //NioWorkOrderDto
             return result;
+        }
+    
+        /// <summary>
+        /// 获取参数数据
+        /// </summary>
+        /// <param name="nioPushId"></param>
+        /// <returns></returns>
+        private async Task<string> GetCollectionData(long nioPushId, string schemaCode)
+        {
+            //获取对应的数据
+            var dbList = await _nioPushCollectionRepository.GetByPushIdAsync(nioPushId);
+            //获取配置
+            long timestmap = NioHelper.GetTimestamp(HymsonClock.Now());
+            JsonSerializerSettings settings = NioHelper.GetJsonSerializer();
+            //将列表转为字符串
+            string tmpPushContext = JsonConvert.SerializeObject(dbList);
+            List<CollectionDto> pushList = JsonConvert.DeserializeObject<List<CollectionDto>>(tmpPushContext);
+            pushList.ForEach(m => m.UpdateTime = timestmap);
+            NioCollectionDto nioSch = new NioCollectionDto() { List = pushList };
+            nioSch.SchemaCode = schemaCode;
+
+            return JsonConvert.SerializeObject(nioSch, settings);
         }
     }
 }

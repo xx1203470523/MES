@@ -399,8 +399,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 var tmpStr = JsonConvert.SerializeObject(model);
                 NioPushCollectionEntity nioModel = JsonConvert.DeserializeObject<NioPushCollectionEntity>(tmpStr);
                 nioModel.Id = IdGenProvider.Instance.CreateId();
-                nioModel.CreatedOn = HymsonClock.Now();
-                nioModel.UpdatedOn = nioModel.CreatedOn;
+                nioModel.CreatedOn = item.CreatedOn;
+                nioModel.UpdatedOn = HymsonClock.Now();
                 nioModel.CreatedBy = NIO_USER_ID;
                 nioModel.UpdatedBy = NIO_USER_ID;
                 if(model.DataType == 1)
