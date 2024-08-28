@@ -54,7 +54,7 @@ namespace Hymson.MES.System.Api.Controllers
         [LogDescription("领料单物料接收", BusinessType.INSERT)]
         public async Task MaterialPickingReceiveAsync([FromBody] WhMaterialPickingReceiveDto param)
         {
-            await _whMaterialPickingService.MaterialPickingReceiveWithoutDetailAsync(param);
+            await _whMaterialPickingService.MaterialPickingReceiveV3Async(param);
         }
 
     }

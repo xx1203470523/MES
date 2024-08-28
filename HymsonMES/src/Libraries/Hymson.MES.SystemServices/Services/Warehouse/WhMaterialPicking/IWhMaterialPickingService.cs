@@ -21,5 +21,13 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
         /// <returns></returns>
         Task<string> MaterialPickingReceiveWithoutDetailAsync(WhMaterialPickingReceiveDto param);
 
+        /// <summary>
+        /// 领料单接收（支持同物料多条）
+        /// 2024.08.28 开会讨论商定方案
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<string> MaterialPickingReceiveV3Async(WhMaterialPickingReceiveDto requestDto);
+
     }
 }

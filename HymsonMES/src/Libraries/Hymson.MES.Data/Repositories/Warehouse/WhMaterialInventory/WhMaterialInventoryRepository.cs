@@ -94,6 +94,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarCodesQuery param)
         {
+            if (param == null || !param.BarCodes.Any()) return Array.Empty<WhMaterialInventoryEntity>();
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodesSql, param);
         }

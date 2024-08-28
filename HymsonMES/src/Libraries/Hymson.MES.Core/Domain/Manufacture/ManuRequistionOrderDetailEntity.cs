@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 生产领料单明细    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  zhaoqing
- *build datetime: 2023-07-05 03:48:53
- */
 using Hymson.Infrastructure;
 
 namespace Hymson.MES.Core.Domain.Manufacture
@@ -22,32 +15,32 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long RequistionOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料Id
         /// </summary>
         public long MaterialId { get; set; }
 
-       ///// <summary>
-       // /// 物料版本
-       // /// </summary>
-       // public string Version { get; set; }
+        ///// <summary>
+        // /// 物料版本
+        // /// </summary>
+        // public string Version { get; set; }
 
-       ///// <summary>
-       // /// 物料条码
-       // /// </summary>
-       // public string MaterialBarCode { get; set; }
+        ///// <summary>
+        // /// 物料条码
+        // /// </summary>
+        // public string MaterialBarCode { get; set; }
 
-       ///// <summary>
-       // /// 物料批次
-       // /// </summary>
-       // public string Batch { get; set; }
+        ///// <summary>
+        // /// 物料批次
+        // /// </summary>
+        // public string Batch { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 领料数量
         /// </summary>
         public decimal Qty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 仓库id
         /// </summary>
         public long? WarehouseId { get; set; }
@@ -67,11 +60,17 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string Remark { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
+        // 2024.08.28 add
+        /// <summary>
+        /// 生产订单子件ID
+        /// </summary>
+        public long? ProductionOrderComponentID { get; set; }
+
     }
 }

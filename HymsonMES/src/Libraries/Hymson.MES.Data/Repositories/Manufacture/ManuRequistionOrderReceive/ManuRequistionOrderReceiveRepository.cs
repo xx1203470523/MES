@@ -3,7 +3,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Microsoft.Extensions.Options;
 
@@ -39,7 +38,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertRangeAsync(IEnumerable<ManuRequistionOrderReceiveEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(InsertSql, entities);
         }
 
         /// <summary>
@@ -61,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> UpdateRangeAsync(IEnumerable<ManuRequistionOrderReceiveEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
         /// <summary>
@@ -169,11 +168,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_requistion_order_receive /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_requistion_order_receive /**where**/  ";
 
-        const string InsertSql = "INSERT INTO manu_requistion_order_receive(  `Id`, `RequistionOrderId`, `MaterialId`, `MaterialBarCode`, `Batch`, `Qty`, `WarehouseId`, `SupplierId`, `ExpirationDate`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @RequistionOrderId, @MaterialId, @MaterialBarCode, @Batch, @Qty, @WarehouseId, @SupplierId, @ExpirationDate, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
-        const string InsertsSql = "INSERT INTO manu_requistion_order_receive(  `Id`, `RequistionOrderId`, `MaterialId`, `MaterialBarCode`, `Batch`, `Qty`, `WarehouseId`, `SupplierId`, `ExpirationDate`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @RequistionOrderId, @MaterialId, @MaterialBarCode, @Batch, @Qty, @WarehouseId, @SupplierId, @ExpirationDate, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertSql = "INSERT INTO manu_requistion_order_receive(  `Id`, `RequistionOrderId`, ProductionOrderComponentID, `MaterialId`, `MaterialBarCode`, `Batch`, `Qty`, `WarehouseId`, `SupplierId`, `ExpirationDate`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @RequistionOrderId, @ProductionOrderComponentID, @MaterialId, @MaterialBarCode, @Batch, @Qty, @WarehouseId, @SupplierId, @ExpirationDate, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE manu_requistion_order_receive SET   RequistionOrderId = @RequistionOrderId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, Qty = @Qty, WarehouseId = @WarehouseId, SupplierId = @SupplierId, ExpirationDate = @ExpirationDate, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE manu_requistion_order_receive SET   RequistionOrderId = @RequistionOrderId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, Qty = @Qty, WarehouseId = @WarehouseId, SupplierId = @SupplierId, ExpirationDate = @ExpirationDate, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE manu_requistion_order_receive SET RequistionOrderId = @RequistionOrderId, ProductionOrderComponentID = @ProductionOrderComponentID, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, Qty = @Qty, WarehouseId = @WarehouseId, SupplierId = @SupplierId, ExpirationDate = @ExpirationDate, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE manu_requistion_order_receive SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE manu_requistion_order_receive SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

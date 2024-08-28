@@ -60,5 +60,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
+
+        // 2024.08.28 add
+        /// <summary>
+        /// 生产订单子件ID
+        /// </summary>
+        public long? ProductionOrderComponentID { get; set; }
+
     }
 }

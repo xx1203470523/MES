@@ -40,6 +40,16 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
     public class WhMaterialPickingDetailDto
     {
         /// <summary>
+        /// 同步Id（WMS需要给ERP）
+        /// </summary>
+        public long? SyncId { get; set; }
+
+        /// <summary>
+        /// 生产订单子件ID
+        /// </summary>
+        public long? ProductionOrderComponentID { get; set; }
+
+        /// <summary>
         /// 物料条码
         /// </summary>
         public string MaterialBarCode { set; get; } = "";
@@ -73,6 +83,18 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// 物料批次
         /// </summary>
         public string Batch { get; set; } = "";
+
+
+        // 2024.08.28 add
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long MaterialId { get; set; } = 0;
+
+        /// <summary>
+        /// 供应商ID
+        /// </summary>
+        public long SupplierId { get; set; } = 0;
 
     }
 

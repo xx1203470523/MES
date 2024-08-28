@@ -5,10 +5,12 @@
     /// </summary>
     public  class DeliveryDetailDto
     {
+        /*
         /// <summary>
         /// 同步明细ID
         /// </summary>
         public long? SyncId { get; set; }
+        */
 
         /// <summary>
         /// 生产订单号

@@ -12,17 +12,16 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
 {
     /// <summary>
     /// 生产领料单明细仓储
     /// </summary>
-    public partial class ManuRequistionOrderDetailRepository :BaseRepository, IManuRequistionOrderDetailRepository
+    public partial class ManuRequistionOrderDetailRepository : BaseRepository, IManuRequistionOrderDetailRepository
     {
 
-        public ManuRequistionOrderDetailRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuRequistionOrderDetailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +56,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         public async Task<ManuRequistionOrderDetailEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuRequistionOrderDetailEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuRequistionOrderDetailEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +64,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuRequistionOrderDetailEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuRequistionOrderDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuRequistionOrderDetailEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuRequistionOrderDetailEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -88,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (manuRequistionOrderDetailPagedQuery.PageIndex - 1) * manuRequistionOrderDetailPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuRequistionOrderDetailPagedQuery.PageSize });
@@ -114,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
-            if (manuRequistionOrderDetailQuery.RequistionOrderIds!=null&&manuRequistionOrderDetailQuery.RequistionOrderIds.Any())
+            if (manuRequistionOrderDetailQuery.RequistionOrderIds != null && manuRequistionOrderDetailQuery.RequistionOrderIds.Any())
             {
                 sqlBuilder.Where("RequistionOrderId IN @RequistionOrderIds");
             }
@@ -171,24 +170,26 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ManuRequistionOrderDetailRepository
     {
-        #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_requistion_order_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_requistion_order_detail` /**where**/ ";
         const string GetManuRequistionOrderDetailEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `manu_requistion_order_detail` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_requistion_order_detail`(  `Id`, `RequistionOrderId`, `MaterialId`, `Qty`, `WarehouseId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @RequistionOrderId, @MaterialId, @Qty, @WarehouseId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `manu_requistion_order_detail`(  `Id`, `RequistionOrderId`, ProductionOrderComponentID, `MaterialId`, `Qty`, `WarehouseId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @RequistionOrderId, @ProductionOrderComponentID, @MaterialId, @Qty, @WarehouseId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
-        const string UpdateSql = "UPDATE `manu_requistion_order_detail` SET   RequistionOrderId = @RequistionOrderId, MaterialId = @MaterialId,  Qty = @Qty, WarehouseId = @WarehouseId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_requistion_order_detail` SET RequistionOrderId = @RequistionOrderId, ProductionOrderComponentID = @ProductionOrderComponentID, MaterialId = @MaterialId,  Qty = @Qty, WarehouseId = @WarehouseId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_requistion_order_detail` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_requistion_order_detail` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM `manu_requistion_order_detail`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `manu_requistion_order_detail`  WHERE Id IN @Ids ";
-        #endregion
+
     }
 }

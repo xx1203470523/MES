@@ -1,34 +1,25 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Authentication;
-using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
-using Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking;
-using Hymson.MES.Services.Dtos.Warehouse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
-using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
-using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.WhWareHouse;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.Snowflake;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Warehouse;
-using Hymson.Utils;
-using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.HttpClients.Requests.XnebulaWMS;
-using Hymson.Utils.Tools;
-using Hymson.MES.HttpClients.Options;
-using Microsoft.Extensions.Options;
-using Hymson.MES.HttpClients;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Minio.DataModel;
-using Azure;
+using Hymson.MES.Data.Repositories.WhWareHouse;
+using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Options;
+using Hymson.MES.HttpClients.Requests.XnebulaWMS;
+using Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking;
+using Hymson.Snowflake;
+using Hymson.Utils;
+using Hymson.Utils.Tools;
+using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
 {
@@ -93,6 +84,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             _planWorkPlanRepository = planWorkPlanRepository;
             _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
         }
+
 
         /// <summary>
         /// 领料单
@@ -160,18 +152,6 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             //咱不验证数量 TODO by王克明
             foreach (var item in param.Details)
             {
-                manuRequistionOrderDetailEntities.Add(new ManuRequistionOrderDetailEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
-                    RequistionOrderId = manuRequistionOrderEntity.Id,
-                    MaterialId = item.MaterialId,
-                    Qty = item.Qty,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedOn = HymsonClock.Now()
-                });
                 var procMaterialEntity = procMaterialEntities.FirstOrDefault(x => x.Id == item.MaterialId);
 
                 // 2024.07.27 TODO: 临时处理
@@ -191,6 +171,21 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                     });
                 }
 
+                // 添加领料明细
+                manuRequistionOrderDetailEntities.Add(new ManuRequistionOrderDetailEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    RequistionOrderId = manuRequistionOrderEntity.Id,
+                    ProductionOrderComponentID = planWorkPlanMaterialEntity?.Id ?? 0,
+                    MaterialId = item.MaterialId,
+                    Qty = item.Qty,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
+                });
+
                 // 校验是否是最小包装量
                 int batchPlacesNum = CountDecimalPlaces(item.Batch); //批次数量小数
                 int qtyPlacesNum = CountDecimalPlaces(item.Qty); //用量数量小数
@@ -208,35 +203,40 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             }
 
             deliveryDto.Details = warehousingDeliveryDetails;
-            using (var trans = TransactionHelper.GetTransactionScope())
-            {
-                await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
-                await _manuRequistionOrderDetailRepository.InsertsAsync(manuRequistionOrderDetailEntities);
 
-                var response = await _wmsRequest.WarehousingDeliveryRequestAsync(deliveryDto);
-                if (response.Code != 0)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15152)).WithData("System", "WMS").WithData("Msg", response.Message);
-                }
-                trans.Complete();
-            }
+            using var trans = TransactionHelper.GetTransactionScope();
+            await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
+            await _manuRequistionOrderDetailRepository.InsertsAsync(manuRequistionOrderDetailEntities);
+
+            var response = await _wmsRequest.WarehousingDeliveryRequestAsync(deliveryDto);
+            if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "WMS结果返回异常，请检查！");
+            if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15152))
+                    .WithData("System", "WMS")
+                    .WithData("Msg", response.Message);
+
+            trans.Complete();
+
             return requistionOrderCode;
+        }
 
-            //计算decimal小数位数
-            int CountDecimalPlaces(decimal number)
-            {
-                // 将数字转换为字符串  
-                string numberAsString = number.ToString();
+        /// <summary>
+        /// 计算decimal小数位数
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
+        private int CountDecimalPlaces(decimal number)
+        {
+            // 将数字转换为字符串  
+            string numberAsString = number.ToString();
 
-                // 找到小数点位置  
-                int decimalPointIndex = numberAsString.IndexOf('.');
+            // 找到小数点位置  
+            int decimalPointIndex = numberAsString.IndexOf('.');
 
-                // 如果没有小数点，返回0  
-                if (decimalPointIndex < 0) return 0;
+            // 如果没有小数点，返回0  
+            if (decimalPointIndex < 0) return 0;
 
-                // 计算小数位数  
-                return numberAsString.Length - decimalPointIndex - 1;
-            }
+            // 计算小数位数  
+            return numberAsString.Length - decimalPointIndex - 1;
         }
 
         /// <summary>
@@ -272,5 +272,6 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
 
             return orderCodes.First();
         }
+
     }
 }

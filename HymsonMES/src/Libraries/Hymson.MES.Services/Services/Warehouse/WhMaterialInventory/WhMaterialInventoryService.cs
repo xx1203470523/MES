@@ -1650,7 +1650,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             // 判断领料单状态是否允许取消
             if (requistionOrderEntities.Any(a => a.Status == WhMaterialPickingStatusEnum.Inspectioning))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16062)).WithData("Status", WhMaterialPickingStatusEnum.Inspectioning.GetDescription());
+                throw new CustomerValidationException(nameof(ErrorCode.MES16062))
+                    .WithData("Status", WhMaterialPickingStatusEnum.Inspectioning.GetDescription());
             }
 
             // 如果存在多个，就表示数据已经有问题
@@ -1753,10 +1754,10 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
 
             // 判断成品入库单状态是否允许取消
-            if (entryOrderEntities.Any(a => a.Status == ProductReceiptStatusEnum.Approvaling))
+            if (entryOrderEntities.Any(a => a.Status != ProductReceiptStatusEnum.Approvaling))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16067))
-                    .WithData("Status", WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful.GetDescription());
+                    .WithData("Status", ProductReceiptStatusEnum.Approvaling.GetDescription());
             }
 
             // 如果存在多个，就表示数据已经有问题
