@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuProductReceiptOrderDetailEntity>(GetByIdsSql, new { Ids = ids });
@@ -185,6 +185,36 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             return await conn.QueryAsync<ManuProductReceiptOrderDetailEntity>(templateData.RawSql, templateData.Parameters);
         }
+
+        /// <summary>
+        /// 数据集查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetEntitiesWithoutCancelAsync(QueryManuProductReceiptOrderDetail query)
+        {
+            var sqlBuilder = new SqlBuilder();
+
+            var templateData = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            // ProductReceiptStatusEnum
+            sqlBuilder.Where("ProductReceiptId NOT IN (SELECT Id FROM manu_product_receipt_order WHERE Status IN (2, 4, 5, 7)");
+
+            if (query.SFCs != null && query.SFCs.Any())
+            {
+                sqlBuilder.Where("Sfc IN @SFCs");
+            }
+
+            sqlBuilder.AddParameters(query);
+
+            using var conn = GetMESDbConnection();
+
+            return await conn.QueryAsync<ManuProductReceiptOrderDetailEntity>(templateData.RawSql, templateData.Parameters);
+        }
+
     }
 
 

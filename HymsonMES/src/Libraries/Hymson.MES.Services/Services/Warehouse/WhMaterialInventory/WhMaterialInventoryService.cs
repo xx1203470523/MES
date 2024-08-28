@@ -1510,21 +1510,15 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             if (request.Items.Any())
             {
-
-                var Sfcs = request.Items.Select(m => m.Sfc);
-                var manuProductReceipts = await _manuProductReceiptOrderDetailRepository.GetListAsync(new QueryManuProductReceiptOrderDetail
+                var manuProductReceiptDetails = await _manuProductReceiptOrderDetailRepository.GetEntitiesWithoutCancelAsync(new QueryManuProductReceiptOrderDetail
                 {
-                    SFCs = Sfcs,
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SFCs = request.Items.Select(m => m.Sfc),
+                    SiteId = _currentSite.SiteId ?? 0
                 });
-                var sfcList = manuProductReceipts.Select(x => x.Sfc).ToArray();
-                if (manuProductReceipts.Any())
-                {
-                    // var sfcStrings = sfcList.Except(request.Items.Select(x => x.Sfc));
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17754));
-                }
 
+                if (manuProductReceiptDetails.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17754));
             }
+
             var returnMaterialDtos = new List<HttpClients.Requests.ProductReceiptItemDto>();
             var manuProductReceiptOrderDetails = new List<ManuProductReceiptOrderDetailEntity>();
             var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");

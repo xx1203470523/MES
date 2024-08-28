@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuProductReceiptOrderDetailEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuProductReceiptOrderDetailEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuProductReceiptOrderDetailEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -72,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetEntitiesAsync(ManuProductReceiptOrderDetailQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -93,5 +93,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetListAsync(QueryManuProductReceiptOrderDetail query);
+
+        /// <summary>
+        /// 数据集查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetEntitiesWithoutCancelAsync(QueryManuProductReceiptOrderDetail query);
+
     }
 }
