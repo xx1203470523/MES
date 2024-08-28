@@ -1701,7 +1701,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
 
             // 判断领料单状态是否允许取消
-            if (returnOrderEntities.Any(a => a.Status == WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful))
+            if (returnOrderEntities.Any(a => a.Status != WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16064))
                     .WithData("Status", WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful.GetDescription());
