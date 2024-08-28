@@ -1663,6 +1663,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SyncCode = requistionOrderEntity.ReqOrderCode,
                 UpdatedBy = _currentUser.UserName,
             });
+            if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "WMS结果返回异常，请检查！");
+            if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
 
             // 修改领料单状态
             requistionOrderEntity.Status = WhMaterialPickingStatusEnum.CancelApply;
@@ -1714,6 +1716,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SyncCode = returnOrderEntity.ReturnOrderCode,
                 UpdatedBy = _currentUser.UserName,
             });
+            if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "WMS结果返回异常，请检查！");
+            if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
 
             // 修改退料单状态
             returnOrderEntity.Status = WhWarehouseMaterialReturnStatusEnum.CancelApply;
@@ -1765,6 +1769,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SyncCode = entryOrderEntity.CompletionOrderCode,
                 UpdatedBy = _currentUser.UserName,
             });
+            if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "WMS结果返回异常，请检查！");
+            if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
 
             // 修改退料单状态
             entryOrderEntity.Status = ProductReceiptStatusEnum.CancelApply;

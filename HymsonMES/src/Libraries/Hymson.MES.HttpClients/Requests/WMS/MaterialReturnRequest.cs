@@ -370,6 +370,9 @@ namespace Hymson.MES.HttpClients.Requests
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class BaseResponse
     {
         [JsonPropertyName("code")]
