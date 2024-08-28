@@ -42,7 +42,7 @@ namespace Hymson.MES.BackgroundTasks.NIO.Jobs
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "推送 -> NIO:");
+                _logger.LogError(ex, "AbnormalParamDataJob -> NIO:");
             }
         }
 

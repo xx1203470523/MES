@@ -9,6 +9,7 @@ using Hymson.MES.Data.Repositories.NioPushCollection;
 using Hymson.MES.Data.Repositories.NioPushCollection.Query;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,13 +34,20 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly ISysConfigRepository _sysConfigRepository;
 
         /// <summary>
+        /// 日志
+        /// </summary>
+        private readonly ILogger<IAbnormalDataService> _logger;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public AbnormalDataService(INioPushCollectionRepository nioPushCollectionRepository,
-            ISysConfigRepository sysConfigRepository)
+            ISysConfigRepository sysConfigRepository,
+            ILogger<IAbnormalDataService> logger)
         {
             _nioPushCollectionRepository = nioPushCollectionRepository;
             _sysConfigRepository = sysConfigRepository;
+            _logger = logger;
         }
 
         /// <summary>
@@ -49,8 +57,29 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task<int> RepeatParamAsync(int day)
         {
+            try
+            {
+                return await RepeatParamTaskAsync(day);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"重复参数处理异常：{ex}；堆栈:{ex.StackTrace}");
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// 重复参数处理
+        /// </summary>
+        /// <param name="day"></param>
+        /// <returns></returns>
+        public async Task<int> RepeatParamTaskAsync(int day)
+        {
+            _logger.LogError($"重复参数处理开始");
+
             DateTime now = HymsonClock.Now();
-            now = Convert.ToDateTime("2024-08-22 14:36:00");
+            //now = Convert.ToDateTime("2024-08-22 14:36:00");
 
             List<string> configProcedureList = new List<string>();
 
@@ -143,6 +172,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
 
             trans.Complete();
+
+            _logger.LogError($"重复参数处理结束");
 
             return 0;
         }
