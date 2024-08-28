@@ -95,5 +95,10 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("NioUrl")]
         NioUrl = 19,
+        /// <summary>
+        /// NIO重复参数处理
+        /// </summary>
+        [Description("NioRepeatParam")]
+        NioRepeatParam = 21,
     }
 }

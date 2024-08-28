@@ -200,6 +200,76 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
             return new PagedInfo<NioPushCollectionStatusView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 获取重复List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<NioPushCollectionRepeatView>> GetRepeatEntitiesAsync(NioPushCollectionRepeatQuery query)
+        {
+            string stationSql = string.Empty;
+            if(query.ProcedureList != null && query.ProcedureList.Count > 0)
+            {
+                stationSql = " and StationId in @ProcedureList ";
+            }
+
+            string sql = $@"
+                select StationId, VendorProductTempSn,VendorFieldCode , count(*) Num  
+                from nio_push_collection t1
+                where t1.CreatedOn >= '{query.BeginDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+                and t1.CreatedOn < '{query.EndDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+                and t1.IsDeleted = 0
+                {stationSql}
+                group by StationId, VendorProductTempSn, VendorFieldCode
+                having count(*) > 1
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<NioPushCollectionRepeatView>(sql, query);
+        }
+
+        /// <summary>
+        /// 获取指定条码+工序List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<NioPushCollectionSfcView>> GetEntitiesBySfcAsync(NioPushCollectionSfcQuery query)
+        {
+            if(query.SfcList == null || query.SfcList.Count == 0)
+            {
+                return new List<NioPushCollectionSfcView>();
+            }
+
+            string sql = $@"
+                select Id, StationId, VendorProductTempSn ,VendorFieldCode 
+                from nio_push_collection npc 
+                where VendorProductTempSn in @SfcList
+                and StationId in @ProcedureList
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<NioPushCollectionSfcView>(sql, query);
+        }
+
+        /// <summary>
+        /// 获取List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<NioPushCollectionEntity>> GetNgEntitiesAsync(NioPushCollectionQuery query)
+        {
+            string sql = $@"
+                select * from nio_push_collection npc 
+                where IsOk  = 0
+                and id > {query.WaterId}
+                and IsDeleted = 0
+                order by id asc
+                limit 0,{query.Num}
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<NioPushCollectionEntity>(sql, query);
+        }
     }
 
 

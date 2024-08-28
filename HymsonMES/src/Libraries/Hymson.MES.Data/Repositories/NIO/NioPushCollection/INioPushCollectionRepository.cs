@@ -88,5 +88,25 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
         /// <returns></returns>
         Task<PagedInfo<NioPushCollectionStatusView>> GetPagedListAsync(NioPushCollectionPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 获取重复List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<NioPushCollectionRepeatView>> GetRepeatEntitiesAsync(NioPushCollectionRepeatQuery query);
+
+        /// <summary>
+        /// 获取指定条码+工序List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<NioPushCollectionSfcView>> GetEntitiesBySfcAsync(NioPushCollectionSfcQuery query);
+
+        /// <summary>
+        /// 获取List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<NioPushCollectionEntity>> GetNgEntitiesAsync(NioPushCollectionQuery query);
     }
 }

@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.ManuRotorSfc.Query;
 using Hymson.MES.Data.Repositories.NioPushCollection;
+using Hymson.MES.Data.Repositories.NioPushCollection.Query;
 using Hymson.MES.Data.Repositories.NioPushSwitch;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
@@ -142,20 +143,9 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly bool NIO_DEBUG = false;
 
         /// <summary>
-        /// 水位数据行数
-        /// 这边是每天推上次的，所以数量应该是所有的
-        /// </summary>
-        private readonly int WATER_ROWS = 100;
-
-        /// <summary>
         /// 取所有行数
         /// </summary>
         private readonly int WATER_ALL_ROWS = 0;
-
-        /// <summary>
-        /// 转子线工序长度
-        /// </summary>
-        private readonly int ROTOR_OP_LEN = 5;
 
         /// <summary>
         /// 转子线
@@ -399,8 +389,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 var tmpStr = JsonConvert.SerializeObject(model);
                 NioPushCollectionEntity nioModel = JsonConvert.DeserializeObject<NioPushCollectionEntity>(tmpStr);
                 nioModel.Id = IdGenProvider.Instance.CreateId();
-                nioModel.CreatedOn = HymsonClock.Now();
-                nioModel.UpdatedOn = nioModel.CreatedOn;
+                nioModel.CreatedOn = item.CreatedOn;
+                nioModel.UpdatedOn = HymsonClock.Now();
                 nioModel.CreatedBy = NIO_USER_ID;
                 nioModel.UpdatedBy = NIO_USER_ID;
                 if(model.DataType == 1)
@@ -1060,8 +1050,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取当前水位
             var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioIssue);
             //获取参数表数据
-            EntityByWaterMarkQuery waterQuery = new EntityByWaterMarkQuery() { Rows = 20, StartWaterMarkId = startWaterMarkId };
-            var paramList = await _manuProductParameterRepository.GetManuNgParamMavelAsync(waterQuery);
+            //EntityByWaterMarkQuery waterQuery = new EntityByWaterMarkQuery() { Rows = 20, StartWaterMarkId = startWaterMarkId };
+            //var paramList = await _manuProductParameterRepository.GetManuNgParamMavelAsync(waterQuery);
+            NioPushCollectionQuery waterQuery = new NioPushCollectionQuery() { Num = 20, WaterId = startWaterMarkId };
+            var paramList = await _nioPushCollectionRepository.GetNgEntitiesAsync(waterQuery);
             if (paramList == null || paramList.Any() == false) return;
             //获取标准参数，用于获取根据ID获取名称（参数表在其他库）
             ProcParameterQuery paramQuery = new ProcParameterQuery() { SiteId = siteId };
@@ -1078,7 +1070,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             foreach (var item in paramList)
             {
                 //标准参数
-                var curBaseParam = baseParamList.Where(m => m.Id == item.ParameterId).FirstOrDefault();
+                var curBaseParam = baseParamList.Where(m => item.VendorFieldCode == m.ParameterCode).FirstOrDefault();
                 if (curBaseParam == null)
                 {
                     continue;
@@ -1089,17 +1081,17 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 }
                 string paramCode = curBaseParam.ParameterCode;
                 char firstChar = paramCode[0];
-                if (firstChar != ROTOR_CHAR && firstChar != STATOR_CHAR)
-                {
-                    continue;
-                }
+                //if (firstChar != ROTOR_CHAR && firstChar != STATOR_CHAR)
+                //{
+                //    continue;
+                //}
                 //工序
-                string procedure = "未知";
-                var curProcedure = procedureList.Where(m => m.Id == item.ProcedureId).FirstOrDefault();
-                if (curProcedure != null)
-                {
-                    procedure = curProcedure.Code;
-                }
+                //string procedure = item.StationId;
+                //var curProcedure = procedureList.Where(m => m.Id == item.ProcedureId).FirstOrDefault();
+                //if (curProcedure != null)
+                //{
+                //    procedure = curProcedure.Code;
+                //}
 
                 NIOConfigBaseDto curConfig = new NIOConfigBaseDto();
                 if (firstChar == ROTOR_CHAR)
@@ -1119,12 +1111,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.PlantId = curConfig.PlantId;
                 model.WorkshopId = curConfig.WorkshopId;
                 model.ProductionLineId = curConfig.ProductionLineId;
-                model.StationId = procedure;
+                model.StationId = item.StationId;
                 model.VendorProductNum = curConfig.VendorProductCode;
-                model.VendorProductSn = item.SFC;
-                model.VendorProductTempSn = item.SFC;
+                model.VendorProductSn = item.VendorProductSn;
+                model.VendorProductTempSn = item.VendorProductTempSn;
                 model.VendorIssueCode = paramCode;
-                model.VendorIssueName = curBaseParam.ParameterName;
+                model.VendorIssueName = curBaseParam.ParameterName + "异常";
                 model.UpdateTime = GetTimestamp(HymsonClock.Now());
 
                 dtos.Add(model);

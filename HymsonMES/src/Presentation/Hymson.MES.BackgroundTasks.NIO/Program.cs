@@ -79,6 +79,7 @@ Host.CreateDefaultBuilder(args)
            //q.AddJobAndTrigger<MockHelloJob>(hostContext.Configuration);
            q.AddJobAndTrigger<PushNIOJob>(hostContext.Configuration);
            q.AddJobAndTrigger<PushFailNIOJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<AbnormalParamDataJob>(hostContext.Configuration);
            #endregion
 
            /*

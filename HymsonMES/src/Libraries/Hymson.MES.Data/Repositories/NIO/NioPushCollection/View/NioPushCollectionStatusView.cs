@@ -49,4 +49,57 @@ namespace Hymson.MES.Data.Repositories.NIO.NioPushCollection.View
         /// </summary>
         public string ProcedureName { get; set; }
     }
+
+    /// <summary>
+    /// 重复数据
+    /// </summary>
+    public class NioPushCollectionRepeatView
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string StationId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string VendorProductTempSn { get; set; }
+
+        /// <summary>
+        /// 参数编码
+        /// </summary>
+        public string VendorFieldCode { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int Num { get; set; }
+    }
+
+    /// <summary>
+    /// 查询条码
+    /// </summary>
+    public class NioPushCollectionSfcView
+    {
+        /// <summary>
+        /// id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string StationId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string VendorProductTempSn { get; set; }
+
+        /// <summary>
+        /// 参数编码
+        /// </summary>
+        public string VendorFieldCode { get; set; }
+    }
+
 }
