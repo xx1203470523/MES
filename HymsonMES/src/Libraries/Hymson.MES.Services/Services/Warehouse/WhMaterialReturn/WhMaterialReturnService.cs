@@ -241,6 +241,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             // 实物退料
             if (requestDto.Type == ManuReturnTypeEnum.WorkOrderReturn)
             {
+                manuReturnOrderEntity.Status = WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful;
+
                 // 生成检验单号
                 var inspectionOrder = await _iqcOrderCreateService.GenerateCommonIQCOrderCodeAsync(new BaseBo
                 {
@@ -411,10 +413,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             if (requestDto.Type == ManuReturnTypeEnum.WorkOrderBorrow)
             {
                 var response = await _wmsRequest.WarehousingEntryRequestAsync(warehousingEntryDto);
-                if (response.Code != 0)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS").WithData("Msg", response.Message);
-                }
+                if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "结果返回异常，请检查！");
+                if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
             }
             trans.Complete();
         }
