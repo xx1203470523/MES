@@ -10,6 +10,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
@@ -21,10 +22,13 @@ using Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
+using Hymson.MES.Data.Repositories.Manufacture.ManuReturnOrder.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality;
+using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
@@ -68,6 +72,11 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
         private readonly IWhSupplierRepository _whSupplierRepository;
+
+        /// <summary>
+        /// 仓储接口（iqc检验单）
+        /// </summary>
+        private readonly IQualIqcOrderReturnRepository _qualIqcOrderReturnRepository;
 
         /// <summary>
         /// 条码信息表 仓储
@@ -126,6 +135,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
         /// <param name="whSupplierRepository"></param>
+        /// <param name="qualIqcOrderReturnRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="validationCreateRules"></param>
@@ -162,6 +172,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
             IWhSupplierRepository whSupplierRepository,
+            IQualIqcOrderReturnRepository qualIqcOrderReturnRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
@@ -200,6 +211,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _whSupplierRepository = whSupplierRepository;
+            _qualIqcOrderReturnRepository = qualIqcOrderReturnRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _validationCreateRules = validationCreateRules;
@@ -1720,12 +1732,35 @@ namespace Hymson.MES.Services.Services.Warehouse
             if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "结果返回异常，请检查！");
             if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
 
+            // 读取退料单关联的IQC检验单
+            var iqcReturnOrderEntities = await _qualIqcOrderReturnRepository.GetEntitiesAsync(new QualIqcOrderReturnQuery
+            {
+                SiteId = returnOrderEntity.SiteId,
+                ReturnOrderId = returnOrderEntity.Id
+            });
+
             // 修改退料单状态
             returnOrderEntity.Status = WhWarehouseMaterialReturnStatusEnum.CancelApply;
             returnOrderEntity.UpdatedBy = _currentUser.UserName;
             returnOrderEntity.UpdatedOn = HymsonClock.Now();
 
-            return await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
+            // 取消关联的IQC检验单
+            var updateIQCReturnOrderEntities = iqcReturnOrderEntities.Select(s => new QualIqcOrderReturnEntity
+            {
+                Status = Core.Enums.Quality.IQCLiteStatusEnum.Cancel,
+                Remark = $"取消退料单【{returnOrderEntity.ReturnOrderCode}】，自动取消关联IQC检验单！",
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+                Id = s.Id
+            });
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
+            rows += await _qualIqcOrderReturnRepository.UpdateRangeAsync(updateIQCReturnOrderEntities);
+            trans.Complete();
+
+            return rows;
         }
 
         /// <summary>

@@ -59,6 +59,8 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> UpdateRangeAsync(IEnumerable<QualIqcOrderReturnEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, entities);
         }

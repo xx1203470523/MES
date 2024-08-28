@@ -48,7 +48,12 @@ namespace Hymson.MES.Core.Enums.Quality
         /// 已检验
         /// </summary>
         [Description("已检验")]
-        Completed = 3
+        Completed = 3,
+        /// <summary>
+        /// 取消检验
+        /// </summary>
+        [Description("取消检验")]
+        Cancel = 4
     }
 
     /// <summary>
