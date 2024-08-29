@@ -19,6 +19,8 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.ManuRotorSfc.Query;
+using Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode;
+using Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode.Query;
 using Hymson.MES.Data.Repositories.NioPushCollection;
 using Hymson.MES.Data.Repositories.NioPushCollection.Query;
 using Hymson.MES.Data.Repositories.NioPushSwitch;
@@ -128,6 +130,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly IProcProductParameterGroupRepository _procProductParameterGroupRepository;
 
         /// <summary>
+        /// 定子表记录
+        /// </summary>
+        private readonly IManuStatorBarcodeRepository _manuStatorBarcodeRepository;
+
+        /// <summary>
         /// 操作员账号
         /// </summary>
         private readonly string NIO_USER_ID = "LMS001";
@@ -211,7 +218,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository,
             INioPushCollectionRepository nioPushCollectionRepository,
             ILogger<IBuzDataPushService> logger,
-            IProcProductParameterGroupRepository procProductParameterGroupRepository)
+            IProcProductParameterGroupRepository procProductParameterGroupRepository,
+            IManuStatorBarcodeRepository manuStatorBarcodeRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -231,6 +239,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _nioPushCollectionRepository = nioPushCollectionRepository;
             _logger = logger;
             _procProductParameterGroupRepository = procProductParameterGroupRepository;
+            _manuStatorBarcodeRepository = manuStatorBarcodeRepository;
 
             BASE_CONFIG_LIST = new List<string>() { NIO_ROTOR_CONFIG, NIO_STATOR_CONFIG };
         }
@@ -240,6 +249,19 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// </summary>
         /// <returns></returns>
         public async Task CollectionAsync()
+        {
+            int Num = 50;
+            for(var i = 0; i < Num; i++)
+            {
+                await CollectionItemAsync();
+            }
+        }
+
+        /// <summary>
+        /// 业务数据（控制项）
+        /// </summary>
+        /// <returns></returns>
+        public async Task CollectionItemAsync()
         {
             _logger.LogError($"开始业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
@@ -355,6 +377,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     }
                     else
                     {
+                        continue; //数字类型转换失败直接不处理该条数据
                         model.DecimalValue = 0;
                         model.StringValue = "";
                     }
@@ -363,6 +386,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 {
                     model.DecimalValue = 0;
                     model.StringValue = item.ParameterValue;
+                    if(model.StringValue.Length > 64)
+                    {
+                        model.StringValue = model.StringValue.Substring(0, 63);
+                    }
                 }
                 model.BooleanValue = null;
                 model.ProcessType = "final";
@@ -639,6 +666,188 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 _logger.LogError($"业务数据（材料清单）RotorMaterialAsync发生异常：{ex}。异常:{ex.StackTrace}");
             }
             //定子线材料清单
+        }
+
+        /// <summary>
+        /// 业务数据（材料清单）
+        /// 只适用于定子线
+        /// </summary>
+        /// <returns></returns>
+        private async Task StatorMaterialAsync()
+        {
+            _logger.LogInformation($"业务数据（材料清单）StatorMaterialAsync");
+
+            var buzScene = BuzSceneEnum.Buz_Material_Summary;
+            var config = await GetSwitchEntityAsync(buzScene);
+            if (config == null) return;
+
+            //站点配置
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
+            if (configEntities == null || !configEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139));
+            }
+            long siteId = long.Parse(configEntities.ElementAt(0).Value);
+            //获取基础配置
+            var baseConfigList = await GetBaseConfigAsync();
+            //获取当前水位
+            var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.StatorNioMaterial);
+            DateTime startWaterMarkTime = DateTime.Now;
+            if (startWaterMarkId != 0)
+            {
+                startWaterMarkTime = UnixTimestampMillisToDateTime(startWaterMarkId);
+            }
+            else
+            {
+                startWaterMarkTime = DateTime.Parse("2024-08-01 01:01:01");
+            }
+
+            //获取已经走完的追溯记录
+            StatorSfcWaterQuery rotorQuery = new StatorSfcWaterQuery();
+            rotorQuery.StartWaterMarkTime = startWaterMarkTime;
+            rotorQuery.Rows = 5;
+            var rotorSfcList = await _manuStatorBarcodeRepository.GetListByWatersAsync(rotorQuery);
+            if (rotorSfcList == null || rotorSfcList.Count() == 0)
+            {
+                return;
+            }
+            List<string> nioSfcList = rotorSfcList.Select(m => m.ProductionCode).ToList();
+            if(nioSfcList == null || nioSfcList.Count == 0)
+            {
+                return;
+            }
+
+            //所有条码
+            List<string> cpSfcList = rotorSfcList.Where(m => string.IsNullOrEmpty(m.ProductionCode) == false).Select(m => m.ProductionCode).Distinct().ToList();
+            List<string> inSfcList = rotorSfcList.Where(m => string.IsNullOrEmpty(m.InnerBarCode) == false).Select(m => m.InnerBarCode).Distinct().ToList();
+            List<string> outSfcList = rotorSfcList.Where(m => string.IsNullOrEmpty(m.OuterBarCode) == false).Select(m => m.OuterBarCode).Distinct().ToList();
+            List<string> busSfcList = rotorSfcList.Where(m => string.IsNullOrEmpty(m.BusBarCode) == false).Select(m => m.BusBarCode).Distinct().ToList();
+            List<string> allSfcList = new List<string>();
+            allSfcList.AddRange(inSfcList);
+            allSfcList.AddRange(outSfcList);
+            allSfcList.AddRange(busSfcList);
+            allSfcList.AddRange(cpSfcList);
+
+            //查询条码物料信息
+            ManuSfcCirculationBySfcsQuery cirQuery = new ManuSfcCirculationBySfcsQuery();
+            cirQuery.SiteId = siteId;
+            cirQuery.Sfc = allSfcList;
+            List<ManuSfcCirculationEntity> cirSfcList = (await _manuSfcCirculationRepository.GetSfcMoudulesAsync(cirQuery)).ToList();
+            if (cirSfcList == null || cirSfcList.Count() == 0)
+            {
+                return;
+            }
+            cirQuery.Sfc = null;
+            cirQuery.CirculationBarCodes = allSfcList;
+            List<ManuSfcCirculationEntity> cirSfcList2 = (await _manuSfcCirculationRepository.GetSfcMoudulesAsync(cirQuery)).ToList();
+            if (cirSfcList2 != null && cirSfcList.Count() > 0)
+            {
+                cirSfcList.AddRange(cirSfcList2);
+            }
+            //查询上料物料信息
+            List<long> upMatIdList = cirSfcList.Select(m => m.CirculationProductId).Distinct().ToList();
+            var upMaterialList = await _procMaterialRepository.GetByIdsAsync(upMatIdList);
+
+            var dtos = new List<MaterialDto> { };
+            foreach (var item in rotorSfcList)
+            {
+                if (string.IsNullOrEmpty(item.InnerBarCode) == false)
+                {
+                    MaterialDto? inModel = GetStatorMaterialDto(item.ProductionCode, item.InnerBarCode, cirSfcList, upMaterialList);
+                    if(inModel != null)
+                    {
+                        dtos.Add(inModel);
+                    }
+                }
+                if(string.IsNullOrEmpty(item.OuterBarCode) == false)
+                {
+                    MaterialDto? outModel = GetStatorMaterialDto(item.ProductionCode, item.OuterBarCode, cirSfcList, upMaterialList);
+                    if (outModel != null)
+                    {
+                        dtos.Add(outModel);
+                    }
+                }
+                if(string.IsNullOrEmpty(item.BusBarCode) == false)
+                {
+                    MaterialDto? busModel = GetStatorMaterialDto(item.ProductionCode, item.BusBarCode, cirSfcList, upMaterialList);
+                    if (busModel != null)
+                    {
+                        dtos.Add(busModel);
+                    }
+                }
+            }
+
+            DateTime? maxUpdateTime = rotorSfcList.Max(x => x.UpdatedOn);
+            long timestamp = GetTimestampInMilliseconds(maxUpdateTime);
+
+            //MES数据入库
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            await AddToPushQueueAsync(config, buzScene, dtos);
+            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.StatorNioMaterial, timestamp);
+
+            trans.Complete();
+        }
+
+        /// <summary>
+        /// 获取转子物料
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="subSfc"></param>
+        /// <param name="cirSfcList"></param>
+        /// <param name="matList"></param>
+        /// <returns></returns>
+        private MaterialDto? GetStatorMaterialDto(string sfc,string subSfc, List<ManuSfcCirculationEntity> cirSfcList,
+            IEnumerable<ProcMaterialEntity> matList)
+        {
+            if(string.IsNullOrEmpty(sfc) == true)
+            {
+                return null;
+            }
+            if (string.IsNullOrEmpty(subSfc) == true)
+            {
+                return null;
+            }
+            var curCirSfc = cirSfcList.Where(m => m.SFC == sfc).FirstOrDefault();
+            if(curCirSfc == null)
+            {
+                return null;
+            }
+            ManuSfcCirculationEntity? curCirSubSfc = cirSfcList.Where(m => m.SFC == subSfc).FirstOrDefault();
+            ManuSfcCirculationEntity? curCirSubBarCode = cirSfcList.Where(m => m.CirculationBarCode == subSfc).FirstOrDefault();
+            if(curCirSubSfc == null && curCirSubBarCode == null)
+            {
+                return null;
+            }
+
+            ProcMaterialEntity? sfcMat = matList.Where(m => m.Id == curCirSfc.ProductId).FirstOrDefault();
+
+            ProcMaterialEntity? subSfcMat = new ProcMaterialEntity();
+            if(curCirSubSfc != null)
+            {
+                subSfcMat = matList.Where(m => m.Id == curCirSubSfc.ProductId).FirstOrDefault();
+            }
+            if(curCirSubSfc != null)
+            {
+                subSfcMat = matList.Where(m => m.Id == curCirSubSfc.CirculationProductId).FirstOrDefault();
+            }
+
+            if(sfcMat == null || subSfcMat == null)
+            {
+                return null;
+            }
+
+            DateTime now = subSfcMat.CreatedOn;
+
+            MaterialDto model = new MaterialDto();
+            model.VendorProductNum = sfcMat.MaterialCode;
+            model.VendorProductSn = sfc;
+            model.ChildSn = subSfc;
+            model.ChildName = subSfcMat.MaterialName;
+            model.ChildNum = subSfcMat.MaterialCode;
+            model.UpdateTime = GetTimestamp(now);
+
+            return model;
         }
 
         /// <summary>

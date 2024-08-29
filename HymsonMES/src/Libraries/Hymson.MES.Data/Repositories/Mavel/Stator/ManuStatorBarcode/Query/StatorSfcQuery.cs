@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode.Query
 {
     /// <summary>
-    /// 转子线成品条码查询
+    /// 定子线成品条码查询
     /// </summary>
     public class StatorSfcQuery
     {
@@ -20,5 +20,21 @@ namespace Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode.Query
         /// 站点ID
         /// </summary>
         public long SiteId { get; set; }
+    }
+
+    /// <summary>
+    /// 定子线成品条码查询
+    /// </summary>
+    public class StatorSfcWaterQuery
+    {
+        /// <summary>
+        /// 时间
+        /// </summary>
+        public DateTime StartWaterMarkTime { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int Rows { get; set; }
     }
 }

@@ -46,6 +46,11 @@
         public const string NioMaterial = "NioMaterial";
 
         /// <summary>
+        /// 定子物料追溯
+        /// </summary>
+        public const string StatorNioMaterial = "StatorNioMaterial";
+
+        /// <summary>
         /// 转子线包装列表
         /// </summary>
         public const string RotorPackList = "RotorPackList";

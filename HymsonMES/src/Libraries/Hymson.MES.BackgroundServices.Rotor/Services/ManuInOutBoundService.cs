@@ -818,6 +818,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     FROM Work_Process_{suffixTableName} t1
                     inner join Work_ProcessData_{suffixTableName} t2 on t1.ID  = t2.ProcessUID 
                     WHERE T2.ProcessUID IN ( {idListStr} )
+                    and NameCode is not null
                 ";
 
                 List<WorkProcessDataDto> dbList = await _workProcessDataRepository.GetList(sql);
