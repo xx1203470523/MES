@@ -250,7 +250,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task CollectionAsync()
         {
-            int Num = 500;
+            int Num = 50;
             for(var i = 0; i < Num; i++)
             {
                 await CollectionItemAsync();

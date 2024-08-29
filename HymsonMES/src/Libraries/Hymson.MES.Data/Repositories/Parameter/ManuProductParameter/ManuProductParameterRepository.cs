@@ -341,7 +341,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
         }
 
         /// <summary>
-        /// 获取马威参数
+        /// 获取马威转子参数
         /// </summary>
         /// <returns></returns>
         public async Task<IEnumerable<ManuProductParameterEntity>> GetManuParamMavelAsync(EntityByWaterMarkQuery query)
@@ -350,6 +350,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
                 select * 
                 from manu_product_procedure_parameter
                 WHERE Id > @StartWaterMarkId 
+                and CreatedBy  = 'RotorLMSJOB'
                 ORDER BY Id ASC 
                 LIMIT @Rows;
             ";
