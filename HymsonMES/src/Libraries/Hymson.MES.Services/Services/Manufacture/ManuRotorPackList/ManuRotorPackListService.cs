@@ -258,8 +258,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var dbStatorList = await _manuStatorBarcodeRepository.GetListBySfcsAsync(statorSfcQuery);
                     if(dbStatorList != null && dbStatorList.Count() > 0)
                     {
+                        List<string> existList = new List<string>();
+
                         foreach(var sItem in dbStatorList)
                         {
+                            if(existList.Contains(sItem.ProductionCode) == true)
+                            {
+                                continue;
+                            }
+                            existList.Add(sItem.ProductionCode);
+
                             ManuRotorPackListEntity manuRotorPackListEntity = new ManuRotorPackListEntity();
                             manuRotorPackListEntity.ProductCode = sItem.ProductionCode;
                             manuRotorPackListEntity.BoxCode = "";

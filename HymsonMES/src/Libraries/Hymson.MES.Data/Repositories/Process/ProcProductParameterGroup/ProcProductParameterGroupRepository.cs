@@ -255,6 +255,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 inner join proc_procedure t3 on t3.Id  = t1.ProcedureId and t3.IsDeleted = 0
                 inner join proc_parameter t4 on t4.Id = t2.ParameterId and t4.IsDeleted = 0
                 where t1.SiteId  = {query.SiteId}
+                and t1.Status in (1,2)
                 and t1.IsDeleted  = 0
             ";
 

@@ -48,6 +48,7 @@ namespace Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode
             select * 
             from manu_stator_barcode  
             where SiteId  = @SiteId
+            order by UpdatedOn desc
             and ProductionCode in @SfcList
         ";
     }
