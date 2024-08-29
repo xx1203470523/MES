@@ -1548,6 +1548,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     Quantity = item.Qty.ToString(),
                     BRelated = TrueOrFalseEnum.No,
                     UnitCode = item.Unit,
+                    UniqueCode = item.Sfc ?? ""
                 };
                 ManuProductReceiptOrderDetailEntity manuProductReceiptOrderDetailEntity = new ManuProductReceiptOrderDetailEntity
                 {
