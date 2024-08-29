@@ -201,7 +201,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("SiteId = @SiteId");
 
             // ProductReceiptStatusEnum
-            sqlBuilder.Where("ProductReceiptId NOT IN (SELECT Id FROM manu_product_receipt_order WHERE Status IN (2, 4, 5, 7)");
+            sqlBuilder.Where("ProductReceiptId NOT IN (SELECT Id FROM manu_product_receipt_order WHERE Status IN (2, 4, 5, 7)) ");
 
             if (query.SFCs != null && query.SFCs.Any())
             {
