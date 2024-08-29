@@ -21,5 +21,12 @@ namespace Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuStatorBarcodeEntity>> GetListBySfcsAsync(StatorSfcQuery query);
+
+        /// <summary>
+        /// 根据水位查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuStatorBarcodeEntity>> GetListByWatersAsync(StatorSfcWaterQuery query);
     }
 }
