@@ -18,7 +18,7 @@ spec:
         app: mes-api
     spec:
       containers:
-      - image: nuget.czhipu.com/xnebula/hymson.mes.api:20240827172355
+      - image: nuget.czhipu.com/xnebula/hymson.mes.api:20240829150312
         name: mes-api
         volumeMounts:
           - mountPath: /logs
