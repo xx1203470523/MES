@@ -209,6 +209,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<IEnumerable<ManuRotorPackViewDto>> QueryByIdAsync(ManuRotorPackListQuery query)
         {
             List<ManuRotorPackViewDto> manuRotors = new();
+            if(string.IsNullOrEmpty(query.Sfc) == false)
+            {
+                query.Sfc = query.Sfc.ToUpper();
+            }
+            if(string.IsNullOrEmpty(query.BoxCode) == false)
+            {
+                query.BoxCode = query.BoxCode.ToUpper();
+            }
 
             List<ManuRotorPackListEntity> manuRotorPackLists = new List<ManuRotorPackListEntity>();
             if (query.WorkCenterCode == "JX101")
