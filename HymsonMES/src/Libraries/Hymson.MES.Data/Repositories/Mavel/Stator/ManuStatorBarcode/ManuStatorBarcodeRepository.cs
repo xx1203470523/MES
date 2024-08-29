@@ -49,7 +49,7 @@ namespace Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode
                 select * 
                 from manu_stator_barcode  
                 where ProductionCode is not null
-                and UpdatedOn > {query.StartWaterMarkTime.ToString("yyyy-MM-dd HH:mm:ss")}
+                and UpdatedOn > '{query.StartWaterMarkTime.ToString("yyyy-MM-dd HH:mm:ss")}'
                 order by UpdatedOn desc
                 limit 0,{query.Rows}
             ";

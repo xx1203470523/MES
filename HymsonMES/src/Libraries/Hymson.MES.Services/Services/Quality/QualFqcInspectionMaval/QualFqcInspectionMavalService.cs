@@ -74,6 +74,7 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
+            qualFqcInspectionMavalCreateDto.SFC = qualFqcInspectionMavalCreateDto.SFC.ToUpper();
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(qualFqcInspectionMavalCreateDto);

@@ -1123,10 +1123,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 return resultList;
             }
 
-            long paramId = 0;
-
             foreach (var item in parammList)
             {
+                long paramId = 0;
                 ProcParameterEntity? mesParam = mesParamList.Where(m => m.ParameterCode == item.ParamCode).FirstOrDefault();
                 if(mesParam != null)
                 {
