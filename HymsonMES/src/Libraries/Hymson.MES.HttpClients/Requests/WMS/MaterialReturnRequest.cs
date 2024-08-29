@@ -279,6 +279,12 @@ namespace Hymson.MES.HttpClients.Requests
         [JsonPropertyName("bRelated")]
         public TrueOrFalseEnum? BRelated { get; set; }
 
+        /// <summary>
+        /// 唯一码
+        /// </summary>
+        [JsonPropertyName("uniqueCode")]
+        public string UniqueCode {  get; set; }
+
     }
     /// <summary>
     /// 废成品入库申请单
