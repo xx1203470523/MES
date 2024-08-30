@@ -1,4 +1,5 @@
-﻿using Hymson.MES.SystemServices.Dtos;
+﻿using Hymson.MES.Core.Constants.Common;
+using Hymson.MES.SystemServices.Dtos;
 using Hymson.MES.SystemServices.Services.Quality;
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
@@ -42,5 +43,17 @@ namespace Hymson.MES.System.Api.Controllers
             _ = await _nioService.AddQueueAsync(requestDtos);
         }
 
+        /// <summary>
+        /// MES更新内容
+        /// </summary>
+        /// <returns></returns>
+        [Route("MesUpdateContent")]
+        [HttpGet]
+        [AllowAnonymous]
+        public string MesUpdateContentApi()
+        {
+            return MesUpdateContent.GetMesUpdateContent();
+
+        }
     }
 }
