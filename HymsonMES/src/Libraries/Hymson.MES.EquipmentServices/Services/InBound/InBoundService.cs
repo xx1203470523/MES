@@ -338,7 +338,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     else
                     {
                         //未查到当前工单{planWorkOrder.code}批次信息,无法正常校验电芯批次
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19157)).WithData("SFC", sfc);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19160)).WithData("WorkOrder", planWorkOrder.OrderCode);
                     }
                 }
 
