@@ -172,6 +172,8 @@ public class SystemApiService : ISystemApiService
         {
             var equipment = equipmentEntities.TryGetValue(item.EquipmentId.GetValueOrDefault(), out EquEquipmentEntity equiptment) ? equiptment : null;
 
+            if (tracelist.Any(a => a.SFC == item.SFC)) continue;
+
             ProcductTraceViewDto trace = new()
             {
                 SFC = item.SFC,
@@ -183,12 +185,31 @@ public class SystemApiService : ISystemApiService
             tracelist.Add(trace);
         }
 
+        foreach (var item in cellSfcCirculationEntities)
+        {
+            var equipment = equipmentEntities.TryGetValue(item.EquipmentId.GetValueOrDefault(), out var equ) ? equ : null;
+
+            if (tracelist.Any(a => a.SFC == item.SFC)) continue;
+
+            ProcductTraceViewDto trace = new()
+            {
+                SFC = item.SFC,
+                Level = 2,
+                CirculationBarCode = item.CirculationBarCode,
+                EquipmentCode = equipment?.EquipmentCode
+            };
+
+            tracelist.Add(trace);
+        }
+
+
+        tracelist = tracelist.Distinct().ToList();
+
         Parallel.ForEach(queryDto.SFC, item =>
         {
             List<ProcductTraceViewDto> trace = new List<ProcductTraceViewDto>();
             List<SFCStepViewDto> steplist = new();
             List<ProductParameterViewDto> paramlist = new();
-
 
             //List<ProcductTraceViewDto> modelTrace = new List<ProcductTraceViewDto>();
             //List<ProcductTraceViewDto> sfcTrace = new List<ProcductTraceViewDto>();
