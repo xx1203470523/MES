@@ -1,6 +1,4 @@
-﻿using Hymson.MES.BackgroundServices.NIO.Services;
-using Hymson.MES.BackgroundServices.NIO.Services.ERP;
-using Hymson.MES.BackgroundServices.Rotor.Services;
+﻿using Hymson.MES.BackgroundServices.Rotor.Services;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos;
@@ -16,7 +14,6 @@ using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Hymson.MES.Equipment.Api.Controllers
 {
@@ -51,31 +48,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IManuInOutBoundService _mavel;
 
         /// <summary>
-        /// 
-        /// </summary>
-        private readonly IErpDataPushService _erpDataPushService;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly IPushNIOService _pushNIOService;
-
-        /// <summary>
-        /// 主数据推送
-        /// </summary>
-        private readonly IMasterDataPushService _masterDataPushService;
-
-        /// <summary>
-        /// 业务数据
-        /// </summary>
-        private readonly IBuzDataPushService _buzDataPushService;
-
-        /// <summary>
-        /// 异常数据处理
-        /// </summary>
-        private readonly IAbnormalDataService _abnormalDataService;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
@@ -89,12 +61,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             IEquCommonService equCommonService,
             IEquipmentCollectService equipmentCollectService,
             ISfcBindingService sfcBindingService,
-            IManuInOutBoundService manuInOutBoundService,
-            IErpDataPushService erpDataPushService,
-            IPushNIOService pushNIOService,
-            IMasterDataPushService masterDataPushService,
-            IBuzDataPushService buzDataPushService,
-            IAbnormalDataService abnormalDataService)
+            IManuInOutBoundService manuInOutBoundService)
         {
             _logger = logger;
             _manufactureService = manufactureService;
@@ -102,11 +69,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _equipmentService = equipmentCollectService;
             _equCommonService = equCommonService;
             _mavel = manuInOutBoundService;
-            _erpDataPushService = erpDataPushService;
-            _pushNIOService = pushNIOService;
-            _masterDataPushService = masterDataPushService;
-            _buzDataPushService = buzDataPushService;
-            _abnormalDataService = abnormalDataService;
         }
 
 
@@ -118,73 +80,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [AllowAnonymous]
         public async Task TestAsync()
         {
-            //DateTime beginDate = DateTime.Parse("2024-05-17 11:49:09.340");
+            DateTime beginDate = DateTime.Parse("2024-05-17 11:49:09.340");
             //DateTime endDate = DateTime.Parse("2024-05-22 13:08:20.273");
 
-            ////主数据（控制项）
-            //await _masterDataPushService.FieldAsync();
-            ////主数据（工站）
-            //await _masterDataPushService.StationAsync();
-            ////主数据（产品）
-            //await _masterDataPushService.ProductAsync();
-            ////主数据（一次合格率目标）
-            //await _masterDataPushService.PassrateTargetAsync();
 
-            ////业务数据（控制项）
-            //await _buzDataPushService.CollectionAsync();
-            ////业务数据（生产业务）
-            //await _buzDataPushService.ProductionAsync();
-            //业务数据（材料清单）
-            await _buzDataPushService.MaterialAsync();
-            ////业务数据（产品一次合格率）
-            //await _buzDataPushService.PassrateProductAsync();
-            ////业务数据（缺陷业务
-            //await _buzDataPushService.IssueAsync();
-            ////业务数据（工单业务）
-            //await _buzDataPushService.WorkOrderAsync();
-
-            ////NIO合作伙伴精益与库存信息
-            //await _erpDataPushService.NioStockInfoAsync();
-            ////关键下级键
-            //await _erpDataPushService.NioKeyItemInfoAsync();
-            ////实际交付情况
-            //await _erpDataPushService.NioActualDeliveryAsync();
-
-            //推送数据
-            //await _pushNIOService.ExecutePushAsync();
-
-            //await _pushNIOService.ExecutePushFailAsync();
-
-            //await _mavel.InOutBoundAsync(100);
-
-            //await _abnormalDataService.RepeatParamAsync(7);
-        }
-
-        /// <summary>
-        /// 马威测试
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("mavel002")]
-        [AllowAnonymous]
-        public List<long> Test002Async()
-        {
-            List<long> resultList = new List<long>();
-            DateTime date = HymsonClock.Now();
-
-            //date = date.AddHours(8);
-            long time1 = (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
-            resultList.Add(time1);
-
-            // 首先将本地时间转换为UTC时间  
-            DateTime utcDateTime = ((DateTime)date).ToUniversalTime();
-            // 然后计算UTC时间与Unix纪元（1970年1月1日UTC）之间的差值  
-            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            TimeSpan timeSpan = utcDateTime - epoch;
-            long tiem2 = (long)timeSpan.TotalSeconds;
-            resultList.Add(tiem2);
-
-
-            return resultList;
+            await _mavel.InOutBoundAsync(100);
         }
 
         /// <summary>
