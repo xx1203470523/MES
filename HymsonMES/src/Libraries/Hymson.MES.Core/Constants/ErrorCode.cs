@@ -2393,6 +2393,8 @@
         #region NIO MES17770
 
         public const string MES17770 = "启动状态不能修改，请先修改状态";
+        public const string MES17771 = "时间格式异常，请确认后在调整";
+        public const string MES17772 = "稼动率只能在0-1之间";
 
         #endregion
     }

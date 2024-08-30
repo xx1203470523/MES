@@ -296,6 +296,6 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
         const string GetByIdSql = @"SELECT * FROM nio_push_collection WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM nio_push_collection WHERE Id IN @Ids ";
 
-        const string GetByNioPushIdSql = @"SELECT * FROM nio_push_collection WHERE NioPushId = @NioPushId ";
+        const string GetByNioPushIdSql = @"SELECT * FROM nio_push_collection WHERE NioPushId = @NioPushId and IsDeleted = 0";
     }
 }

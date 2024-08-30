@@ -22,6 +22,8 @@ using Hymson.MES.BackgroundServices.NIO.Utils;
 using Hymson.MES.BackgroundServices.NIO.Dtos.Buz;
 using Hymson.MES.BackgroundServices.NIO.Dtos.Master;
 using Hymson.MES.Data.Repositories.NioPushCollection;
+using Hymson.MES.BackgroundServices.NIO.Dtos.ERP;
+using Hymson.MES.Data.Repositories.NIO;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -56,6 +58,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly INioPushCollectionRepository _nioPushCollectionRepository;
 
         /// <summary>
+        /// NIO
+        /// </summary>
+        private readonly INioPushProductioncapacityRepository _nioPushProductioncapacityRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="waterMarkService"></param>
@@ -65,13 +72,15 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             INioPushSwitchRepository nioPushSwitchRepository,
             INioPushRepository nioPushRepository,
             ISysConfigRepository sysConfigRepository,
-            INioPushCollectionRepository nioPushCollectionRepository)
+            INioPushCollectionRepository nioPushCollectionRepository,
+            INioPushProductioncapacityRepository nioPushProductioncapacityRepository)
         {
             _waterMarkService = waterMarkService;
             _nioPushSwitchRepository = nioPushSwitchRepository;
             _nioPushRepository = nioPushRepository;
             _sysConfigRepository = sysConfigRepository;
             _nioPushCollectionRepository = nioPushCollectionRepository;
+            _nioPushProductioncapacityRepository = nioPushProductioncapacityRepository;
         }
 
         /// <summary>
@@ -369,6 +378,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                         {
                             pushContent = await GetCollectionData(data.Id, data.SchemaCode);
                         }
+                        else if(data.BuzScene == BuzSceneEnum.ERP_ProductionCapacity || data.BuzScene == BuzSceneEnum.ERP_ProductionCapacity_Summary)
+                        {
+                            pushContent = await GetNioStockInfoData(data.Id, data.SchemaCode);
+                        }
                         else
                         {
                             //这里将数据序列化在反序列化，更新时间戳字段
@@ -649,6 +662,26 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             List<CollectionDto> pushList = JsonConvert.DeserializeObject<List<CollectionDto>>(tmpPushContext);
             pushList.ForEach(m => m.UpdateTime = timestmap);
             NioCollectionDto nioSch = new NioCollectionDto() { List = pushList };
+            nioSch.SchemaCode = schemaCode;
+
+            return JsonConvert.SerializeObject(nioSch, settings);
+        }
+
+        /// <summary>
+        /// 获取NIO合作伙伴精益与库存信息数据
+        /// </summary>
+        /// <param name="nioPushId"></param>
+        /// <param name="schemaCode"></param>
+        /// <returns></returns>
+        private async Task<string> GetNioStockInfoData(long nioPushId, string schemaCode)
+        {
+            //获取对应的数据
+            var dbList = await _nioPushProductioncapacityRepository.GetByPushIdAsync(nioPushId);
+            //获取配置
+            JsonSerializerSettings settings = NioHelper.GetJsonSerializer();
+            string tmpPushContext = JsonConvert.SerializeObject(dbList);
+            List<ProductionCapacityDto> pushList = JsonConvert.DeserializeObject<List<ProductionCapacityDto>>(tmpPushContext);
+            NioProductionCapacityDto nioSch = new NioProductionCapacityDto() { List = pushList };
             nioSch.SchemaCode = schemaCode;
 
             return JsonConvert.SerializeObject(nioSch, settings);

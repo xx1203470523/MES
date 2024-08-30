@@ -2,7 +2,10 @@
 using Hymson.MES.BackgroundServices.NIO.Dtos;
 using Hymson.MES.BackgroundServices.NIO.Dtos.ERP;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Common;
+using Hymson.MES.Core.Domain.NIO;
+using Hymson.MES.Core.Domain.NioPushCollection;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
@@ -10,6 +13,7 @@ using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.NIO;
 using Hymson.MES.Data.Repositories.NioPushSwitch;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -18,7 +22,9 @@ using Hymson.MES.HttpClients.Requests.ERP;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Hymson.MES.HttpClients.Responses.NioErp;
 using Hymson.MES.HttpClients.Responses.NioWms;
+using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -70,9 +76,19 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
         private readonly IERPApiClient _eRPApiClient;
 
         /// <summary>
+        /// 仓储接口（合作伙伴精益与生产能力）
+        /// </summary>
+        private readonly INioPushProductioncapacityRepository _nioPushProductioncapacityRepository;
+
+        /// <summary>
         /// 末工序
         /// </summary>
         private readonly string PRODUCRE_END = "R01OP150";
+
+        /// <summary>
+        /// 操作员账号
+        /// </summary>
+        private readonly string NIO_USER_ID = "LMS001";
 
         /// <summary>
         /// 构造函数
@@ -85,7 +101,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             IProcBomDetailRepository procBomDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IERPApiClient eRPApiClient)
+            IERPApiClient eRPApiClient,
+            INioPushProductioncapacityRepository nioPushProductioncapacityRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _iWMSApiClient = wMSApiClient;
@@ -95,6 +112,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             _procMaterialRepository = procMaterialRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _eRPApiClient = eRPApiClient;
+            _nioPushProductioncapacityRepository = nioPushProductioncapacityRepository;
         }
 
         /// <summary>
@@ -156,6 +174,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             List<StockPush> dataList = wmsResult.Data;
             //3. 组装数据
             List<ProductionCapacityDto> dtos = new List<ProductionCapacityDto>();
+            List<NioPushProductioncapacityEntity> nioList = new List<NioPushProductioncapacityEntity>();
             foreach(var item in dataList)
             {
                 NIOConfigBaseDto ?curBaseConfig = configList.Where(m => m.VendorProductCode == item.MaterialCode).FirstOrDefault();
@@ -196,12 +215,29 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
 
                 dto.Date = HymsonClock.Now().ToString("yyyy-MM-dd HH:mm:ss");
                 dto.DownlineNum = downNum;
-
                 dtos.Add(dto);
+
+                var tmpStr = JsonConvert.SerializeObject(dto);
+                NioPushProductioncapacityEntity nioModel = JsonConvert.DeserializeObject<NioPushProductioncapacityEntity>(tmpStr);
+                nioModel.Id = IdGenProvider.Instance.CreateId();
+                nioModel.CreatedOn = HymsonClock.Now();
+                nioModel.UpdatedOn = nioModel.CreatedOn;
+                nioModel.CreatedBy = NIO_USER_ID;
+                nioModel.UpdatedBy = NIO_USER_ID;
+
+                nioList.Add(nioModel);
             }
 
-            //4. 保存数据至NIO
-            await AddToPushQueueAsync(config, buzScene, dtos);
+            long nioId = IdGenProvider.Instance.CreateId();
+            nioList.ForEach(m => m.NioPushId = nioId);
+
+            //MES数据入库
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            await AddToPushQueueAsync(config, buzScene, dtos, nioId);
+            await _nioPushProductioncapacityRepository.InsertRangeAsync(nioList);
+
+            trans.Complete();
         }
 
         /// <summary>

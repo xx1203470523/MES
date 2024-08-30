@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.BackgroundServices.NIO.Dtos.ERP
+﻿using Hymson.MES.BackgroundServices.NIO.Dtos.Buz;
+
+namespace Hymson.MES.BackgroundServices.NIO.Dtos.ERP
 {
     /// <summary>  
     /// 合作伙伴精益与生产能力  
@@ -9,11 +11,6 @@
         /// 合作业务（1:电池，2:电驱）  
         /// </summary>  
         public int PartnerBusiness { get; set; }
-
-        /// <summary>  
-        /// 订单号  
-        /// </summary>  
-        //public string OrderNo { get; set; }
 
         /// <summary>  
         /// 物料编码  
@@ -61,16 +58,6 @@
         public string BottleneckProcess { get; set; }
 
         /// <summary>  
-        /// 实际产量  
-        /// </summary>  
-        //public decimal ActualityOutput { get; set; }
-
-        /// <summary>  
-        /// 计划产量  
-        /// </summary>  
-        //public decimal PlanOutput { get; set; }
-
-        /// <summary>  
         /// 下线合格数量  
         /// </summary>  
         public decimal DownlineNum { get; set; }
@@ -106,23 +93,24 @@
         public decimal ProductBackUpMin { get; set; }
 
         /// <summary>  
-        /// 产品批次号  
-        /// </summary>  
-        //public string VendorProductBatch { get; set; }
-
-        /// <summary>  
-        /// 检测数量  
-        /// </summary>  
-        //public decimal ParaConfigQty { get; set; }
-
-        /// <summary>  
         /// 单位  
         /// </summary>  
         public string ParaConfigUnit { get; set; }
+    }
 
-        /// <summary>  
-        /// 停留天数  
-        /// </summary>  
-        //public decimal StayDays { get; set; }
+    /// <summary>
+    /// 推送NIO数据
+    /// </summary>
+    public class NioProductionCapacityDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public List<ProductionCapacityDto> List { get; set; } = new List<ProductionCapacityDto>();
     }
 }

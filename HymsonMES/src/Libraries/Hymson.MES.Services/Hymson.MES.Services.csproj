@@ -64,14 +64,13 @@
   <ItemGroup>
     <Folder Include="Dtos\Process\LabelTemplate\DataSource\" />
     <Folder Include="Dtos\Process\LabelTemplate\Utility\" />
-    <Folder Include="Dtos\NIO\" />
     <Folder Include="Services\Equipment\EquSpotcheckItem\" />
     <Folder Include="Services\Equipment\EquMaintenance\EquMaintenanceItem\" />
     <Folder Include="Services\Integrated\InteBusinessField\" />
+    <Folder Include="Services\NIO\NioPushProductioncapacity\" />
     <Folder Include="Services\Process\LabelTemplate\DataSource\BatchBarcode\" />
     <Folder Include="Services\Process\LabelTemplate\DataSource\ProductionBarcod\" />
     <Folder Include="Services\Process\LabelTemplate\Utility\Execute\" />
-    <Folder Include="Services\NIO\" />
     <Folder Include="Validators\NIO\" />
   </ItemGroup>
 
