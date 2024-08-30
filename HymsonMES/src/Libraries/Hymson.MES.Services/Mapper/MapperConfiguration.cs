@@ -65,6 +65,7 @@ using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Marking;
 using Hymson.MES.Data.Repositories.Marking.Query;
 using Hymson.MES.Data.Repositories.NIO.NioPushCollection.View;
+using Hymson.MES.Data.Repositories.NIO.NioPushKeySubordinate.View;
 using Hymson.MES.Data.Repositories.NIO.NioPushProductionCapacity.Query.View;
 using Hymson.MES.Data.Repositories.NIO.Query;
 using Hymson.MES.Data.Repositories.NioPushCollection.Query;
@@ -1680,6 +1681,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<NioPushProductioncapacityView, NioPushProductioncapacityDto>();
             CreateMap<NioPushProductioncapacityDto, NioPushProductioncapacityEntity>();
             CreateMap<NioPushProductioncapacitySaveDto, NioPushProductioncapacityEntity>();
+
+            CreateMap<NioPushKeySubordinatePagedQueryDto, NioPushKeySubordinatePagedQuery>();
+            CreateMap<NioPushKeySubordinateEntity, NioPushKeySubordinateDto>();
+            CreateMap<NioPushKeySubordinateView, NioPushKeySubordinateDto>();
+            CreateMap<NioPushKeySubordinateDto, NioPushKeySubordinateEntity>();
+            CreateMap<NioPushKeySubordinateSaveDto, NioPushKeySubordinateEntity>();
         }
 
         /// <summary>

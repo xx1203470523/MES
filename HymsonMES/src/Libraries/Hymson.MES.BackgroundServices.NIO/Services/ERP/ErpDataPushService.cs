@@ -81,6 +81,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
         private readonly INioPushProductioncapacityRepository _nioPushProductioncapacityRepository;
 
         /// <summary>
+        /// 仓储接口（物料及其关键下级件信息表）
+        /// </summary>
+        private readonly INioPushKeySubordinateRepository _nioPushKeySubordinateRepository;
+
+        /// <summary>
         /// 末工序
         /// </summary>
         private readonly string PRODUCRE_END = "R01OP150";
@@ -102,7 +107,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             IProcMaterialRepository procMaterialRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IERPApiClient eRPApiClient,
-            INioPushProductioncapacityRepository nioPushProductioncapacityRepository)
+            INioPushProductioncapacityRepository nioPushProductioncapacityRepository,
+            INioPushKeySubordinateRepository nioPushKeySubordinateRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _iWMSApiClient = wMSApiClient;
@@ -113,6 +119,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             _manuSfcStepRepository = manuSfcStepRepository;
             _eRPApiClient = eRPApiClient;
             _nioPushProductioncapacityRepository = nioPushProductioncapacityRepository;
+            _nioPushKeySubordinateRepository = nioPushKeySubordinateRepository;
         }
 
         /// <summary>
@@ -253,6 +260,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             string nowStr = now.ToString("yyyy-MM-dd");
 
             List<KeySubordinateDto> dtos = new List<KeySubordinateDto>();
+            List<NioPushKeySubordinateEntity> nioList = new List<NioPushKeySubordinateEntity>();
 
             IEnumerable<ProcBomDetailView> materialList = new List<ProcBomDetailView>();
             //1. 取配置中的两个生产物料
@@ -298,7 +306,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                 }
 
                 //组装数据
-                foreach(var wmsItem in wmsResult.Data)
+                foreach (var wmsItem in wmsResult.Data)
                 {
                     if(string.IsNullOrEmpty(wmsItem.SubordinateCode) == true)
                     {
@@ -353,11 +361,32 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                     }              
 
                     dtos.Add(dto);
+
+                    var tmpStr = JsonConvert.SerializeObject(dto);
+                    NioPushKeySubordinateEntity nioModel = JsonConvert.DeserializeObject<NioPushKeySubordinateEntity>(tmpStr);
+                    nioModel.Id = IdGenProvider.Instance.CreateId();
+                    nioModel.CreatedOn = HymsonClock.Now();
+                    nioModel.UpdatedOn = nioModel.CreatedOn;
+                    nioModel.CreatedBy = NIO_USER_ID;
+                    nioModel.UpdatedBy = NIO_USER_ID;
+
+                    nioList.Add(nioModel);
                 }
             }
 
             //4. 保存数据至NIO
             await AddToPushQueueAsync(config, buzScene, dtos);
+
+            long nioId = IdGenProvider.Instance.CreateId();
+            nioList.ForEach(m => m.NioPushId = nioId);
+
+            //MES数据入库
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            await AddToPushQueueAsync(config, buzScene, dtos, nioId);
+            await _nioPushKeySubordinateRepository.InsertRangeAsync(nioList);
+
+            trans.Complete();
         }
 
         /// <summary>

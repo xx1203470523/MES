@@ -26,11 +26,6 @@
         public string Date { get; set; }
 
         /// <summary>  
-        /// 关键下级件类型  
-        /// </summary>  
-        //public string SubordinateType { get; set; }
-
-        /// <summary>  
         /// 关键下级件物料编码  
         /// </summary>  
         public string SubordinateCode { get; set; }
@@ -101,13 +96,24 @@
         public decimal SubordinateDemandPlan { get; set; }
 
         /// <summary>  
-        /// 下级件来料批次号（可选）  
-        /// </summary>  
-        //public string SubordinateBatch { get; set; }
-
-        /// <summary>  
         /// 单位  
         /// </summary>  
         public string ParaConfigUnit { get; set; }
+    }
+
+    /// <summary>
+    /// 推送NIO数据
+    /// </summary>
+    public class NioKeySubordinateDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public List<KeySubordinateDto> List { get; set; } = new List<KeySubordinateDto>();
     }
 }

@@ -68,6 +68,7 @@
     <Folder Include="Services\Equipment\EquMaintenance\EquMaintenanceItem\" />
     <Folder Include="Services\Integrated\InteBusinessField\" />
     <Folder Include="Services\NIO\NioPushProductioncapacity\" />
+    <Folder Include="Services\NIO\NioPushKeySubordinate\" />
     <Folder Include="Services\Process\LabelTemplate\DataSource\BatchBarcode\" />
     <Folder Include="Services\Process\LabelTemplate\DataSource\ProductionBarcod\" />
     <Folder Include="Services\Process\LabelTemplate\Utility\Execute\" />
