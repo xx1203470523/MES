@@ -1,5 +1,6 @@
 ﻿using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -153,5 +154,17 @@ namespace Hymson.MES.Api.Controllers
 
         }
 
+        /// <summary>
+        /// MES更新内容
+        /// </summary>
+        /// <returns></returns>
+        [Route("MesUpdateContent")]
+        [HttpGet]
+        [AllowAnonymous]
+        public string MesUpdateContentApi()
+        {
+            return MesUpdateContent.GetMesUpdateContent();
+
+        }
     }
 }

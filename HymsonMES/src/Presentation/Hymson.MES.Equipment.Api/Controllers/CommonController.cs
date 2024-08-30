@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Hymson.MES.Core.Constants.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Concurrent;
@@ -94,5 +95,16 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         }
 
+        /// <summary>
+        /// MES更新内容
+        /// </summary>
+        /// <returns></returns>
+        [Route("MesUpdateContent")]
+        [HttpGet]
+        [AllowAnonymous]
+        public string MesUpdateContentApi()
+        {
+            return MesUpdateContent.GetMesUpdateContent();
+        }
     }
 }
