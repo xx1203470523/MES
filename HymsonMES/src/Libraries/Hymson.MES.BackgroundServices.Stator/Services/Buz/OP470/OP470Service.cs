@@ -6,17 +6,17 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public partial class OP050Service : IOP050Service
+    public partial class OP470Service : IOP470Service
     {
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<OP050Service> _logger;
+        private readonly ILogger<OP470Service> _logger;
 
         /// <summary>
         /// 仓储接口（工序）
         /// </summary>
-        private readonly IOPRepository<OP050> _opRepository;
+        private readonly IOPRepository<OP470> _opRepository;
 
         /// <summary>
         /// 服务接口（基础）
@@ -28,7 +28,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// </summary>
         public readonly IWaterMarkService _waterMarkService;
 
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -36,8 +35,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="opRepository"></param>
         /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
-        public OP050Service(ILogger<OP050Service> logger,
-            IOPRepository<OP050> opRepository,
+        public OP470Service(ILogger<OP470Service> logger,
+            IOPRepository<OP470> opRepository,
             IMainService mainService,
             IWaterMarkService waterMarkService)
         {
@@ -47,7 +46,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             _waterMarkService = waterMarkService;
         }
 
-
         /// <summary>
         /// 执行统计
         /// </summary>
@@ -55,7 +53,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <returns></returns>
         public async Task<int> ExecuteAsync(int limitCount)
         {
-            var producreCode = $"{typeof(OP050).Name}";
+            var producreCode = $"{typeof(OP470).Name}";
             var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
@@ -72,7 +70,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             }
 
             // 获取转换数据（基础数据）
-            var summaryBo = await _mainService.ConvertDataTableWireAsync(dataTable, producreCode, _parameterCodes);
+            var summaryBo = await _mainService.ConvertDataTableOuterAsync(dataTable, producreCode, _parameterCodes);
 
             // 保存数据
             var waterLevel = dataTable.AsEnumerable().Select(s => s["index"].ParseToLong());
@@ -84,61 +82,34 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public partial class OP050Service
+    public partial class OP470Service
     {
         /// <summary>
         /// 参数编码集合
         /// </summary>
         private static readonly List<string> _parameterCodes = new()
         {
-            "pressCount",
-            "CrimpingPosition01",
-            "CrimpingPressDistance01",
-            "CrimpingPressLoad01",
-            "CrimpingPosition02",
-            "CrimpingPressDistance02",
-            "CrimpingPressLoad02",
-            "CrimpingPosition03",
-            "CrimpingPressDistance03",
-            "CrimpingPressLoad03",
-            "CrimpingPosition04",
-            "CrimpingPressDistance04",
-            "CrimpingPressLoad04",
-            "CrimpingPosition05",
-            "CrimpingPressDistance05",
-            "CrimpingPressLoad05",
-            "CrimpingPosition06",
-            "CrimpingPressDistance06",
-            "CrimpingPressLoad06",
-            "CrimpingPosition07",
-            "CrimpingPressDistance07",
-            "CrimpingPressLoad07",
-            "CrimpingPosition08",
-            "CrimpingPressDistance08",
-            "CrimpingPressLoad08",
-            "CrimpingPosition09",
-            "CrimpingPressDistance09",
-            "CrimpingPressLoad09",
-            "CrimpingPosition10",
-            "CrimpingPressDistance10",
-            "CrimpingPressLoad10",
-            /*
-            "CrimpingPosition11",
-            "CrimpingPressDistance11",
-            "CrimpingPressLoad11",
-            "CrimpingPosition12",
-            "CrimpingPressDistance12",
-            "CrimpingPressLoad12",
-            "CrimpingPosition13",
-            "CrimpingPressDistance13",
-            "CrimpingPressLoad13",
-            "CrimpingPosition14",
-            "CrimpingPressDistance14",
-            "CrimpingPressLoad14",
-            "CrimpingPosition15",
-            "CrimpingPressDistance15",
-            "CrimpingPressLoad15"
-            */
+            "LineResistantAB",
+            "LineResistantBC",
+            "LineResistantAC",
+            "NCTResistant",
+            "LineInductanceAB",
+            "LineInductanceBC",
+            "LineInductanceAC",
+            "InsultionResistantWD_LAMI",
+            "InsultionResistantWD_NCT",
+            "InsultionResistantNTC_LAMI",
+            "HiPotTestWD_LAMI",
+            "HiPotTestWD_NTC",
+            "SurgeTestAreaAB",
+            "SurgeTestAreaBC",
+            "SurgeTestAreaAC",
+            "SurgeTestdifferenceAB",
+            "SurgeTestdifferenceBC",
+            "SurgeTestdifferenceAC",
+            "Unbalanceupperlimit",
+            "UnbalanceLowerlimit",
+            "UnbalanceAverage"
         };
 
     }

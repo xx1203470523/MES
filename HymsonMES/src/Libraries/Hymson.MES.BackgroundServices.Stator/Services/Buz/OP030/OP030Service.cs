@@ -1,9 +1,4 @@
-﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Extension;
-using Hymson.Snowflake;
-using Hymson.Utils;
+﻿using Hymson.Utils;
 using System.Data;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
