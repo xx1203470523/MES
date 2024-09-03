@@ -20,6 +20,11 @@ namespace Hymson.MES.Core.Constants.Common
             return V_20240830_0919;
         }
 
+        public static string V_20240903_1057 = $@"
+            版本：V_20240830_0919
+            内容：SYS.API更新
+        ";
+
         public static string V_20240830_0919 = $@"
             版本：V_20240830_0919
             内容：第一次新增该接口
