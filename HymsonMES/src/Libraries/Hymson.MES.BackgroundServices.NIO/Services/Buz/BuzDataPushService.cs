@@ -665,7 +665,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             {
                 _logger.LogError($"业务数据（材料清单）RotorMaterialAsync发生异常：{ex}。异常:{ex.StackTrace}");
             }
-            //定子线材料清单
+
+            ////定子线材料清单
+            //try
+            //{
+            //    await StatorMaterialAsync();
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError($"业务数据（材料清单）StatorMaterialAsync发生异常：{ex}。异常:{ex.StackTrace}");
+            //}
         }
 
         /// <summary>
@@ -746,6 +755,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
             //查询上料物料信息
             List<long> upMatIdList = cirSfcList.Select(m => m.CirculationProductId).Distinct().ToList();
+            upMatIdList.AddRange(cirSfcList.Select(m => m.ProductId).Distinct().ToList());
             var upMaterialList = await _procMaterialRepository.GetByIdsAsync(upMatIdList);
 
             var dtos = new List<MaterialDto> { };

@@ -45,4 +45,20 @@
         /// </summary>  
         //public decimal? LeadTime { get; set; } // 使用Nullable<decimal>（即decimal?）来允许空值  
     }
+
+    /// <summary>
+    /// 推送NIO数据
+    /// </summary>
+    public class NioActualDeliveryDto
+    {
+        /// <summary>
+        /// 标识码
+        /// </summary>
+        public string SchemaCode { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public List<ActualDeliveryDto> List { get; set; } = new List<ActualDeliveryDto>();
+    }
 }

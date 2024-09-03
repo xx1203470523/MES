@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.BackgroundServices.NIO.Utils
+namespace Hymson.MES.CoreServices.Helper
 {
     /// <summary>
     /// nio帮助类

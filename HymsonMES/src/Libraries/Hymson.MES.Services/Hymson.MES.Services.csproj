@@ -69,6 +69,7 @@
     <Folder Include="Services\Integrated\InteBusinessField\" />
     <Folder Include="Services\NIO\NioPushProductioncapacity\" />
     <Folder Include="Services\NIO\NioPushKeySubordinate\" />
+    <Folder Include="Services\NIO\NioPushActualDelivery\" />
     <Folder Include="Services\Process\LabelTemplate\DataSource\BatchBarcode\" />
     <Folder Include="Services\Process\LabelTemplate\DataSource\ProductionBarcod\" />
     <Folder Include="Services\Process\LabelTemplate\Utility\Execute\" />

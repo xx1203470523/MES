@@ -154,17 +154,21 @@ namespace Hymson.MES.Data.Repositories.NIO
             if(string.IsNullOrEmpty(pagedQuery.MaterialName) == false)
             {
                 pagedQuery.MaterialName = $"%{pagedQuery.MaterialName}%";
-                sqlBuilder.Where(" MaterialName like @MaterialName ");
+                sqlBuilder.Where(" t1.MaterialName like @MaterialName ");
             }
             if(string.IsNullOrEmpty(pagedQuery.MaterialCode) == false)
             {
                 pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
-                sqlBuilder.Where(" MaterialCode like @MaterialCode ");
+                sqlBuilder.Where(" t1.MaterialCode like @MaterialCode ");
             }
             if(string.IsNullOrEmpty(pagedQuery.Date) == false)
             {
                 pagedQuery.Date = $"%{pagedQuery.Date}%";
-                sqlBuilder.Where(" Date like @Date ");
+                sqlBuilder.Where(" t1.Date like @Date ");
+            }
+            if(pagedQuery.Status != null)
+            {
+                sqlBuilder.Where(" t2.Status = @Status ");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;

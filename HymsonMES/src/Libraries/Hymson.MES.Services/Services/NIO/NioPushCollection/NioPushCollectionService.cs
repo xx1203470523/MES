@@ -119,6 +119,12 @@ namespace Hymson.MES.Services.Services.NioPushCollection
             // 验证DTO
             //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
+            var dbModel = await _nioPushRepository.GetByIdAsync(saveDto.NioPushId);
+            if (dbModel.Status == Core.Enums.Plan.PushStatusEnum.Success)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17773));
+            }
+
             Core.Enums.TrueOrFalseEnum isOk = Core.Enums.TrueOrFalseEnum.Yes;
             //判断参数是否合格
             if (saveDto.DecimalValue != null)

@@ -86,6 +86,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
         private readonly INioPushKeySubordinateRepository _nioPushKeySubordinateRepository;
 
         /// <summary>
+        /// 仓储接口（物料发货信息表）
+        /// </summary>
+        private readonly INioPushActualDeliveryRepository _nioPushActualDeliveryRepository;
+
+        /// <summary>
         /// 末工序
         /// </summary>
         private readonly string PRODUCRE_END = "R01OP150";
@@ -108,7 +113,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             IManuSfcStepRepository manuSfcStepRepository,
             IERPApiClient eRPApiClient,
             INioPushProductioncapacityRepository nioPushProductioncapacityRepository,
-            INioPushKeySubordinateRepository nioPushKeySubordinateRepository)
+            INioPushKeySubordinateRepository nioPushKeySubordinateRepository,
+            INioPushActualDeliveryRepository nioPushActualDeliveryRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _iWMSApiClient = wMSApiClient;
@@ -120,6 +126,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             _eRPApiClient = eRPApiClient;
             _nioPushProductioncapacityRepository = nioPushProductioncapacityRepository;
             _nioPushKeySubordinateRepository = nioPushKeySubordinateRepository;
+            _nioPushActualDeliveryRepository = nioPushActualDeliveryRepository;
         }
 
         /// <summary>
@@ -375,7 +382,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             }
 
             //4. 保存数据至NIO
-            await AddToPushQueueAsync(config, buzScene, dtos);
+            //await AddToPushQueueAsync(config, buzScene, dtos);
 
             long nioId = IdGenProvider.Instance.CreateId();
             nioList.ForEach(m => m.NioPushId = nioId);
@@ -423,8 +430,9 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             //    return;
             //}
             List<ActualDeliveryDto> dtos = new List<ActualDeliveryDto>();
+            List<NioPushActualDeliveryEntity> nioList = new List<NioPushActualDeliveryEntity>();
             //List<string> matList = configList.Select(m => m.VendorProductCode).Distinct().ToList();
-            foreach(var item in configList)
+            foreach (var item in configList)
             {
                 ActualDeliveryDto dto = new ActualDeliveryDto();
                 dto.MaterialCode = item.VendorProductCode;
@@ -459,13 +467,35 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                 }
                 if(dto.ShippedQty == 0)
                 {
-                    continue;
+                    //continue;
                 }
 
                 dtos.Add(dto);
+
+                var tmpStr = JsonConvert.SerializeObject(dto);
+                NioPushActualDeliveryEntity nioModel = JsonConvert.DeserializeObject<NioPushActualDeliveryEntity>(tmpStr);
+                nioModel.Id = IdGenProvider.Instance.CreateId();
+                nioModel.CreatedOn = HymsonClock.Now();
+                nioModel.UpdatedOn = nioModel.CreatedOn;
+                nioModel.CreatedBy = NIO_USER_ID;
+                nioModel.UpdatedBy = NIO_USER_ID;
+
+                nioList.Add(nioModel);
             }
 
-            await AddToPushQueueAsync(config, buzScene, dtos);
+            //4. 保存数据至NIO
+            //await AddToPushQueueAsync(config, buzScene, dtos);
+
+            long nioId = IdGenProvider.Instance.CreateId();
+            nioList.ForEach(m => m.NioPushId = nioId);
+
+            //MES数据入库
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            await AddToPushQueueAsync(config, buzScene, dtos, nioId);
+            await _nioPushActualDeliveryRepository.InsertRangeAsync(nioList);
+
+            trans.Complete();
         }
 
         /// <summary>

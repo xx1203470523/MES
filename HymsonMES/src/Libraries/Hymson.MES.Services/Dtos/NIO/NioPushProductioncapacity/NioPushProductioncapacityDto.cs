@@ -290,6 +290,11 @@ namespace Hymson.MES.Services.Dtos.NIO
         /// 日期（格式为yyyy-MM-dd HH:mm:ss）
         /// </summary>
         public string? Date { get; set; }
+
+        /// <summary>
+        /// 推送状态;0：无需推送；1：待推送；2：已推送；3：推送失败；
+        /// </summary>
+        public PushStatusEnum? Status { get; set; }
     }
 
 }

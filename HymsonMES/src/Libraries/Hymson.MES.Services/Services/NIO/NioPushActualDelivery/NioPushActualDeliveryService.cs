@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.NIO;
+using Hymson.MES.CoreServices.Helper;
 using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.NIO;
@@ -17,9 +18,9 @@ using Hymson.Utils;
 namespace Hymson.MES.Services.Services.NIO
 {
     /// <summary>
-    /// 服务（物料及其关键下级件信息表） 
+    /// 服务（物料发货信息表） 
     /// </summary>
-    public class NioPushKeySubordinateService : INioPushKeySubordinateService
+    public class NioPushActualDeliveryService : INioPushActualDeliveryService
     {
         /// <summary>
         /// 当前用户
@@ -31,9 +32,9 @@ namespace Hymson.MES.Services.Services.NIO
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 仓储接口（物料及其关键下级件信息表）
+        /// 仓储接口（物料发货信息表）
         /// </summary>
-        private readonly INioPushKeySubordinateRepository _nioPushKeySubordinateRepository;
+        private readonly INioPushActualDeliveryRepository _nioPushActualDeliveryRepository;
 
         /// <summary>
         /// 
@@ -43,13 +44,13 @@ namespace Hymson.MES.Services.Services.NIO
         /// <summary>
         /// 构造函数
         /// </summary>
-        public NioPushKeySubordinateService(ICurrentUser currentUser, ICurrentSite currentSite,
-            INioPushKeySubordinateRepository nioPushKeySubordinateRepository,
+        public NioPushActualDeliveryService(ICurrentUser currentUser, ICurrentSite currentSite,
+            INioPushActualDeliveryRepository nioPushActualDeliveryRepository,
             INioPushRepository nioPushRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _nioPushKeySubordinateRepository = nioPushKeySubordinateRepository;
+            _nioPushActualDeliveryRepository = nioPushActualDeliveryRepository;
             _nioPushRepository = nioPushRepository;
         }
 
@@ -59,7 +60,7 @@ namespace Hymson.MES.Services.Services.NIO
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(NioPushKeySubordinateSaveDto saveDto)
+        public async Task<int> CreateAsync(NioPushActualDeliverySaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -69,7 +70,7 @@ namespace Hymson.MES.Services.Services.NIO
             var updatedOn = HymsonClock.Now();
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<NioPushKeySubordinateEntity>();
+            var entity = saveDto.ToEntity<NioPushActualDeliveryEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
@@ -78,7 +79,7 @@ namespace Hymson.MES.Services.Services.NIO
             //entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 保存
-            return await _nioPushKeySubordinateRepository.InsertAsync(entity);
+            return await _nioPushActualDeliveryRepository.InsertAsync(entity);
         }
 
         /// <summary>
@@ -86,23 +87,26 @@ namespace Hymson.MES.Services.Services.NIO
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(NioPushKeySubordinateSaveDto saveDto)
+        public async Task<int> ModifyAsync(NioPushActualDeliverySaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             var dbModel = await _nioPushRepository.GetByIdAsync(saveDto.NioPushId);
-            if (dbModel.Status == Core.Enums.Plan.PushStatusEnum.Success)
+            if(dbModel.Status == Core.Enums.Plan.PushStatusEnum.Success)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17773));
             }
 
+            DateTime date = Convert.ToDateTime(saveDto.Date);
+            saveDto.ActualDeliveryTime = NioHelper.GetTimestamp(date);
+
             // DTO转换实体
-            var entity = saveDto.ToEntity<NioPushKeySubordinateEntity>();
+            var entity = saveDto.ToEntity<NioPushActualDeliveryEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
-            return await _nioPushKeySubordinateRepository.UpdateAsync(entity);
+            return await _nioPushActualDeliveryRepository.UpdateAsync(entity);
         }
 
         /// <summary>
@@ -112,7 +116,7 @@ namespace Hymson.MES.Services.Services.NIO
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            return await _nioPushKeySubordinateRepository.DeleteAsync(id);
+            return await _nioPushActualDeliveryRepository.DeleteAsync(id);
         }
 
         /// <summary>
@@ -122,7 +126,7 @@ namespace Hymson.MES.Services.Services.NIO
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
-            return await _nioPushKeySubordinateRepository.DeletesAsync(new DeleteCommand
+            return await _nioPushActualDeliveryRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
                 DeleteOn = HymsonClock.Now(),
@@ -135,12 +139,12 @@ namespace Hymson.MES.Services.Services.NIO
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<NioPushKeySubordinateDto?> QueryByIdAsync(long id) 
+        public async Task<NioPushActualDeliveryDto?> QueryByIdAsync(long id) 
         {
-           var nioPushKeySubordinateEntity = await _nioPushKeySubordinateRepository.GetByIdAsync(id);
-           if (nioPushKeySubordinateEntity == null) return null;
+           var nioPushActualDeliveryEntity = await _nioPushActualDeliveryRepository.GetByIdAsync(id);
+           if (nioPushActualDeliveryEntity == null) return null;
            
-           return nioPushKeySubordinateEntity.ToModel<NioPushKeySubordinateDto>();
+           return nioPushActualDeliveryEntity.ToModel<NioPushActualDeliveryDto>();
         }
 
         /// <summary>
@@ -148,15 +152,15 @@ namespace Hymson.MES.Services.Services.NIO
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<NioPushKeySubordinateDto>> GetPagedListAsync(NioPushKeySubordinatePagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<NioPushActualDeliveryDto>> GetPagedListAsync(NioPushActualDeliveryPagedQueryDto pagedQueryDto)
         {
-            var pagedQuery = pagedQueryDto.ToQuery<NioPushKeySubordinatePagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _nioPushKeySubordinateRepository.GetPagedListAsync(pagedQuery);
+            var pagedQuery = pagedQueryDto.ToQuery<NioPushActualDeliveryPagedQuery>();
+            //pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _nioPushActualDeliveryRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<NioPushKeySubordinateDto>());
-            return new PagedInfo<NioPushKeySubordinateDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<NioPushActualDeliveryDto>());
+            return new PagedInfo<NioPushActualDeliveryDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
     }

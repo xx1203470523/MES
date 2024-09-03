@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.NIO;
+using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.NIO;
 using Hymson.MES.Data.Repositories.NIO.Query;
@@ -40,17 +41,21 @@ namespace Hymson.MES.Services.Services.NIO
         private readonly INioPushProductioncapacityRepository _nioPushProductioncapacityRepository;
 
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly INioPushRepository _nioPushRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="nioPushProductioncapacityRepository"></param>
         public NioPushProductioncapacityService(ICurrentUser currentUser, ICurrentSite currentSite, 
-            INioPushProductioncapacityRepository nioPushProductioncapacityRepository)
+            INioPushProductioncapacityRepository nioPushProductioncapacityRepository,
+            INioPushRepository nioPushRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _nioPushProductioncapacityRepository = nioPushProductioncapacityRepository;
+            _nioPushRepository = nioPushRepository;
         }
 
 
@@ -108,7 +113,13 @@ namespace Hymson.MES.Services.Services.NIO
                 throw new CustomerValidationException(nameof(ErrorCode.MES17772));
             }
 
-             // 验证DTO
+            var dbModel = await _nioPushRepository.GetByIdAsync(saveDto.NioPushId);
+            if (dbModel.Status == Core.Enums.Plan.PushStatusEnum.Success)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17773));
+            }
+
+            // 验证DTO
             //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体

@@ -148,6 +148,36 @@ namespace Hymson.MES.Data.Repositories.NIO
             sqlBuilder.Where("t1.IsDeleted = 0");
             sqlBuilder.InnerJoin("nio_push t2 on t1.NioPushId = t2.Id and t2.IsDeleted = 0");
 
+            if (string.IsNullOrEmpty(pagedQuery.MaterialName) == false)
+            {
+                pagedQuery.MaterialName = $"%{pagedQuery.MaterialName}%";
+                sqlBuilder.Where(" t1.MaterialName like @MaterialName ");
+            }
+            if (string.IsNullOrEmpty(pagedQuery.MaterialCode) == false)
+            {
+                pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" t1.MaterialCode like @MaterialCode ");
+            }
+            if (string.IsNullOrEmpty(pagedQuery.Date) == false)
+            {
+                pagedQuery.Date = $"%{pagedQuery.Date}%";
+                sqlBuilder.Where(" t1.Date like @Date ");
+            }
+            if (pagedQuery.Status != null)
+            {
+                sqlBuilder.Where(" t2.Status = @Status ");
+            }
+            if (string.IsNullOrEmpty(pagedQuery.SubordinateName) == false)
+            {
+                pagedQuery.SubordinateName = $"%{pagedQuery.SubordinateName}%";
+                sqlBuilder.Where(" t1.SubordinateName like @SubordinateName ");
+            }
+            if (string.IsNullOrEmpty(pagedQuery.SubordinateCode) == false)
+            {
+                pagedQuery.SubordinateCode = $"%{pagedQuery.SubordinateCode}%";
+                sqlBuilder.Where(" t1.SubordinateCode like @SubordinateCode ");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });

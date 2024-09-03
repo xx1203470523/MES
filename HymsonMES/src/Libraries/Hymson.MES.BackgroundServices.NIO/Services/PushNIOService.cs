@@ -24,6 +24,7 @@ using Hymson.MES.BackgroundServices.NIO.Dtos.Master;
 using Hymson.MES.Data.Repositories.NioPushCollection;
 using Hymson.MES.BackgroundServices.NIO.Dtos.ERP;
 using Hymson.MES.Data.Repositories.NIO;
+using RestSharp;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -63,6 +64,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly INioPushProductioncapacityRepository _nioPushProductioncapacityRepository;
 
         /// <summary>
+        /// NIO
+        /// </summary>
+        private readonly INioPushKeySubordinateRepository _nioPushKeySubordinateRepository;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly INioPushActualDeliveryRepository _nioPushActualDeliveryRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="waterMarkService"></param>
@@ -73,7 +84,9 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             INioPushRepository nioPushRepository,
             ISysConfigRepository sysConfigRepository,
             INioPushCollectionRepository nioPushCollectionRepository,
-            INioPushProductioncapacityRepository nioPushProductioncapacityRepository)
+            INioPushProductioncapacityRepository nioPushProductioncapacityRepository,
+            INioPushKeySubordinateRepository nioPushKeySubordinateRepository,
+            INioPushActualDeliveryRepository nioPushActualDeliveryRepository)
         {
             _waterMarkService = waterMarkService;
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -81,6 +94,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _sysConfigRepository = sysConfigRepository;
             _nioPushCollectionRepository = nioPushCollectionRepository;
             _nioPushProductioncapacityRepository = nioPushProductioncapacityRepository;
+            _nioPushKeySubordinateRepository = nioPushKeySubordinateRepository;
+            _nioPushActualDeliveryRepository = nioPushActualDeliveryRepository;
         }
 
         /// <summary>
@@ -382,27 +397,42 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                         {
                             pushContent = await GetNioStockInfoData(data.Id, data.SchemaCode);
                         }
+                        else if(data.BuzScene == BuzSceneEnum.ERP_KeySubordinate || data.BuzScene == BuzSceneEnum.ERP_KeySubordinate_Summary)
+                        {
+                            pushContent = await GetNioKeyItemInfoData(data.Id, data.SchemaCode);
+                        }
+                        else if(data.BuzScene == BuzSceneEnum.ERP_ActualDelivery || data.BuzScene == BuzSceneEnum.ERP_ActualDelivery_Summary)
+                        {
+                            pushContent = await GetNioActualDeliveryData(data.Id, data.SchemaCode);
+                        }
                         else
                         {
                             //这里将数据序列化在反序列化，更新时间戳字段
                             pushContent = NioUpdateTime(data.BuzScene, data.Content);
                         }
 
-                        // 推送
-                        var restResponse = await config.ExecuteAsync(pushContent, host, hostsuffix);
-
-                        // 处理推送结果
-                        data.Status = PushStatusEnum.Failure;
-                        if (restResponse.IsSuccessStatusCode)
+                        if(string.IsNullOrEmpty(pushContent) == false)
                         {
-                            var responseContent = restResponse.Content?.ToDeserializeLower<NIOResponseDto>();
-                            if (responseContent != null && responseContent.NexusOpenapi.Code == "QM-000000")
-                            {
-                                data.Status = PushStatusEnum.Success;
-                            }
-                        }
+                            var restResponse = await config.ExecuteAsync(pushContent, host, hostsuffix);
 
-                        data.Result = restResponse.Content;
+                            // 处理推送结果
+                            data.Status = PushStatusEnum.Failure;
+                            if (restResponse.IsSuccessStatusCode)
+                            {
+                                var responseContent = restResponse.Content?.ToDeserializeLower<NIOResponseDto>();
+                                if (responseContent != null && responseContent.NexusOpenapi.Code == "QM-000000")
+                                {
+                                    data.Status = PushStatusEnum.Success;
+                                }
+                            }
+
+                            data.Result = restResponse.Content;
+                        }
+                        else
+                        {
+                            data.Status = PushStatusEnum.Success;
+                            data.Result = "数据为0，无需推送";
+                        }
                     }
                     else
                     {
@@ -682,6 +712,51 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             string tmpPushContext = JsonConvert.SerializeObject(dbList);
             List<ProductionCapacityDto> pushList = JsonConvert.DeserializeObject<List<ProductionCapacityDto>>(tmpPushContext);
             NioProductionCapacityDto nioSch = new NioProductionCapacityDto() { List = pushList };
+            nioSch.SchemaCode = schemaCode;
+
+            return JsonConvert.SerializeObject(nioSch, settings);
+        }
+
+        /// <summary>
+        /// 获取NIO物料及其关键下级件
+        /// </summary>
+        /// <param name="nioPushId"></param>
+        /// <param name="schemaCode"></param>
+        /// <returns></returns>
+        private async Task<string> GetNioKeyItemInfoData(long nioPushId, string schemaCode)
+        {
+            //获取对应的数据
+            var dbList = await _nioPushKeySubordinateRepository.GetByPushIdAsync(nioPushId);
+            //获取配置
+            JsonSerializerSettings settings = NioHelper.GetJsonSerializer();
+            string tmpPushContext = JsonConvert.SerializeObject(dbList);
+            List<KeySubordinateDto> pushList = JsonConvert.DeserializeObject<List<KeySubordinateDto>>(tmpPushContext);
+            NioKeySubordinateDto nioSch = new NioKeySubordinateDto() { List = pushList };
+            nioSch.SchemaCode = schemaCode;
+
+            return JsonConvert.SerializeObject(nioSch, settings);
+        }
+
+        /// <summary>
+        /// 获取NIO物料发货信息
+        /// </summary>
+        /// <param name="nioPushId"></param>
+        /// <param name="schemaCode"></param>
+        /// <returns></returns>
+        private async Task<string> GetNioActualDeliveryData(long nioPushId, string schemaCode)
+        {
+            //获取对应的数据
+            var dbList = await _nioPushActualDeliveryRepository.GetByPushIdAsync(nioPushId);
+            dbList = dbList.Where(m => m.ShippedQty > 0).ToList();
+            if(dbList == null || dbList.Count() == 0)
+            {
+                return "";
+            }
+            //获取配置
+            JsonSerializerSettings settings = NioHelper.GetJsonSerializer();
+            string tmpPushContext = JsonConvert.SerializeObject(dbList);
+            List<ActualDeliveryDto> pushList = JsonConvert.DeserializeObject<List<ActualDeliveryDto>>(tmpPushContext);
+            NioActualDeliveryDto nioSch = new NioActualDeliveryDto() { List = pushList };
             nioSch.SchemaCode = schemaCode;
 
             return JsonConvert.SerializeObject(nioSch, settings);
