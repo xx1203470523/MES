@@ -17,11 +17,11 @@ namespace Hymson.MES.Core.Constants.Common
         /// <returns></returns>
         public static string GetMesUpdateContent()
         {
-            return V_20240830_0919;
+            return V_20240903_1057;
         }
 
         public static string V_20240903_1057 = $@"
-            版本：V_20240830_0919
+            版本：V_20240903_1057
             内容：SYS.API更新
         ";
 
