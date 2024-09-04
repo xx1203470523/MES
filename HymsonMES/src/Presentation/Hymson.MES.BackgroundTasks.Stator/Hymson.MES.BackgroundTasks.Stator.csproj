@@ -72,7 +72,7 @@
 
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.21" />
+		<PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.4" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
 		<PackageReference Include="MySql.Data" Version="8.0.32" />
 		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.4.0" />
