@@ -112,7 +112,20 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             });
             if (waitPushEntities == null || !waitPushEntities.Any()) return default;
 
-            return await ExecuteAsync(limitCount, waitPushEntities);
+            List<Task<int>> tasks = new();
+
+            int maxNum = 30;
+            int batchNum = limitCount / maxNum + 1;
+            for (int i = 0;i < batchNum; ++i)
+            {
+                var curList = waitPushEntities.Skip(i * maxNum).Take(maxNum);
+                tasks.Add(ExecuteAsync(limitCount, curList));
+            }
+            var rowArray = await Task.WhenAll(tasks);
+
+            //return await ExecuteAsync(limitCount, waitPushEntities);
+
+            return 0;
 
             // 查询全部开关配置
             var configEntities = await _nioPushSwitchRepository.GetEntitiesAsync(new NioPushSwitchQuery { });
