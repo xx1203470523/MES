@@ -159,7 +159,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             string dateStr = HymsonClock.Now().ToString("yyyyMMdd");
             string serialNumKey = $"DBOX{dateStr}";
-            int curKeyNum = await _sequenceService.GetCurrentValueAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, serialNumKey);
+            int curKeyNum = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, serialNumKey);
             if (curKeyNum == 0)
             {
                 ++curKeyNum;
