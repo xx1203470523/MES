@@ -1513,7 +1513,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 var manuProductReceiptDetails = await _manuProductReceiptOrderDetailRepository.GetEntitiesWithoutCancelAsync(new QueryManuProductReceiptOrderDetail
                 {
                     SFCs = request.Items.Select(m => m.Sfc),
-                    SiteId = _currentSite.SiteId ?? 0
+                    SiteId = _currentSite.SiteId ?? 0,
+                    WorkOrderId = planWorkOrderEntity.Id
                 });
 
                 if (manuProductReceiptDetails.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17754));
