@@ -87,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// ERP订单
         /// </summary>
-        public string WorkPlanCode { get; set; }
+        public string ?WorkPlanCode { get; set; }
 
         /// <summary>
         /// MES工单

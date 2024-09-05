@@ -748,6 +748,29 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 获取马威NIO工单数量
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="num"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<OrderQtyMavelView>> GetWorkOrderQtyMavelAsync(long siteId, long num = 20)
+        {
+            string sql = $@"
+                select t1.OrderCode ,t1.Qty,t2.MaterialCode ,t2.MaterialName ,t1.UpdatedOn  ,t1.CreatedOn  
+                from plan_work_order t1
+                inner join proc_material t2 on t1.ProductId = t2.Id and t2.IsDeleted = 0
+                left join nio_order_qty t3 on t1.OrderCode = t3.OrderCode -- and t1.Qty = t3.Qty 
+                where t1.IsDeleted = 0
+                and t1.SiteId = {siteId}
+                and (t3.Qty is null or t3.Qty <> t1.Qty )
+                limit 0,{num}
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<OrderQtyMavelView>(sql);
+        }
+
+        /// <summary>
         /// 更新工单完成数量
         /// </summary>
         /// <param name="planWorkOrderEntitys"></param>

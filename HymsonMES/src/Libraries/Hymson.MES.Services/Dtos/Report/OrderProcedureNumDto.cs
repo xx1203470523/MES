@@ -14,7 +14,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// ERP订单
         /// </summary>
-        public string WorkPlanCode { get; set; }
+        public string ?WorkPlanCode { get; set; }
 
         /// <summary>
         /// MES工单

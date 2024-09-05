@@ -293,6 +293,14 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         Task<PlanWorkOrderEntity?> GetOrderByMaterialCodeAsync(PlanWorkOrderMaterialQuery query);
 
+        /// <summary>
+        /// 获取工单和数量
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="num"></param>
+        /// <returns></returns>
+        Task<IEnumerable<OrderQtyMavelView>> GetWorkOrderQtyMavelAsync(long siteId, long num);
+
         #endregion
     }
 }
