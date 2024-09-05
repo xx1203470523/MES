@@ -2326,6 +2326,7 @@
         public const string MES17521 = "装箱数量不能大于箱体容量{BoxNum}";
         public const string MES17522 = "装箱数量不能和已有数据不一致，当前容量：{BoxNum1}，已经数据容量{BoxNum2}";
         public const string MES17523 = "成品码{sfc}已经装箱到箱体{BoxCode}";
+        public const string MES17524 = "成品码箱体码不能都为空！";
 
         #endregion
 

@@ -86,6 +86,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17520));
             }
+            saveDto.BoxCode = saveDto.BoxCode.ToUpper();
+            saveDto.ProductCode = saveDto.ProductCode.ToUpper();
             //查询箱体码已经装箱数量，并且判断数量
             var statorList = await _manuStatorPackListRepository.GetByBoxcodeAsync(saveDto.BoxCode);
             if(statorList != null && statorList.Count() > 0)
@@ -140,7 +142,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // DTO转换实体
             var entity = saveDto.ToEntity<ManuStatorPackListEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.QualStatus = type.ToString();
+            entity.QualStatus = type.GetDescription();
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
@@ -231,6 +233,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<PagedInfo<ManuStatorPackListDto>> GetPagedListAsync(ManuStatorPackListPagedQueryDto pagedQueryDto)
         {
+            if(string.IsNullOrEmpty(pagedQueryDto.ProductCode) == true && string.IsNullOrEmpty(pagedQueryDto.BoxCode) == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17524));
+            }
+
             var pagedQuery = pagedQueryDto.ToQuery<ManuStatorPackListPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             pagedQuery.PageSize = 10000;
@@ -240,6 +247,5 @@ namespace Hymson.MES.Services.Services.Manufacture
             var dtos = pagedInfo.Data.Select(s => s.ToModel<ManuStatorPackListDto>());
             return new PagedInfo<ManuStatorPackListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
-
     }
 }
