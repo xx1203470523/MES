@@ -144,4 +144,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string? ProductCode { get; set; }
     }
 
+    /// <summary>
+    /// 打印
+    /// </summary>
+    public record ManuStatorPackPrintDto
+    {
+        /// <summary>
+        /// 箱体码
+        /// </summary>
+        public string? BoxCode { get; set; }
+    }
 }

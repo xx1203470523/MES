@@ -61,6 +61,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 打印箱体码
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("print")]
+        public async Task<int> PrintAsync(ManuStatorPackPrintDto parame)
+        {
+            return 0;
+        }
+
+        /// <summary>
         /// 更新（定子装箱记录表）
         /// </summary>
         /// <param name="saveDto"></param>
