@@ -703,7 +703,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //将列表转为字符串
             string tmpPushContext = JsonConvert.SerializeObject(dbList);
             List<CollectionDto> pushList = JsonConvert.DeserializeObject<List<CollectionDto>>(tmpPushContext);
-            pushList.ForEach(m => m.UpdateTime = timestmap);
+            //pushList.ForEach(m => m.UpdateTime = timestmap);
             NioCollectionDto nioSch = new NioCollectionDto() { List = pushList };
             nioSch.SchemaCode = schemaCode;
 
