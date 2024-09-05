@@ -1488,7 +1488,17 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuReturnOrderPagedQueryDto, ManuReturnOrderPagedQuery>();
             CreateMap<ManuReturnOrderEntity, ManuReturnOrderDto>();
             CreateMap<ManuReturnOrderDetailEntity, ManuReturnOrderDetailDto>();
-            
+
+            #endregion
+
+            #region ManuStatorPackList
+
+            CreateMap<ManuStatorPackListPagedQueryDto, ManuStatorPackListPagedQuery>();
+            CreateMap<ManuStatorPackListEntity, ManuStatorPackListDto>();
+            //CreateMap<ManuStatorPackListView, ManuStatorPackListDto>();
+            CreateMap<ManuStatorPackListDto, ManuStatorPackListEntity>();
+            CreateMap<ManuStatorPackListSaveDto, ManuStatorPackListEntity>();
+
             #endregion
         }
 

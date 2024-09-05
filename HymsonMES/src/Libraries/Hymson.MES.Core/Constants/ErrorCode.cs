@@ -2320,7 +2320,14 @@
         public const string MES17505 = "物料条码已录入不良且未进行不良处置!";
         #endregion
 
+        #region 定子装箱
 
+        public const string MES17520 = "箱体码和产品码都不能为空！";
+        public const string MES17521 = "装箱数量不能大于箱体容量{BoxNum}";
+        public const string MES17522 = "装箱数量不能和已有数据不一致，当前容量：{BoxNum1}，已经数据容量{BoxNum2}";
+        public const string MES17523 = "成品码{sfc}已经装箱到箱体{BoxCode}";
+
+        #endregion
 
         #region 备件出入库管理 17900
         public const string MES17901 = "未查询到备件信息";

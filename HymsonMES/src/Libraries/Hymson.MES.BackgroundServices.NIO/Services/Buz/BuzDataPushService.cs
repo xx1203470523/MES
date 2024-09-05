@@ -263,11 +263,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task CollectionItemAsync()
         {
-            _logger.LogError($"开始业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
-
             var buzScene = BuzSceneEnum.Buz_Collection_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
+
+            _logger.LogError($"开始业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
             //站点配置
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
