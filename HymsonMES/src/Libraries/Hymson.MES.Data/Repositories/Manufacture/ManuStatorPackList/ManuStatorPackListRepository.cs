@@ -135,6 +135,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            //sqlBuilder.OrderBy("ProductCode");
+
+            sqlBuilder.Where("IsDeleted = 0");
+            //sqlBuilder.Where("SiteId = @SiteId");
+
+            if (string.IsNullOrEmpty(query.BoxCode) == false)
+            {
+                sqlBuilder.Where("BoxCode = @BoxCode ");
+            }
+
+            if (string.IsNullOrWhiteSpace(query.ProductCode) == false)
+            {
+                sqlBuilder.Where("ProductCode = @ProductCode ");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuStatorPackListEntity>(template.RawSql, query);
         }
