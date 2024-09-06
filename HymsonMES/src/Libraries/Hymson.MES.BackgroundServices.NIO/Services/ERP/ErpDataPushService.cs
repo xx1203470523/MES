@@ -210,8 +210,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
 
                 ProductionCapacityDto dto = new ProductionCapacityDto();
                 dto.PartnerBusiness = item.PartnerBusiness;
-                dto.MaterialCode = item.MaterialCode;
-                dto.MaterialName = item.MaterialName;
+                dto.MaterialCode = curBaseConfig.NioProductCode;
+                dto.MaterialName = curBaseConfig.NioProductName;
                 dto.ProductStockQualified = item.ProductStockQualified;
                 dto.ProductStockRejection = item.ProductStockRejection;
                 dto.ProductStockUndetermined = item.ProductStockUndetermined;
@@ -323,8 +323,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                     KeySubordinateDto dto = new KeySubordinateDto();
                     dto.Date = HymsonClock.Now().ToString("yyyy-MM-dd HH:mm:ss");
                     //产品编码
-                    dto.MaterialCode = curConfig.VendorProductCode;
-                    dto.MaterialName = curConfig.VendorProductName;
+                    dto.MaterialCode = curConfig.NioProductCode;
+                    dto.MaterialName = curConfig.NioProductName;
                     //WMS取的BOM物料信息
                     dto.PartnerBusiness = wmsItem.PartnerBusiness;
                     dto.SubordinateStockQualified = wmsItem.SubordinateStockQualified;
@@ -435,8 +435,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             foreach (var item in configList)
             {
                 ActualDeliveryDto dto = new ActualDeliveryDto();
-                dto.MaterialCode = item.VendorProductCode;
-                dto.MaterialName = item.VendorProductName;
+                dto.MaterialCode = item.NioProductCode;
+                dto.MaterialName = item.NioProductName;
 
                 if (wmsResult != null && wmsResult.Data != null && wmsResult.Data.Count != 0)
                 {
