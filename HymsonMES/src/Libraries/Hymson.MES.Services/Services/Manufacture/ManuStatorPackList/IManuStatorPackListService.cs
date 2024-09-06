@@ -22,6 +22,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task<string> AddBoxAsync();
 
         /// <summary>
+        /// 打印
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<int> PrintAsync(ManuStatorPackPrintDto param);
+
+        /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
