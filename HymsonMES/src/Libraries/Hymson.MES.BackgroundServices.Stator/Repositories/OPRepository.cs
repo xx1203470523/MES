@@ -14,12 +14,25 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// </summary>
         //const string QuerySql = @"SELECT * FROM `{0}` WHERE RDate >= '2024-08-11 08:30:00' AND `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
         const string QuerySql = @"SELECT * FROM `{0}` WHERE `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
+        const string QueryByIdSql = @"SELECT * FROM `{0}` WHERE `ID` IN @Ids ORDER BY `index` ASC";
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         public OPRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+
+
+        /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TEntity>> GetListByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetStatorDbConnection();
+            return await conn.QueryAsync<TEntity>(string.Format(QueryByIdSql, typeof(TEntity).Name), new { Ids = ids });
+        }
 
         /// <summary>
         /// 根据水位批量获取数据

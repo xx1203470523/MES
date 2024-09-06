@@ -66,6 +66,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 StartWaterMarkId = waterMarkId,
                 Rows = limitCount
             });
+
+            // 特殊处理（只取ID正常的数据）
+            entities = entities.Where(w => !StatorConst.IgnoreString.Contains(w.ID));
             if (entities == null || !entities.Any())
             {
                 _logger.LogDebug($"【{producreCode}】没有要拉取的数据！");

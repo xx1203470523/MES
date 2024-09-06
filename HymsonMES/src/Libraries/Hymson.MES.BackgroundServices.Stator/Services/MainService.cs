@@ -445,7 +445,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var id_key = "ID";
             var ids = dataTable.AsEnumerable().Select(s => $"{s[id_key]}").Distinct();
 
-            // 批量读取条码（定子）
+            // 批量读取条码（内定子）
             var statorSFCEntities = await GetStatorBarCodeEntitiesAsync(new StatorBarCodeQuery
             {
                 SiteId = statorBo.SiteId,
@@ -611,7 +611,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var barCode_key = "Barcode";
             var barCodes = dataTable.AsEnumerable().Select(s => $"{s[barCode_key]}").Distinct();
 
-            // 批量读取条码（定子）
+            // 批量读取条码（外定子）
             var statorSFCEntities = await GetStatorBarCodeEntitiesAsync(new StatorBarCodeQuery
             {
                 SiteId = statorBo.SiteId,
@@ -849,6 +849,17 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <summary>
         /// 保存数据
         /// </summary>
+        /// <param name="summaryBo"></param>
+        /// <returns></returns>
+        public async Task<int> SaveBaseDataWithCommitAsync(StatorSummaryBo summaryBo)
+        {
+            using var trans = TransactionHelper.GetTransactionScope();
+            return await SaveBaseDataAsync(summaryBo);
+        }
+
+        /// <summary>
+        /// 保存数据
+        /// </summary>
         /// <param name="buzKey"></param>
         /// <param name="waterLevel"></param>
         /// <param name="summaryBo"></param>
@@ -957,6 +968,16 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         public async Task<IEnumerable<StatorBarCodeEntity>> GetStatorBarCodeEntitiesAsync(StatorBarCodeQuery query)
         {
             return await _statorBarCodeRepository.GetEntitiesAsync(query);
+        }
+
+        /// <summary>
+        /// 批量获取（定子条码）
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<long>> GetInnerIdsByNullColumnAsync(string columnName)
+        {
+            return await _statorBarCodeRepository.GetInnerIdsByNullColumnAsync(columnName);
         }
 
         /// <summary>

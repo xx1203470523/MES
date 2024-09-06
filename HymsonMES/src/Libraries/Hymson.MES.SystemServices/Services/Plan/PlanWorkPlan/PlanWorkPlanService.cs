@@ -2,7 +2,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common;
