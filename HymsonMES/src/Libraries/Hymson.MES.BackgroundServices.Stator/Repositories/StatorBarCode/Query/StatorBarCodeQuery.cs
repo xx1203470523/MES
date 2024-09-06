@@ -8,7 +8,7 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long? SiteId { get; set; }
+        public long SiteId { get; set; }
 
         /// <summary>
         /// 条码（铜线）
@@ -41,4 +41,22 @@ namespace Hymson.MES.BackgroundServices.Stator
         public IEnumerable<string>? ProductionCodes { get; set; }
 
     }
+
+    /// <summary>
+    /// 查询参数
+    /// </summary>
+    public class StatorSpecifiedColumnQuery
+    {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 列名
+        /// </summary>
+        public string ColumnName { get; set; }
+
+    }
+
 }

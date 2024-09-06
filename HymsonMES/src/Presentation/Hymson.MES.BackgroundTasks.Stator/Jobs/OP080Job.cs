@@ -10,24 +10,24 @@ namespace Hymson.MES.BackgroundTasks.Stator
     /// 工序
     /// </summary>
     [DisallowConcurrentExecution]
-    internal class OP060Job : IJob
+    internal class OP080Job : IJob
     {
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<OP060Job> _logger;
-        private readonly IOP060Service _op060Service;
+        private readonly ILogger<OP080Job> _logger;
+        private readonly IOP080Service _op080Service;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="op060Service"></param>
-        public OP060Job(ILogger<OP060Job> logger,
-            IOP060Service op060Service)
+        /// <param name="op080Service"></param>
+        public OP080Job(ILogger<OP080Job> logger,
+            IOP080Service op080Service)
         {
             _logger = logger;
-            _op060Service = op060Service;
+            _op080Service = op080Service;
         }
 
         /// <summary>
@@ -38,21 +38,20 @@ namespace Hymson.MES.BackgroundTasks.Stator
         public async Task Execute(IJobExecutionContext context)
         {
             // 创建计时器实例
-            Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch = new();
             stopwatch.Start();
 
             try
             {
-                await Task.CompletedTask;
-                //await _op060Service.ExecuteAsync(50);
+                await _op080Service.ExecuteAsync(StatorConst.MAXLIMIT);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "OP060Job :");
+                _logger.LogError(ex, "OP080Job :");
             }
 
             stopwatch.Stop();
-            _logger.LogDebug($"【{typeof(OP060).Name}】执行完毕，耗时：{stopwatch.ElapsedMilliseconds}毫秒");
+            _logger.LogDebug($"【OP080Job】执行完毕，耗时：{stopwatch.ElapsedMilliseconds}毫秒");
         }
 
     }

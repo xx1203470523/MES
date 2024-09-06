@@ -12,16 +12,6 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("试产工单")]
         TrialProduction = 1,
-        ///// <summary>
-        ///// 测试工单
-        ///// </summary>
-        //[Description("测试工单")]
-        //Test = 2,
-        ///// <summary>
-        ///// 量产工单
-        ///// </summary>
-        //[Description("量产工单")]
-        //Output = 3,
         /// <summary>
         /// 生产工单
         /// </summary>
@@ -38,4 +28,5 @@ namespace Hymson.MES.Core.Enums
         [Description("实验工单")]
         Experiment = 4
     }
+
 }

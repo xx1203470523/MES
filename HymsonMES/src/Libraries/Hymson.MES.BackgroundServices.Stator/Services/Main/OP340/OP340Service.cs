@@ -58,15 +58,17 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         public async Task<int> ExecuteAsync(int limitCount)
         {
             var producreCode = $"{typeof(OP340).Name}";
-            var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
-            var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
-            // 根据水位读取数据
-            var entities = await _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            // 读取未赋值的条码（BusBar）
+            var ids = await _mainService.GetInnerIdsByNullColumnAsync("BusBarCode");
+            if (ids == null || !ids.Any())
             {
-                StartWaterMarkId = waterMarkId,
-                Rows = limitCount
-            });
+                _logger.LogDebug($"【 {producreCode} 】没有要填充的数据！");
+                return 0;
+            }
+
+            // 读取需要填充的记录
+            var entities = await _opRepository.GetListByIdsAsync(ids);
             if (entities == null || !entities.Any())
             {
                 _logger.LogDebug($"【 {producreCode} 】没有要拉取的数据！");
@@ -80,7 +82,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var summaryBo = await ConvertDataListAsync(entities, barCodes);
 
             // 保存数据
-            return await _mainService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
+            return await _mainService.SaveBaseDataWithCommitAsync(summaryBo);
         }
 
         /// <summary>

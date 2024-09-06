@@ -35,5 +35,12 @@ namespace Hymson.MES.Data.Repositories.Stator
         /// <returns></returns>
         Task<IEnumerable<StatorBarCodeEntity>> GetEntitiesAsync(StatorBarCodeQuery query);
 
+        /// <summary>
+        /// 查询List（未赋值的列）
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
+        Task<IEnumerable<long>> GetInnerIdsByNullColumnAsync(string columnName);
+
     }
 }

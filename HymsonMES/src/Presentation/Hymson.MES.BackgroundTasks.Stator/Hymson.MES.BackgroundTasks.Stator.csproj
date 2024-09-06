@@ -29,6 +29,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Jobs\OP210Job.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="appsettings.Development.json" />
 		<None Remove="appsettings.json" />
 		<None Remove="appsettings.Production.json" />
