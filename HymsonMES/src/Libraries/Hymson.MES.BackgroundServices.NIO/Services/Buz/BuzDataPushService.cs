@@ -6,6 +6,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.NIO;
 using Hymson.MES.Core.Domain.NioPushCollection;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
@@ -21,6 +22,7 @@ using Hymson.MES.Data.Repositories.Mavel.Rotor;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.ManuRotorSfc.Query;
 using Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode;
 using Hymson.MES.Data.Repositories.Mavel.Stator.ManuStatorBarcode.Query;
+using Hymson.MES.Data.Repositories.NIO;
 using Hymson.MES.Data.Repositories.NioPushCollection;
 using Hymson.MES.Data.Repositories.NioPushCollection.Query;
 using Hymson.MES.Data.Repositories.NioPushSwitch;
@@ -135,6 +137,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly IManuStatorBarcodeRepository _manuStatorBarcodeRepository;
 
         /// <summary>
+        /// nio工单数量记录
+        /// </summary>
+        private readonly INioOrderQtyRepository _nioOrderQtyRepository;
+
+        /// <summary>
         /// 操作员账号
         /// </summary>
         private readonly string NIO_USER_ID = "LMS001";
@@ -219,7 +226,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             INioPushCollectionRepository nioPushCollectionRepository,
             ILogger<IBuzDataPushService> logger,
             IProcProductParameterGroupRepository procProductParameterGroupRepository,
-            IManuStatorBarcodeRepository manuStatorBarcodeRepository)
+            IManuStatorBarcodeRepository manuStatorBarcodeRepository,
+            INioOrderQtyRepository nioOrderQtyRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -240,6 +248,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _logger = logger;
             _procProductParameterGroupRepository = procProductParameterGroupRepository;
             _manuStatorBarcodeRepository = manuStatorBarcodeRepository;
+            _nioOrderQtyRepository = nioOrderQtyRepository;
 
             BASE_CONFIG_LIST = new List<string>() { NIO_ROTOR_CONFIG, NIO_STATOR_CONFIG };
         }
@@ -263,11 +272,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task CollectionItemAsync()
         {
-            _logger.LogError($"开始业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
-
             var buzScene = BuzSceneEnum.Buz_Collection_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
+
+            _logger.LogError($"开始业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
             //站点配置
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
@@ -1372,21 +1381,32 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var baseConfigList = await GetBaseConfigAsync();
             IEnumerable<NIOConfigBaseDto> baseDataList = GetBaseData(baseConfigList);
             //获取工单数据
-            var planOrderList = await _planWorkOrderRepository.GetWorkOrderMavelAsync(siteId);
+            var planOrderList = await _planWorkOrderRepository.GetWorkOrderQtyMavelAsync(siteId, 20);
+            if(planOrderList == null || planOrderList.Count() == 0)
+            {
+                return;
+            }
             //处理数据
             var dtos = new List<WorkOrderDto> { };
+            List<NioOrderQtyEntity> nioList = new List<NioOrderQtyEntity>();
             foreach (var item in planOrderList)
             {
+                NioOrderQtyEntity nioModel = new NioOrderQtyEntity();
+                nioModel.Id = IdGenProvider.Instance.CreateId();
+                nioModel.OrderCode = item.OrderCode;
+                nioModel.Qty = item.Qty;
+
                 var curConfig = baseDataList.Where(m => m.VendorProductCode == item.MaterialCode).FirstOrDefault();
                 if (curConfig == null)
                 {
+                    nioList.Add(nioModel);
                     continue;
                 }
 
-                if (item.FinishProductQuantity <= 0)
-                {
-                    continue;
-                }
+                //if (item.FinishProductQuantity <= 0)
+                //{
+                //    continue;
+                //}
 
                 WorkOrderDto model = new WorkOrderDto();
                 model.PlantId = curConfig.PlantId;
@@ -1398,20 +1418,34 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 //model.NioProductCode = curConfig.NioProductCode;
                 //model.NioProductName = curConfig.NioProductName;
                 //model.NioModel = "ES8";
-                model.Quantity = (int)item.FinishProductQuantity;
+                model.Quantity = (int)item.Qty;
                 //model.NioHardwareRevision = "1.0";
                 //model.NioSoftwareRevision = "1.0";
                 //model.NioProjectName = "";
                 //model.Launched = NIO_DEBUG;
-                model.UpdateTime = GetTimestamp(HymsonClock.Now());
+                model.UpdateTime = GetTimestamp(item.UpdatedOn);
 
                 model.WorkorderId = item.OrderCode;
                 model.OrderCreateTime = GetTimestamp(item.CreatedOn);
 
                 dtos.Add(model);
+
+                nioList.Add(nioModel);
             }
 
+            DateTime now = HymsonClock.Now();
+            nioList.ForEach(m => m.CreatedBy = NIO_USER_ID);
+            nioList.ForEach(m => m.UpdatedBy = NIO_USER_ID);
+            nioList.ForEach(m => m.CreatedOn = now);
+            nioList.ForEach(m => m.UpdatedOn = now);
+            nioList.ForEach(m => m.SiteId = siteId);
+
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            await _nioOrderQtyRepository.InsertRangeAsync(nioList);
             await AddToPushQueueAsync(config, buzScene, dtos);
+
+            trans.Complete();
         }
 
         /// <summary>

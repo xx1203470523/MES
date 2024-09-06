@@ -99,5 +99,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 条码组
         /// </summary>
         public IEnumerable<string> SFCs { get; set; }
+
+
+        /// <summary>
+        /// 条码组
+        /// </summary>
+        public long? WorkOrderId { get; set; }
     }
 }

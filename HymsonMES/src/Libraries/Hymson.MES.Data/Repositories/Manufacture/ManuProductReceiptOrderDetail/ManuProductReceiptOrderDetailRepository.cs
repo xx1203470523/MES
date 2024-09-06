@@ -195,17 +195,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
 
-            var templateData = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            var templateData = sqlBuilder.AddTemplate(GetFormulaListSqlTemplate);
+            sqlBuilder.Where("t1.IsDeleted = 0");
+            sqlBuilder.Where("t1.SiteId = @SiteId");
 
             // ProductReceiptStatusEnum
-            sqlBuilder.Where("ProductReceiptId NOT IN (SELECT Id FROM manu_product_receipt_order WHERE Status IN (2, 4, 5, 7)) ");
+            sqlBuilder.Where("t2.ProductReceiptId NOT IN (SELECT Id FROM manu_product_receipt_order WHERE Status IN (2, 4, 5, 7)) ");
 
             if (query.SFCs != null && query.SFCs.Any())
             {
-                sqlBuilder.Where("Sfc IN @SFCs");
+                sqlBuilder.Where("t2.Sfc IN @SFCs");
+            }
+
+            if (query.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where("t1.WorkOrderCode= @WorkOrderId");
             }
 
             sqlBuilder.AddParameters(query);
@@ -240,6 +244,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT * FROM manu_product_receipt_order_detail WHERE Id IN @Ids ";
 
         const string GetByProductReceiptIdsSql = @"SELECT * FROM manu_product_receipt_order_detail WHERE ProductReceiptId IN @Ids order by CreatedOn desc ";
+
+        /// <summary>
+        /// 获取配方列表
+        /// </summary>
+        const string GetFormulaListSqlTemplate = $@"
+            select * from manu_product_receipt_order t1
+            inner join manu_product_receipt_order_detail t2 
+            on t1.Id =t2.ProductReceiptId and t2.IsDeleted = 0
+            /**where**/ 
+        ";
 
     }
 }

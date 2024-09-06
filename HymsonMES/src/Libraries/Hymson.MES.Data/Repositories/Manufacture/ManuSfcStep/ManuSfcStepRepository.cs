@@ -232,6 +232,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 orderSql = $"and t2.OrderCode  = '{query.OrderCode}'";
             }
+            string erpSql = string.Empty;
+            if(string.IsNullOrEmpty(query.WorkPlanCode) == false)
+            {
+                erpSql = $"and t4.WorkPlanCode  = '{query.WorkPlanCode}'";
+            }
 
             string sql = $@"
                 select t4.WorkPlanCode,DATE(t1.CreatedOn) DateStr, t2.OrderCode  ,t3.Code ,t3.Name , t2.ProductId  , count(*) Num
@@ -242,10 +247,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 where t1.SiteId  = {query.SiteId}
                 and t1.CreatedOn >= '{query.BeginDate.ToString("yyyy-MM-dd HH:mm:ss")}'
                 and t1.CreatedOn < '{query.EndDate.ToString("yyyy-MM-dd HH:mm:ss")}'
-                and t4.WorkPlanCode  = '{query.WorkPlanCode}'
+                {erpSql}
                 {orderSql}
-                group by  t4.WorkPlanCode,DateStr, t2.OrderCode  ,t3.Code ,t3.Name , t2.ProductId
-                order by DateStr, t2.OrderCode ,t3.Code 
+                group by t4.WorkPlanCode,DateStr, t2.OrderCode  ,t3.Code ,t3.Name , t2.ProductId
+                order by t4.WorkPlanCode,DateStr, t2.OrderCode ,t3.Code 
             ";
 
             using var conn = GetMESDbConnection();

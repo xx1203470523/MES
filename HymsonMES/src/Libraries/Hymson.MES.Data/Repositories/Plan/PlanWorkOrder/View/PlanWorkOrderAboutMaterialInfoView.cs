@@ -144,4 +144,39 @@ namespace Hymson.MES.Data.Repositories.Plan
         public decimal FinishProductQuantity { get; set; }
     }
 
+    /// <summary>
+    /// 工单数量
+    /// </summary>
+    public class OrderQtyMavelView
+    {
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+    }
 }

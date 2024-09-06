@@ -67,6 +67,7 @@
     <Folder Include="Services\Equipment\EquSpotcheckItem\" />
     <Folder Include="Services\Equipment\EquMaintenance\EquMaintenanceItem\" />
     <Folder Include="Services\Integrated\InteBusinessField\" />
+    <Folder Include="Services\Manufacture\ManuStatorPackList\" />
     <Folder Include="Services\NIO\NioPushProductioncapacity\" />
     <Folder Include="Services\NIO\NioPushKeySubordinate\" />
     <Folder Include="Services\NIO\NioPushActualDelivery\" />

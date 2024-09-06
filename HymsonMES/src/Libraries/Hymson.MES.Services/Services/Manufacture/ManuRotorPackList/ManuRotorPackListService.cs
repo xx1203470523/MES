@@ -72,6 +72,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuStatorBarcodeRepository _manuStatorBarcodeRepository;
 
         /// <summary>
+        /// 定子装箱主条码
+        /// </summary>
+        private readonly IManuStatorPackListRepository _manuStatorPackListRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ManuRotorPackListService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuRotorPackListSaveDto> validationSaveRules,
@@ -80,7 +85,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             IOptions<WMSOptions> wmsOptions,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IManuRotorSfcRepository manuRotorSfcRepository,
-            IManuStatorBarcodeRepository manuStatorBarcodeRepository
+            IManuStatorBarcodeRepository manuStatorBarcodeRepository,
+            IManuStatorPackListRepository manuStatorPackListRepository
             )
         {
             _sequenceService = sequenceService;
@@ -93,6 +99,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _manuRotorSfcRepository = manuRotorSfcRepository;
             _manuStatorBarcodeRepository = manuStatorBarcodeRepository;
+            _manuStatorPackListRepository = manuStatorPackListRepository;
         }
 
 
@@ -257,41 +264,65 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             else
             {
-                //查询 manu_stator_barcode 表，并转成 ManuRotorPackListEntity结构，BoxCode赋空值
-                if(string.IsNullOrEmpty(query.Sfc) == false)
+                ManuStatorPackListQuery statorQuery = new ManuStatorPackListQuery() { ProductCode = query.Sfc, BoxCode = query.BoxCode };
+                var statorPackList = await _manuStatorPackListRepository.GetEntitiesAsync(statorQuery);
+                if(statorPackList != null && statorPackList.Count() > 0)
                 {
-                    StatorSfcQuery statorSfcQuery = new StatorSfcQuery();
-                    statorSfcQuery.SiteId = _currentSite.SiteId ?? 0;
-                    statorSfcQuery.SfcList = new List<string>(query.Sfc.Split(','));
-                    var dbStatorList = await _manuStatorBarcodeRepository.GetListBySfcsAsync(statorSfcQuery);
-                    if(dbStatorList != null && dbStatorList.Count() > 0)
-                    {
-                        List<string> existList = new List<string>();
+                    List<string> existList = new List<string>();
 
-                        foreach(var sItem in dbStatorList)
+                    foreach (var sItem in statorPackList)
+                    {
+                        if (existList.Contains(sItem.ProductCode) == true)
                         {
-                            if(existList.Contains(sItem.ProductionCode) == true)
-                            {
-                                continue;
-                            }
-                            existList.Add(sItem.ProductionCode);
-
-                            ManuRotorPackListEntity manuRotorPackListEntity = new ManuRotorPackListEntity();
-                            manuRotorPackListEntity.ProductCode = sItem.ProductionCode;
-                            manuRotorPackListEntity.BoxCode = "";
-                            manuRotorPackLists.Add(manuRotorPackListEntity);
+                            continue;
                         }
-                    }
-                    else
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES10542)).WithData("sfc", query.Sfc);
-                        //return manuRotors;
+                        existList.Add(sItem.ProductCode);
+
+                        ManuRotorPackListEntity manuRotorPackListEntity = new ManuRotorPackListEntity();
+                        manuRotorPackListEntity.ProductCode = sItem.ProductCode;
+                        manuRotorPackListEntity.BoxCode = sItem.BoxCode;
+                        manuRotorPackLists.Add(manuRotorPackListEntity);
                     }
                 }
                 else
                 {
-                    return manuRotors;
+                    //查询 manu_stator_barcode 表，并转成 ManuRotorPackListEntity结构，BoxCode赋空值
+                    if (string.IsNullOrEmpty(query.Sfc) == false)
+                    {
+                        StatorSfcQuery statorSfcQuery = new StatorSfcQuery();
+                        statorSfcQuery.SiteId = _currentSite.SiteId ?? 0;
+                        statorSfcQuery.SfcList = new List<string>(query.Sfc.Split(','));
+                        var dbStatorList = await _manuStatorBarcodeRepository.GetListBySfcsAsync(statorSfcQuery);
+                        if (dbStatorList != null && dbStatorList.Count() > 0)
+                        {
+                            List<string> existList = new List<string>();
+
+                            foreach (var sItem in dbStatorList)
+                            {
+                                if (existList.Contains(sItem.ProductionCode) == true)
+                                {
+                                    continue;
+                                }
+                                existList.Add(sItem.ProductionCode);
+
+                                ManuRotorPackListEntity manuRotorPackListEntity = new ManuRotorPackListEntity();
+                                manuRotorPackListEntity.ProductCode = sItem.ProductionCode;
+                                manuRotorPackListEntity.BoxCode = "";
+                                manuRotorPackLists.Add(manuRotorPackListEntity);
+                            }
+                        }
+                        else
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES10542)).WithData("sfc", query.Sfc);
+                            //return manuRotors;
+                        }
+                    }
+                    else
+                    {
+                        return manuRotors;
+                    }
                 }
+
             }
 
             //if(string.IsNullOrEmpty(query.Sfc) == false && (manuRotors == null || manuRotors.Count == 0))
