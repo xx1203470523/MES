@@ -90,6 +90,8 @@ namespace Hymson.MES.BackgroundTasks.Stator
         /// <returns></returns>
         public async Task Execute(IJobExecutionContext context)
         {
+            _logger.LogDebug($"【OP190Job】启动");
+
             // 创建计时器实例
             Stopwatch stopwatch = new();
             stopwatch.Start();
@@ -102,23 +104,21 @@ namespace Hymson.MES.BackgroundTasks.Stator
                 await _op190Service.ExecuteAsync(StatorConst.MAXLIMIT);
                 await _op200Service.ExecuteAsync(StatorConst.MAXLIMIT);
 
-                if (rows > 0)
-                {
-                    // 顺序不要随意调整
-                    await _op240Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op260Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op290Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op310Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op350Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op390Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op410Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op415Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op420Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op430Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op450Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op455Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op470Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                }
+                // 顺序不要随意调整
+                await _op240Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op260Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op290Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op310Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op350Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op390Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op410Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op415Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op420Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op430Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op450Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op455Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op470Service.ExecuteAsync(StatorConst.MAXLIMIT);
+
             }
             catch (Exception ex)
             {

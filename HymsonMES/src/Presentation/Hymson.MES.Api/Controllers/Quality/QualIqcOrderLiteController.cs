@@ -127,6 +127,17 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 取消（iqc检验单）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("cancel/{id}")]
+        public async Task<int> CancelOrderAsync(long id)
+        {
+            return await _qualIqcOrderLiteService.CancelOrderAsync(id);
+        }
+
+        /// <summary>
         /// 查询详情（iqc检验单）
         /// </summary>
         /// <param name="id"></param>

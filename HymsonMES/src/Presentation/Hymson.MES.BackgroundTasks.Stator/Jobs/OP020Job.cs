@@ -65,6 +65,8 @@ namespace Hymson.MES.BackgroundTasks.Stator
         /// <returns></returns>
         public async Task Execute(IJobExecutionContext context)
         {
+            _logger.LogDebug($"【OP020Job】启动");
+
             // 创建计时器实例
             Stopwatch stopwatch = new();
             stopwatch.Start();
@@ -76,15 +78,13 @@ namespace Hymson.MES.BackgroundTasks.Stator
                 rows = await _op020Service.ExecuteAsync(StatorConst.MAXLIMIT);
                 await _op060Service.ExecuteAsync(100); // 参数太多，容易报错
 
-                if (rows > 0)
-                {
-                    // 顺序不要随意调整
-                    await _op030Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op050Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op090Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op100Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                    await _op120Service.ExecuteAsync(StatorConst.MAXLIMIT);
-                }
+                // 顺序不要随意调整
+                await _op030Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op050Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op090Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op100Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await _op120Service.ExecuteAsync(StatorConst.MAXLIMIT);
+
             }
             catch (Exception ex)
             {

@@ -37,6 +37,8 @@ namespace Hymson.MES.BackgroundTasks.Stator
         /// <returns></returns>
         public async Task Execute(IJobExecutionContext context)
         {
+            _logger.LogDebug($"【OP340Job】启动");
+
             // 创建计时器实例
             Stopwatch stopwatch = new();
             stopwatch.Start();

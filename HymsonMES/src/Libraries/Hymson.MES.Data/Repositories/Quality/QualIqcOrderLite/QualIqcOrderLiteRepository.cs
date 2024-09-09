@@ -38,7 +38,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         public async Task<int> InsertRangeAsync(IEnumerable<QualIqcOrderLiteEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(InsertSql, entities);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         public async Task<int> UpdateRangeAsync(IEnumerable<QualIqcOrderLiteEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
         /// <summary>
@@ -235,10 +235,8 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_lite /**where**/ /**orderby**/ LIMIT 1 ";
 
         const string InsertSql = "INSERT INTO qual_iqc_order_lite(`Id`, `SiteId`, `InspectionOrder`, `MaterialReceiptId`, `SupplierId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialReceiptId, @SupplierId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_iqc_order_lite(`Id`, `SiteId`, `InspectionOrder`, `MaterialReceiptId`, `SupplierId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialReceiptId, @SupplierId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-
+       
         const string UpdateSql = "UPDATE qual_iqc_order_lite SET Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_iqc_order_lite SET Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_iqc_order_lite SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_iqc_order_lite SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
