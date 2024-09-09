@@ -61,6 +61,13 @@ namespace Hymson.MES.Services.Services.Quality
         Task<QualIqcOrderLiteBaseDto?> QueryByIdAsync(long id);
 
         /// <summary>
+        /// 取消检验单
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> CancelOrderAsync(long id);
+
+        /// <summary>
         /// 查询检验单明细数据
         /// </summary>
         /// <param name="id"></param>

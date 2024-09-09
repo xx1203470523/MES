@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -511,6 +512,29 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             return dto;
+        }
+
+        /// <summary>
+        /// 取消检验单
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> CancelOrderAsync(long id)
+        {
+            // 检验单
+            var orderEntity = await _qualIqcOrderLiteRepository.GetByIdAsync(id);
+            if (orderEntity == null) return 0;
+
+            // TODO 判断检验单状态是否允许取消（WMS）
+            return 0;
+
+            // 修复检验单状态
+            orderEntity.Remark = $"手动弃审，弃审前状态：【{orderEntity.Status.GetDescription()}】";
+            orderEntity.Status = IQCLiteStatusEnum.Cancel;
+            orderEntity.UpdatedBy = _currentUser.UserName;
+            orderEntity.UpdatedOn = HymsonClock.Now();
+
+            return await _qualIqcOrderLiteRepository.UpdateAsync(orderEntity);
         }
 
         /// <summary>

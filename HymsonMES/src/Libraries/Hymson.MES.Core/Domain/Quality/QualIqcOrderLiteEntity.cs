@@ -33,7 +33,7 @@ namespace Hymson.MES.Core.Domain.Quality
         public long? SupplierId { get; set; }
 
         /// <summary>
-        /// 状态;1、待检验2、检验中3、已检验4、已关闭
+        /// 状态;1、待检验2、检验中3、已检验4、取消检验
         /// </summary>
         public IQCLiteStatusEnum Status { get; set; }
 

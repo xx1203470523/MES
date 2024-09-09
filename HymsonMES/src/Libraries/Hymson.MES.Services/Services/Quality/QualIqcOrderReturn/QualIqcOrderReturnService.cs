@@ -552,6 +552,29 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
+        /// 取消检验单
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> CancelOrderAsync(long id)
+        {
+            // 检验单
+            var orderEntity = await _qualIqcOrderReturnRepository.GetByIdAsync(id);
+            if (orderEntity == null) return 0;
+
+            // TODO 判断检验单状态是否允许取消（WMS）
+            return 0;
+
+            // 修复检验单状态
+            orderEntity.Remark = $"手动弃审，弃审前状态：【{orderEntity.Status.GetDescription()}】";
+            orderEntity.Status = IQCLiteStatusEnum.Cancel;
+            orderEntity.UpdatedBy = _currentUser.UserName;
+            orderEntity.UpdatedOn = HymsonClock.Now();
+
+            return await _qualIqcOrderReturnRepository.UpdateAsync(orderEntity);
+        }
+
+        /// <summary>
         /// 查询检验单明细数据
         /// </summary>
         /// <param name="id"></param>
