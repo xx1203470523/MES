@@ -294,7 +294,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             _eventBus.Publish(new PrintIntegrationEvent
             {
-                CurrencyTemplateType = CurrencyTemplateTypeEnum.Material,
+                CurrencyTemplateType = CurrencyTemplateTypeEnum.DBox,
                 SiteId = _currentSite.SiteId ?? 0,
                 PrintId = dbPrint.Id,
                 ProcedureId = dbProcedure.Id,
