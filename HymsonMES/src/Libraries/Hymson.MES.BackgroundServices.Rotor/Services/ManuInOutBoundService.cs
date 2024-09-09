@@ -167,7 +167,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly string PRODUCRE_Z_TX = "R01OP070";
 
         /// <summary>
-        /// 成品和轴码绑定东旭
+        /// 成品和轴码绑定工序
         /// </summary>
         private readonly string PRODUCRE_CP_Z = "R01OP130";
 
@@ -437,6 +437,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 //处理上料信息
                 List<WorkItemInfoDto> curUpMatList = upMatList.Where(m => m.ProcessUID == item.ID).ToList();
                 List<SfcUpMatDto> sfcUpList = new List<SfcUpMatDto>();
+                //TODO:如果是成品工序，兵器curUpMatList为空，则记录下相关信息
+
+
                 if (curUpMatList != null && curUpMatList.Count > 0)
                 {
                     foreach (var upItem in curUpMatList)
@@ -850,7 +853,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             for (int i = 0; i < batchNum; ++i)
             {
                 List<string> curSfcIdList = sfcIdList.Skip(i * batchDataNum).Take(batchDataNum).ToList();
-                string idListStr = string.Join(",", sfcIdList.Select(uuid => $"'{uuid}'"));
+                string idListStr = string.Join(",", curSfcIdList.Select(uuid => $"'{uuid}'"));
 
                 string sql = $@"
                     SELECT t1.*
