@@ -21,6 +21,11 @@ namespace Hymson.MES.Core.Enums.Process
         /// 生产通用
         /// </summary>
         [Description("生产通用")]
-        Production = 2
+        Production = 2,
+        /// <summary>
+        /// 定子装箱
+        /// </summary>
+        [Description("定子装箱")]
+        DBox = 3,
     }
 }

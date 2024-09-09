@@ -7,6 +7,7 @@ using Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility;
 using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
 using Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.BatchBarcode;
 using Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.ProductionBarcod;
+using Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.StatorBox;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
@@ -112,6 +113,11 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
         private readonly IProcLabelTemplateRelationRepository _procLabelTemplateRelationRepository;
 
         /// <summary>
+        /// 定子
+        /// </summary>
+        private readonly IStatorBoxService _statorBoxService;
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="productionBarcodeService"></param>
@@ -147,7 +153,8 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
             IProcPrintConfigRepository printConfigRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IProcLabelTemplateRelationRepository procLabelTemplateRelationRepository,
-            IPrintService printService)
+            IPrintService printService,
+            IStatorBoxService statorBoxService)
         {
             _productionBarcodeService = productionBarcodeService;
             _batchBarcodeService = batchBarcodeService;
@@ -167,6 +174,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
             _manuSfcStepRepository = manuSfcStepRepository;
             _printService = printService;
             _procLabelTemplateRelationRepository = procLabelTemplateRelationRepository;
+            _statorBoxService = statorBoxService;
         }
 
         /// <summary>
@@ -217,6 +225,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
 
             var batchBarcodeList = new List<PrintStructDto<BatchBarcodeDto>>();
             var productionBarcodeList = new List<PrintStructDto<ProductionBarcodeDto>>();
+            var statorBoxList = new List<PrintStructDto<StatorBoxDto>>();
             foreach (var groupItem in groups)
             {
                 var procProcedurePrintReleationByMaterialIdEnties = procProcedurePrintReleationEnties.Where(x => x.MaterialId == groupItem.Key);
@@ -266,6 +275,19 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                                 });
                             }
                             break;
+                        case "Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.DataSource.StatorBoxDto":
+                            var statorBoxDataList = await _statorBoxService.GetLabelTemplateDataAsync(labelTemplateSourceDto);
+                            foreach (var statorBarcodeItem in statorBoxDataList)
+                            {
+                                statorBoxList.Add(new PrintStructDto<StatorBoxDto>
+                                {
+                                    TemplateName = labelTemplateId.ToString(),
+                                    PrintCount = Convert.ToInt16(procProcedurePrintReleation.Copy ?? 0),
+                                    PrintName = printConfigEntiy.PrintName,
+                                    PrintData = statorBarcodeItem
+                                });
+                            }
+                            break;
                         default:
                             throw new CustomerValidationException(nameof(ErrorCode.MES10390));
                     }
@@ -280,6 +302,10 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
             if (productionBarcodeList != null && productionBarcodeList.Any())
             {
                 await _printService.AddTaskAsync<ProductionBarcodeDto>(productionBarcodeList);
+            }
+            if (statorBoxList != null && statorBoxList.Any())
+            {
+                await _printService.AddTaskAsync<StatorBoxDto>(statorBoxList);
             }
             trans.Complete();
         }

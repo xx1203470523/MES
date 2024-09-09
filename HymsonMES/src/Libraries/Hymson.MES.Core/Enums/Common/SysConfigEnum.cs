@@ -100,5 +100,10 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("NioRepeatParam")]
         NioRepeatParam = 21,
+        /// <summary>
+        /// 定子装箱
+        /// </summary>
+        [Description("StatorBox")]
+        StatorBox = 22,
     }
 }

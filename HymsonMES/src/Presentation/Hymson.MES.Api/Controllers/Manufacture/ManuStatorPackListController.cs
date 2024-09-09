@@ -66,9 +66,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("print")]
-        public async Task<int> PrintAsync(ManuStatorPackPrintDto parame)
+        public async Task<int> PrintAsync(ManuStatorPackPrintDto param)
         {
-            return 0;
+            return await _manuStatorPackListService.PrintAsync(param);
         }
 
         /// <summary>
