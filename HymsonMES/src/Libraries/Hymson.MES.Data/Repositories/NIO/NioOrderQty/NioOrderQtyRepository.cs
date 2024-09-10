@@ -161,7 +161,7 @@ namespace Hymson.MES.Data.Repositories.NIO
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM nio_order_qty /**where**/  ";
 
         const string InsertSql = "INSERT INTO nio_order_qty(  `Id`, `OrderCode`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @OrderCode, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
-        const string InsertsSql = "INSERT INTO nio_order_qty(  `Id`, `OrderCode`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @OrderCode, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT INTO nio_order_qty(  `Id`, `OrderCode`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @OrderCode, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ON DUPLICATE KEY UPDATE Qty = @Qty, UpdatedOn = now()";
 
         const string UpdateSql = "UPDATE nio_order_qty SET   OrderCode = @OrderCode, Qty = @Qty, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE nio_order_qty SET   OrderCode = @OrderCode, Qty = @Qty, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";

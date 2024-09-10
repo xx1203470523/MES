@@ -5,6 +5,7 @@ using Hymson.MES.BackgroundServices.Rotor.Entity;
 using Hymson.MES.BackgroundServices.Rotor.Repositories;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Mavel.Rotor;
 using Hymson.MES.Core.Domain.Plan;
@@ -13,6 +14,7 @@ using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor;
@@ -157,6 +159,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
         /// <summary>
+        /// 系统异常消息记录
+        /// </summary>
+        private readonly ISysAbnormalMessageRecordRepository _sysAbnormalMessageRecordRepository;
+
+        /// <summary>
         /// 转子线操作人
         /// </summary>
         private readonly string OperationBy = "RotorLMSJOB";
@@ -221,7 +228,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             IManuProductNgRecordRepository manuProductNgRecordRepository,
             IPlanWorkPlanRepository planWorkPlanRepository,
             IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository)
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            ISysAbnormalMessageRecordRepository sysAbnormalMessageRecordRepository)
         {
             _workItemInfoRepository = workItemInfoRepository;
             _workProcessDataRepository = workProcessDataRepository;
@@ -245,6 +253,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             _planWorkPlanRepository = planWorkPlanRepository;
             _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _sysAbnormalMessageRecordRepository = sysAbnormalMessageRecordRepository;
         }
 
         /// <summary>
@@ -386,6 +395,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             List<ProcParameterEntity> mesParamList = (await _procParameterRepository.GetProcParameterEntitiesAsync(paramQuery)).ToList();
             #endregion
 
+            List<SysAbnormalMessageRecordEntity> sysLogList = new List<SysAbnormalMessageRecordEntity>();
+
             //MES过站数据
             List<MesOutDto> mesList = new List<MesOutDto>();
 
@@ -438,7 +449,41 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 List<WorkItemInfoDto> curUpMatList = upMatList.Where(m => m.ProcessUID == item.ID).ToList();
                 List<SfcUpMatDto> sfcUpList = new List<SfcUpMatDto>();
                 //TODO:如果是成品工序，兵器curUpMatList为空，则记录下相关信息
+                if(procedureCode == PRODUCRE_CP_Z && (curUpMatList == null || curUpMatList.Count == 0))
+                {
+                    //根据item.ID重新查一遍Work_ItemInfo表，并手动添加日志进行记录
+                    //select top 1 * from Work_ItemInfo where ProcessUID = '1A0F2566-6F52-4D48-A90C-467D639C649B'
+                    curUpMatList = await GetSfcUpMatListAsync(item.ID);
 
+                    SysAbnormalMessageRecordEntity sysLog = new SysAbnormalMessageRecordEntity();
+                    sysLog.Id = IdGenProvider.Instance.CreateId();
+                    sysLog.CreatedOn = now;
+                    sysLog.UpdatedOn = now;
+                    sysLog.CreatedBy = OperationBy;
+                    sysLog.UpdatedBy = OperationBy;
+                    sysLog.SiteId = 47024007283048448;
+                    sysLog.Source = "ROTOR";
+                    sysLog.MessageType = "异常数据记录";
+                    sysLog.Title = "转子线成品工序没有上料记录";
+                    sysLog.MessageStatus = "新建";
+                    string curItemStr = JsonConvert.SerializeObject(item);
+                    if(curItemStr.Length > 5000)
+                    {
+                        curItemStr = curItemStr.Substring(0, 5000);
+                    }
+                    sysLog.Context = $@"条码{item.ProductNo}对应ID为:{item.ID}。完整数据如下：【{curItemStr}】";
+                    sysLog.Remark1 = suffixTableName;
+                    string curUpStr = JsonConvert.SerializeObject(curUpMatList);              
+                    if(curUpStr.Length > 2000)
+                    {
+                        curUpStr = curUpStr.Substring(0, 2000);
+                    }
+                    sysLog.Remark2 = curUpStr;
+                    sysLog.Remark3 = "";
+                    sysLog.Remark4 = "";
+                    sysLog.Remark5 = "";
+                    sysLogList.Add(sysLog);
+                }
 
                 if (curUpMatList != null && curUpMatList.Count > 0)
                 {
@@ -725,6 +770,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             List<Task<int>> tasks = new()
             {
+                 _sysAbnormalMessageRecordRepository.InsertRangeAsync(sysLogList),
                  _manuSfcCirculationRepository.InsertRangeAsync(circulaList),
                  //_manuSfcStepRepository.InsertRangeMavleAsync(stepList),
                  _manuSfcStepRepository.InsertRangeAsync(stepList),
@@ -867,6 +913,28 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
 
             resultLit = allDbList.Cast<WorkItemInfoDto>().ToList();
+
+            return resultLit;
+        }
+
+        /// <summary>
+        /// 获取单条数据的上料信息
+        /// </summary>
+        /// <param name="sfcIdList"></param>
+        /// <returns></returns>
+        private async Task<List<WorkItemInfoDto>> GetSfcUpMatListAsync(string id)
+        {
+            List<WorkItemInfoDto> resultLit = new List<WorkItemInfoDto>();
+
+            string sql = $@"
+                SELECT t1.*
+                FROM Work_ItemInfo t1
+                WHERE T1.ProcessUID = '{id}'
+            ";
+
+            var dbList = await _workItemInfoRepository.GetList(sql);
+
+            resultLit = dbList.Cast<WorkItemInfoDto>().ToList();
 
             return resultLit;
         }
