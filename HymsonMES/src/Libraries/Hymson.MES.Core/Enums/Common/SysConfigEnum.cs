@@ -105,5 +105,10 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("StatorBox")]
         StatorBox = 22,
+        /// <summary>
+        /// 转子数据同步差异秒数
+        /// </summary>
+        [Description("RotorDbSynSecond")]
+        RotorDbSynSecond = 23,
     }
 }

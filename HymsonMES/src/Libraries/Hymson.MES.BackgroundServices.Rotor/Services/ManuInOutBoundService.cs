@@ -310,6 +310,20 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
             DateTime start = startWaterMarkTime;
 
+            int rotorDbSecond = 120;
+            var rotorDbConfigEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorDbSynSecond });
+            if (rotorDbConfigEntities != null && rotorDbConfigEntities.Count() > 0)
+            {
+                string rotorSecondStr = rotorDbConfigEntities.First().Value;
+                int.TryParse(rotorSecondStr, out rotorDbSecond);
+            }
+
+            //如果和当前时间相差在一分钟之内，则不处理，避免转子线数据库同步导致的延迟问题
+            if (startWaterMarkTime.AddSeconds(rotorDbSecond) > now)
+            {
+                return;
+            }
+
             //TODO
             //1. 中间工序不管进出站，但是参数需要记录保存，上料信息需要记录
             //2. 进站工序的上料，直接查出来
