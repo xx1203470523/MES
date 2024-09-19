@@ -1,10 +1,4 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Services.Dtos.Warehouse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking
 {
@@ -26,7 +20,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking
         /// <summary>
         /// 仓库编码
         /// </summary>
-        public string WarehouseCode { get; set; }
+        public string? WarehouseCode { get; set; }
+
+        /// <summary>
+        /// 工单编码（虚仓领料时，需要指定从哪个工单领虚退的物料）
+        /// </summary>
+        public string? WorkOrderCode { get; set; }
 
         /// <summary>
         /// 领料数量
@@ -34,6 +33,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking
         public List<PickBomDetailDto> Details { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class PickBomDetailDto
     {
         /// <summary>
@@ -54,6 +56,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking
         /// <summary>
         /// BomID
         /// </summary>
-        public long? BomId {  get; set; }
+        public long? BomId { get; set; }
     }
+
 }

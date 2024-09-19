@@ -127,6 +127,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("WorkOrderId = @WorkOrderId");
             }
 
+            if (query.Type.HasValue)
+            {
+                sqlBuilder.Where("Type = @Type");
+            }
+
             if (!string.IsNullOrWhiteSpace(query.ReturnOrderCode))
             {
                 query.ReturnOrderCode = $"%{query.ReturnOrderCode}%";

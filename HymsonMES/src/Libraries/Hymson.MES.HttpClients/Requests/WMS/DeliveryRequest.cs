@@ -43,6 +43,11 @@
         public string? MaterialClassificationCode { get; set; }
 
         /// <summary>
+        /// 批次号
+        /// </summary>
+        public string? LotCode { get; set; }
+
+        /// <summary>
         /// 单位编号
         /// </summary>
         public string? UnitCode { get; set; }

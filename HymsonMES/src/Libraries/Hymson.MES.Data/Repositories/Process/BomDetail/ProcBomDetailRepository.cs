@@ -75,8 +75,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcBomDetailEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ProcBomDetailEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
+            if (ids == null || !ids.Any()) return Enumerable.Empty<ProcBomDetailEntity>();
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcBomDetailEntity>(GetByIdsSql, new { ids = ids });
         }
