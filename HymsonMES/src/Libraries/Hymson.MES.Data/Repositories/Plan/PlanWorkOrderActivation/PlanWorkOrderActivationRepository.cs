@@ -102,12 +102,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<PlanWorkOrderActivationEntity> GetByWorkOrderIdAsync(long workOrderId)
         {
-            var key = $"plan_work_order_activation&{workOrderId}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByworkOrderIdSql, new { workOrderId });
-            });
+            //var key = $"plan_work_order_activation&{workOrderId}";
+            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            //{
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByworkOrderIdSql, new { workOrderId });
+            //});
         }
 
         /// <summary>
