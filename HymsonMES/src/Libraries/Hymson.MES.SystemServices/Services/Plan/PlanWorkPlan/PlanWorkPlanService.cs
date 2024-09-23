@@ -232,12 +232,20 @@ namespace Hymson.MES.SystemServices.Services.Plan
             var bomCodes = workPlanDtos.SelectMany(s => s.Products).Select(s => s.BomCode).Distinct();
             var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = currentBo.SiteId, Codes = bomCodes });
             */
-            var bomIds = workPlanDtos.SelectMany(s => s.Products).Select(s => s.BomId).Distinct();
-            var bomEntities = await _procBomRepository.GetByIdsAsync(bomIds);
-            if (bomEntities == null || !bomEntities.Any())
+
+            // 检查工单BOM是否和主数据一致
+            foreach (var workPlanDto in workPlanDtos)
             {
-                // 这里应该提示BOM不存在
-                throw new CustomerValidationException(nameof(ErrorCode.MES10252));
+                // 如果是返工工单，不需要检查BOM
+                if (workPlanDto.Type == PlanWorkOrderTypeEnum.Rework) continue;
+
+                var bomIds = workPlanDto.Products.Select(s => s.BomId).Distinct();
+                var bomEntities = await _procBomRepository.GetByIdsAsync(bomIds);
+                if (bomEntities == null || !bomEntities.Any())
+                {
+                    // 这里应该提示BOM不存在
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10252));
+                }
             }
 
             // 读取已存在的生产计划记录
