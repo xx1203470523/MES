@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Core.Enums.Warehouse;
@@ -521,12 +522,23 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> CancelOrderAsync(long id)
         {
-            // 检验单
+            // 查询检验单
             var orderEntity = await _qualIqcOrderLiteRepository.GetByIdAsync(id);
             if (orderEntity == null) return 0;
 
-            // TODO 判断检验单状态是否允许取消（WMS）
-            return 0;
+            // 查询来料单
+            var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(orderEntity.MaterialReceiptId)
+           if (receiptEntity == null) return 0;
+
+            // 判断检验单状态是否允许取消（WMS）
+            var response = await _wmsApiClient.CancelIQCEntryAsync(new CancelEntryDto
+            {
+                SyncCode = receiptEntity.ReceiptNum,
+                UpdatedBy = _currentUser.UserName
+            });
+
+            if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "结果返回异常，请检查！");
+            if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
 
             // 修复检验单状态
             orderEntity.Remark = $"手动弃审，弃审前状态：【{orderEntity.Status.GetDescription()}】";

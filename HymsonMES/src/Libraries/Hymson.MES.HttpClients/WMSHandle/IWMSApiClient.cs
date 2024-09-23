@@ -32,6 +32,13 @@ namespace Hymson.MES.HttpClients
         Task<BaseResponse?> WarehousingDeliveryRequestAsync(DeliveryDto request);
 
         /// <summary>
+        /// 取消入库IQC申请
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<BaseResponse?> CancelIQCEntryAsync(CancelEntryDto requestBody);
+
+        /// <summary>
         /// 取消入库申请
         /// </summary>
         /// <param name="requestDto"></param>
