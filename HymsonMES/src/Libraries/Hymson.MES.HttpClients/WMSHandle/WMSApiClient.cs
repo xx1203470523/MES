@@ -141,6 +141,24 @@ namespace Hymson.MES.HttpClients
         }
 
         /// <summary>
+        /// 取消入库IQC申请
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<BaseResponse?> CancelIQCEntryAsync(CancelEntryDto requestBody)
+        {
+            _logger.LogDebug($"取消入库IQC申请 -> Request: {requestBody.ToSerialize()}");
+
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.ReceiptIQCCancel.Route, requestBody);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"取消入库IQC申请 -> Response: {jsonResponse}");
+
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse?>();
+        }
+
+        /// <summary>
         /// 取消入库申请
         /// </summary>
         /// <param name="requestDto"></param>
@@ -175,7 +193,6 @@ namespace Hymson.MES.HttpClients
 
             return await httpResponse.Content.ReadFromJsonAsync<BaseResponse?>();
         }
-
 
 
 

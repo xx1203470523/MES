@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.SystemServices.Dtos;
 using Hymson.MES.SystemServices.Services.Quality;
+using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -46,6 +47,8 @@ namespace Hymson.MES.System.Api.Controllers
         [LogDescription("来料检验", BusinessType.INSERT)]
         public async Task SubmitIncomingAsync([FromBody] WhMaterialReceiptDto dto)
         {
+            _logger.LogDebug($"来料检验 -> Request: {dto.ToSerialize()}");
+
             await _qualIQCService.SubmitIncomingAsync(dto);
         }
 

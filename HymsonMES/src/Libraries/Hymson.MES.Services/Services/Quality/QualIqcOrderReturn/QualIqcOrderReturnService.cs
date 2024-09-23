@@ -23,6 +23,7 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Options;
+using Hymson.MES.HttpClients.Requests.WMS;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
@@ -558,12 +559,23 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> CancelOrderAsync(long id)
         {
-            // 检验单
+            // 查询检验单
             var orderEntity = await _qualIqcOrderReturnRepository.GetByIdAsync(id);
             if (orderEntity == null) return 0;
 
-            // TODO 判断检验单状态是否允许取消（WMS）
-            return 0;
+            // 查询退料单
+            var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(orderEntity.ReturnOrderId);
+            if (returnEntity == null) return 0;
+
+            // 判断检验单状态是否允许取消（WMS）
+            var response = await _wmsApiClient.CancelEntryAsync(new CancelEntryDto
+            {
+                SyncCode = returnEntity.ReturnOrderCode,
+                UpdatedBy = _currentUser.UserName
+            });
+
+            if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "结果返回异常，请检查！");
+            if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
 
             // 修复检验单状态
             orderEntity.Remark = $"手动弃审，弃审前状态：【{orderEntity.Status.GetDescription()}】";

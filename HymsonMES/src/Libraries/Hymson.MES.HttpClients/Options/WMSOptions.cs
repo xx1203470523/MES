@@ -36,6 +36,11 @@
         public WMSBusinessOptions Receipt { get; set; }
 
         /// <summary>
+        /// 取消入库IQC操作配置
+        /// </summary>
+        public WMSBusinessOptions ReceiptIQCCancel { get; set; }
+
+        /// <summary>
         /// 取消入库操作配置
         /// </summary>
         public WMSBusinessOptions ReceiptCancel { get; set; }
