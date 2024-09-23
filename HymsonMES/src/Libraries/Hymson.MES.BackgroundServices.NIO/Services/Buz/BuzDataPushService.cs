@@ -315,6 +315,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             List<NioPushCollectionEntity> rotorNioList = new List<NioPushCollectionEntity>();
             List<NioPushCollectionEntity> statorNioList = new List<NioPushCollectionEntity>();
             // TODO: 替换为实际数据
+            paramList = paramList.OrderBy(m => m.CreatedOn).ToList();
             foreach (var item in paramList)
             {
                 //标准参数
