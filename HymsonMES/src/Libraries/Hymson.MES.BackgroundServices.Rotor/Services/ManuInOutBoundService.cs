@@ -318,11 +318,12 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 int.TryParse(rotorSecondStr, out rotorDbSecond);
             }
 
-            //如果和当前时间相差在一分钟之内，则不处理，避免转子线数据库同步导致的延迟问题
+            //如果和当前时间相差在指定时间之内，则不处理，避免转子线数据库同步导致的延迟问题
             if (startWaterMarkTime.AddSeconds(rotorDbSecond) > now)
             {
                 return;
             }
+            DateTime endDate = now.AddSeconds(-rotorDbSecond);
 
             //TODO
             //1. 中间工序不管进出站，但是参数需要记录保存，上料信息需要记录
@@ -351,7 +352,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //表名后缀
             string suffixTableName = GetFirstDayOfQuarter(start);
             //1. 根据开始时间，结束时间，读取线体MES过站数据
-            List<WorkProcessDto> inOutList = await GetInOutBoundListAsync(start, rows, suffixTableName);
+            List<WorkProcessDto> inOutList = await GetInOutBoundListAsync(start, endDate, rows, suffixTableName);
             if(inOutList == null || inOutList.Count == 0)
             {
                 //如果数据为空，且当前水位的季度和当前时间的季度不一样，则把水位转为下个季度的初始时间
@@ -493,7 +494,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         curUpStr = curUpStr.Substring(0, 2000);
                     }
                     sysLog.Remark2 = curUpStr;
-                    sysLog.Remark3 = "";
+                    sysLog.Remark3 = $"水位开始时间：{startWaterMarkTime.ToString("yyyyMMdd HH:mm:ss")},当前时间：{now.ToString("yyyyMMdd HH:mm:ss")}，间隔时间:{rotorDbSecond}";
                     sysLog.Remark4 = "";
                     sysLog.Remark5 = "";
                     sysLogList.Add(sysLog);
@@ -545,7 +546,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         SfcParamDto curParamDto = new SfcParamDto();
                         curParamDto.ParamName = paramItem.Name;
                         curParamDto.ParamCode = paramItem.NameCode;
-                        curParamDto.CreateOn = paramItem.CreateTime;
+                        curParamDto.CreateOn = paramItem.UpdateTime;
                         curParamDto.Unit = paramItem.Unit;
                         curParamDto.Value = Convert.ToDecimal(paramItem.Value);
                         curParamDto.StrValue = paramItem.StrValue;
@@ -824,11 +825,12 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// 获取线体MES过站数据
         /// </summary>
         /// <param name="start"></param>
+        /// <param name="end"></param>
         /// <param name="rows"></param>
         /// <param name="suffixTableName"></param>
         /// <returns></returns>
-        private async Task<List<WorkProcessDto>> GetInOutBoundListAsync(DateTime start, int rows,
-            string suffixTableName)
+        private async Task<List<WorkProcessDto>> GetInOutBoundListAsync(DateTime start, DateTime end,
+            int rows, string suffixTableName)
         {
             List<WorkProcessDto> resultList = new List<WorkProcessDto>();
 
@@ -838,6 +840,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 WHERE IsDeleted = 0
                 AND EndTime IS NOT NULL
                 AND EndTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
+                AND EndTime < '{end.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
                 AND ProductStatus = '{ProductStatus_Out}'
 -- and ProductNo = 'E3001131AFV15881001001TPL060102H60400043'
                 ORDER BY EndTime ASC;
