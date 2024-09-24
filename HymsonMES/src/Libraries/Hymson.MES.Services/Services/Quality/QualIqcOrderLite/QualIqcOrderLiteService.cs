@@ -527,7 +527,7 @@ namespace Hymson.MES.Services.Services.Quality
             if (orderEntity == null) return 0;
 
             // 查询来料单
-            var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(orderEntity.MaterialReceiptId)
+            var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(orderEntity.MaterialReceiptId);
            if (receiptEntity == null) return 0;
 
             // 判断检验单状态是否允许取消（WMS）
