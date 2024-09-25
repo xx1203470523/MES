@@ -110,5 +110,10 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("RotorDbSynSecond")]
         RotorDbSynSecond = 23,
+        /// <summary>
+        /// NIO关键下级键排除物料
+        /// </summary>
+        [Description("NioKeyExcludeMat")]
+        NioKeyExcludeMat = 24,
     }
 }

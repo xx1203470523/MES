@@ -269,6 +269,17 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             List<KeySubordinateDto> dtos = new List<KeySubordinateDto>();
             List<NioPushKeySubordinateEntity> nioList = new List<NioPushKeySubordinateEntity>();
 
+            List<string> excludeMatList = new List<string>();
+            //取配置中需要过滤的物料
+            SysConfigQuery configQuery = new SysConfigQuery();
+            configQuery.Type = SysConfigEnum.NioKeyExcludeMat;
+            var keyConfigList = await _sysConfigRepository.GetEntitiesAsync(configQuery);
+            if(keyConfigList != null && keyConfigList.Count() > 0)
+            {
+                string matStr = keyConfigList.First().Value;
+                excludeMatList.AddRange(matStr.Split('&'));
+            }
+
             IEnumerable<ProcBomDetailView> materialList = new List<ProcBomDetailView>();
             //1. 取配置中的两个生产物料
             List<PlanWorkOrderEntity> orderList = new List<PlanWorkOrderEntity>();
@@ -316,6 +327,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                 foreach (var wmsItem in wmsResult.Data)
                 {
                     if(string.IsNullOrEmpty(wmsItem.SubordinateCode) == true)
+                    {
+                        continue;
+                    }
+                    if(excludeMatList.Contains(wmsItem.SubordinateCode) == true)
                     {
                         continue;
                     }
