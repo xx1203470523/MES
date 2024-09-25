@@ -68,37 +68,53 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             string equipmentCode = "YTLPACK01AE014";
             //string equipmentCode = "YTLPACK01AE023";
             await SetEquInfoAsync(equipmentCode);
-            SfcCirculationBindDto sfcCirculationCCS = new SfcCirculationBindDto()
+
+            SfcCirculationBindDto sfcCirculationCCS = new()
             {
-                SFC = "TESTM001",
-                ModelCode = "12S",  //ModelCode
-                //IsVirtualSFC=false,
-                BindSFCs = new CirculationBindDto[] {
-                    //new CirculationBindDto{
-                    //    SFC="YTC20240620003",
-                    //    Location="0",
-                    //    //Name="CCS01"
-                    //},
-
-                    new CirculationBindDto{
-                        SFC="TESTSFC01",
-                        Location="0",
-                        //Name="CCS01"
-                    },
-
-                    //new CirculationBindDto{
-                    //    SFC="YTM20240620003",
-                    //    Location="1",
-                    //    //Name="CCS01"
-                    //}
-                },
                 EquipmentCode = "YTLPACK01AE014",
                 ResourceCode = "YTLPACK01ER014",
-
-                //EquipmentCode = "YTLPACK01AE023",
-                //ResourceCode = "YTLPACK01ER023",
+                SFC = "ES01340010000000572409180096",
+                ModelCode = "",
+                BindSFCs = new CirculationBindDto[] {
+                    new(){Location="0",SFC= "YTLSM202409230258A",Name= null},
+                    new(){ Location="1",SFC="5357211000001024890111CZHC",Name =null },
+                    new(){Location="2",SFC="YTLSM202409230256A",Name=null}
+                },
                 LocalTime = DateTime.Now
             };
+
+
+            //SfcCirculationBindDto sfcCirculationCCS = new SfcCirculationBindDto()
+            //{
+            //    SFC = "TESTM001",
+            //    ModelCode = "12S",  //ModelCode
+            //    //IsVirtualSFC=false,
+            //    BindSFCs = new CirculationBindDto[] {
+            //        //new CirculationBindDto{
+            //        //    SFC="YTC20240620003",
+            //        //    Location="0",
+            //        //    //Name="CCS01"
+            //        //},
+
+            //        new CirculationBindDto{
+            //            SFC="TESTSFC01",
+            //            Location="0",
+            //            //Name="CCS01"
+            //        },
+
+            //        //new CirculationBindDto{
+            //        //    SFC="YTM20240620003",
+            //        //    Location="1",
+            //        //    //Name="CCS01"
+            //        //}
+            //    },
+            //    EquipmentCode = "YTLPACK01AE014",
+            //    ResourceCode = "YTLPACK01ER014",
+
+            //    //EquipmentCode = "YTLPACK01AE023",
+            //    //ResourceCode = "YTLPACK01ER023",
+            //    LocalTime = DateTime.Now
+            //};
             await _sfcCirculationService.SfcCirculationBindAsync(sfcCirculationCCS);
             Assert.IsTrue(true);
         }
@@ -133,20 +149,17 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
         [TestMethod()]
         public async Task SfcCirculationCCSBindAsyncTest2()
         {
-            string equipmentCode = "QAEM002";
+            string equipmentCode = "YTLPACK01AE023";
             await SetEquInfoAsync(equipmentCode);
             SfcCirculationCCSBindDto sfcCirculationCCS = new SfcCirculationCCSBindDto()
             {
-                ResourceCode = "QAEMZY002",
-                SFC = "AAATESTSFC2308091",
-                ModelCode = "TEST",
+                ResourceCode = "YTLPACK01ER023",
+                SFC = "ES01340010000000572409180096",
+                ModelCode = "",
                 BindSFCs = new CirculationCCSDto[] {
-                    new CirculationCCSDto{
-                        SFC="CCS0002",
-                        Location="B",
-                        Name="CCS02"
-                    }
-                }
+                    new(){Location="1",SFC= "YTLSM202409230258A",Name= null}
+                    ,new(){Location="2",SFC="YTLSM202409230256A",Name=null}
+}
             };
             await _sfcCirculationService.SfcCirculationCCSBindAsync(sfcCirculationCCS);
             Assert.IsTrue(true);

@@ -326,7 +326,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //绑定条码信息
             if (mpManuSfc == null && sfcCirculationBindDto.IsVirtualSFC != true)
             {
-                var sfcProduceEntity = sfcProduceList.First();
+                //根据条码排序，确保BMU板码在前，获取BMU板码在制生成Pack码信息
+                var sfcProduceEntity = sfcProduceList.OrderBy(a=>a.SFC).First();
                 manuSfc = new ManuSfcEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -365,7 +366,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     EquipmentId = _currentEquipment.Id ?? 0,
                     ResourceId = procResource.Id,
                     Qty = 1,//进站默认都是1个
-                    ProcedureId = sfcProduceList.First().ProcedureId,//当前绑定条码所在工序
+                    ProcedureId = sfcProduceEntity.ProcedureId,//当前绑定条码所在工序
                     Status = SfcProduceStatusEnum.Activity,//接口进站直接为活动
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
