@@ -118,6 +118,22 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 InnerIds = entities.Select(s => s.ID).Distinct()
             });
 
+            // 物料信息（外定子）
+            var outerMaterialEntity = await _mainService.GetMaterialEntityAsync(new EntityByCodeQuery
+            {
+                Site = statorBo.SiteId,
+                Code = _outerBarCode
+            });
+            var outerStatorId = outerMaterialEntity?.Id ?? 0;
+
+            // 物料信息（内定子）
+            var innerMaterialEntity = await _mainService.GetMaterialEntityAsync(new EntityByCodeQuery
+            {
+                Site = statorBo.SiteId,
+                Code = _innerStatorCode
+            });
+            var innerStatorId = innerMaterialEntity?.Id ?? 0;
+
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
             foreach (var opEntity in entities)
@@ -241,15 +257,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
                 {
                     WorkOrderId = statorBo.WorkOrderId,
-                    ProductId = 51558094155608064,//TODO materialId,
+                    ProductId = innerStatorId,// 51558094067523584,
                     ProcedureId = statorBo.ProcedureId,
                     ResourceId = null,
-                    SFC = barCode,
+                    SFC = statorSFCEntity.InnerBarCode,
 
-                    CirculationBarCode = statorSFCEntity.InnerBarCode,
+                    CirculationBarCode = barCode,
                     CirculationWorkOrderId = statorBo.WorkOrderId,
-                    CirculationProductId = 51558094067523584,//TODO statorBo.ProductId,
-                    CirculationMainProductId = 51558094067523584,//TODOstatorBo.ProductId,
+                    CirculationProductId = outerStatorId,//51558094155608064,
+                    CirculationMainProductId = outerStatorId,//51558094155608064,
                     CirculationQty = StatorConst.QTY,
                     CirculationType = SfcCirculationTypeEnum.Consume,
 
@@ -384,6 +400,16 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// </summary>
     public partial class OP210Service
     {
+        /// <summary>
+        /// 编码（外定子铁芯-NIO4.8量产φ188x122）
+        /// </summary>
+        private const string _outerBarCode = "030102000002";
+
+        /// <summary>
+        /// 编码（內定子铁芯-NIO4.8量产φ154x121.5）
+        /// </summary>
+        private const string _innerStatorCode = "030101000002";
+
         /// <summary>
         /// 参数编码集合
         /// </summary>
