@@ -3,6 +3,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Plan;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -236,6 +237,18 @@ namespace Hymson.MES.SystemServices.Services.Plan
             // 检查工单BOM是否和主数据一致
             foreach (var workPlanDto in workPlanDtos)
             {
+                // 判断"工单类型"是否合法
+                if (!Enum.IsDefined(typeof(PlanWorkOrderTypeEnum), workPlanDto.Type))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16041));
+                }
+
+                // 判断"生产计划类型"是否合法
+                if (!Enum.IsDefined(typeof(PlanWorkPlanTypeEnum), workPlanDto.PlanType))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16069));
+                }
+
                 // 如果是返工工单，不需要检查BOM
                 if (workPlanDto.Type == PlanWorkOrderTypeEnum.Rework) continue;
 

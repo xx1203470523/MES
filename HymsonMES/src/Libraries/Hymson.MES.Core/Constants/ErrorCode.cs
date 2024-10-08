@@ -1277,6 +1277,7 @@
         public const string MES16066 = "领料单未找到，发送的请求标识为：【{Code}】。";
         public const string MES16067 = "只允许取消【{Status}】的完工入库单！";
         public const string MES16068 = "请选择虚仓的领料来源工单！";
+        public const string MES16069 = "生产计划类型不合法，请检查！";
         #endregion
 
         #region 条码接收 16100
