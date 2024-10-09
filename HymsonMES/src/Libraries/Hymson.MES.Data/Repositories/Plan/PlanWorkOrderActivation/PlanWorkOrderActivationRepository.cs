@@ -191,7 +191,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1].AddDays(1) });
                 sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
             }
-            sqlBuilder.OrderBy(" wo.WorkPlanId desc, wo.OrderCode asc ");
+            sqlBuilder.OrderBy(" wo.WorkPlanId desc, wo.Id asc ");
 
             var offSet = (planWorkOrderActivationPagedQuery.PageIndex - 1) * planWorkOrderActivationPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -323,7 +323,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                          LEFT JOIN inte_work_center wc on wo.WorkCenterId=wc.Id
                          
                         /**where**/  
-                        Order by wo.CreatedOn desc LIMIT @Offset,@Rows ";
+                        /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                          FROM `plan_work_order` wo 
                          LEFT JOIN plan_work_order_activation woa ON wo.Id= woa.WorkOrderId
