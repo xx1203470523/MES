@@ -191,6 +191,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1].AddDays(1) });
                 sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
             }
+            sqlBuilder.OrderBy(" wo.WorkPlanId desc, wo.OrderCode asc ");
 
             var offSet = (planWorkOrderActivationPagedQuery.PageIndex - 1) * planWorkOrderActivationPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
