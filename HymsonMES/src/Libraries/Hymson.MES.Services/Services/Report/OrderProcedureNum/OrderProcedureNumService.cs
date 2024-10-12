@@ -1,11 +1,15 @@
 ﻿using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Minio;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,17 +45,31 @@ namespace Hymson.MES.Services.Services.Report.OrderProcedureNum
         private readonly ISysConfigRepository _sysConfigRepository;
 
         /// <summary>
+        /// excel
+        /// </summary>
+        private readonly IExcelService _excelService;
+
+        /// <summary>
+        /// minio
+        /// </summary>
+        private readonly IMinioService _minioService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public OrderProcedureNumService(IManuSfcStepRepository manuSfcStepRepository,
             ICurrentSite currentSite,
             IProcMaterialRepository procMaterialRepository,
-            ISysConfigRepository sysConfigRepository)
+            ISysConfigRepository sysConfigRepository,
+            IExcelService excelService,
+            IMinioService minioService)
         {
             _manuSfcStepRepository = manuSfcStepRepository;
             _currentSite = currentSite;
             _procMaterialRepository = procMaterialRepository;
             _sysConfigRepository = sysConfigRepository;
+            _excelService = excelService;
+            _minioService = minioService;   
         }
 
         /// <summary>
@@ -169,5 +187,30 @@ namespace Hymson.MES.Services.Services.Report.OrderProcedureNum
             //result.SumList = sumList;
             //return result;
         }
+
+        /// <summary>
+        /// 导出
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<ExportResponseDto> ExportOrderProcedureNumListAsync(OrderProcedureNumDto param)
+        {
+            var pageList = await GetOrderProcedureNumListAsync(param);
+
+            var list = pageList.Data;
+
+            string listStr = JsonConvert.SerializeObject(list);
+            List<OrderProcedureNumExcelDto> excelList = JsonConvert.DeserializeObject<List<OrderProcedureNumExcelDto>>(listStr);
+
+            string fileName = $"工时报表";
+            var filePath = await _excelService.ExportAsync(excelList, fileName, fileName);
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new ExportResponseDto
+            {
+                FileName = fileName,
+                Path = uploadResult.AbsoluteUrl,
+            };
+        }
+
     }
 }
