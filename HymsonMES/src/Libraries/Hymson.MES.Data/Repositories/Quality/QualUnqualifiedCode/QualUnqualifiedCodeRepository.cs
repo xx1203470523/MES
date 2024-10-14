@@ -118,6 +118,23 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 根据编码获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByAllCodesAsync(long siteid)
+        {
+            string sql = @$"
+                SELECT * FROM qual_unqualified_code 
+                WHERE SiteId = {siteid} 
+                AND IsDeleted = 0
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualUnqualifiedCodeEntity>(sql);
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="parm"></param>

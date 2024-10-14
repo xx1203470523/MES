@@ -1610,6 +1610,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             var response = await _wmsRequest.ProductReceiptRequestAsync(new HttpClients.Requests.ProductReceiptRequestDto
             {
+                CreateBy = _currentUser.UserName,
                 WarehouseCode = whCode,
                 // SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
                 SyncCode = CompletionOrderCode,
@@ -2053,6 +2054,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             //trans.Complete();
             var response = await _wmsRequest.WasteProductReceiptRequestAsync(new HttpClients.Requests.WasteProductReceiptRequestDto
             {
+                CreateBy = _currentUser.UserName,
                 WarehouseCode = whCode,
                 // SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
                 SyncCode = CompletionOrderCode,

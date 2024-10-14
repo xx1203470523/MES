@@ -14,6 +14,7 @@ using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
@@ -107,24 +108,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IIQCOrderCreateService _iqcOrderCreateService;
 
+        /// <summary>
+        /// 单位
+        /// </summary>
+        private readonly IInteUnitRepository _inteUnitRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="wmsOptions"></param>
-        /// <param name="wmsApiClient"></param>
-        /// <param name="qualIqcOrderLiteRepository"></param>
-        /// <param name="qualIqcOrderLiteDetailRepository"></param>
-        /// <param name="qualIqcOrderOperateRepository"></param>
-        /// <param name="qualIqcOrderAnnexRepository"></param>
-        /// <param name="whMaterialReceiptRepository"></param>
-        /// <param name="whMaterialReceiptDetailRepository"></param>
-        /// <param name="procMaterialRepository"></param>
-        /// <param name="whSupplierRepository"></param>
-        /// <param name="inteAttachmentRepository"></param>
-        /// <param name="iqcOrderCreateService"></param>
         public QualIqcOrderLiteService(ICurrentUser currentUser, ICurrentSite currentSite,
             IOptions<WMSOptions> wmsOptions,
             IWMSApiClient wmsApiClient,
@@ -137,7 +128,8 @@ namespace Hymson.MES.Services.Services.Quality
             IProcMaterialRepository procMaterialRepository,
             IWhSupplierRepository whSupplierRepository,
             IInteAttachmentRepository inteAttachmentRepository,
-            IIQCOrderCreateService iqcOrderCreateService)
+            IIQCOrderCreateService iqcOrderCreateService,
+            IInteUnitRepository inteUnitRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -153,6 +145,7 @@ namespace Hymson.MES.Services.Services.Quality
             _whSupplierRepository = whSupplierRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _iqcOrderCreateService = iqcOrderCreateService;
+            _inteUnitRepository = inteUnitRepository;
         }
 
 
@@ -581,6 +574,10 @@ namespace Hymson.MES.Services.Services.Quality
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(detailEntities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
             var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
 
+            //获取单位
+            InteUnitQuery unitQuery = new InteUnitQuery() { SiteId = orderEntity.SiteId };
+            var unitList = await _inteUnitRepository.GetEntitiesAsync(unitQuery);
+
             // 遍历
             foreach (var entity in detailEntities)
             {
@@ -606,6 +603,14 @@ namespace Hymson.MES.Services.Services.Quality
                         dto.MaterialVersion = materialEntity.Version ?? "";
                         dto.Specifications = materialEntity.Specifications ?? "";
                         //dto.Unit = materialEntity.Unit ?? "";
+                        if(unitList != null && unitList.Count() > 0)
+                        {
+                            var curUnit = unitList.Where(m => m.Code == materialEntity.Unit).FirstOrDefault();
+                            if(curUnit != null)
+                            {
+                                dto.Unit = curUnit.Name;
+                            }
+                        }
                     }
                 }
                 else

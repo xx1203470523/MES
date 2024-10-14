@@ -119,6 +119,10 @@ namespace Hymson.MES.Services.Dtos.QualFqcInspectionMaval
         /// </summary>
         public FqcJudgmentResultsEnum JudgmentResults { get; set; }
 
+        /// <summary>
+        /// 不合格原因
+        /// </summary>
+        public string ?Remark { get; set; }
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 
@@ -66,6 +67,12 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeletesQualUnqualifiedCodeAsync(long[] ids);
+
+        /// <summary>
+        /// 查询编码
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> QueryCodesAsync();
 
         /// <summary>
         /// 状态变更

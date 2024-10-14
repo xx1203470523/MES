@@ -197,6 +197,12 @@ namespace Hymson.MES.HttpClients.Requests
         /// 
         [JsonPropertyName("details")]
         public List<ProductReceiptItemDto> Details { get; set; }
+
+        /// <summary>
+        /// 操作人
+        /// </summary>
+        [JsonPropertyName("createBy")]
+        public string CreateBy { get; set; }
     }
 
     /// <summary>
@@ -213,6 +219,8 @@ namespace Hymson.MES.HttpClients.Requests
         public string WarehouseCode { get; set; }
 
         public List<ProductReceiptItemDto> Details { get; set; }
+
+        public string CreateBy { get; set; }
     }
     /// <summary>
     /// 成品入库明细item
@@ -316,6 +324,12 @@ namespace Hymson.MES.HttpClients.Requests
         /// 
         [JsonPropertyName("details")]
         public List<WasteProductReceiptItemDto> Details { get; set; }
+
+        /// <summary>
+        /// 操作人
+        /// </summary>
+        [JsonPropertyName("createBy")]
+        public string CreateBy { get; set; }
     }
     /// <summary>
     /// 废成品入库
@@ -331,6 +345,8 @@ namespace Hymson.MES.HttpClients.Requests
         public string WarehouseCode { get; set; }
 
         public List<WasteProductReceiptItemDto> Details { get; set; }
+
+        public string CreateBy { get; set; }
     }
     /// <summary>
     /// 废成品入库明细item

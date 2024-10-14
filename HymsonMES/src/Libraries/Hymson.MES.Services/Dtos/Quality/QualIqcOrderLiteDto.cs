@@ -354,6 +354,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string IsFreeText { get; set; }
 
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string Unit { get; set; }
+
     }
 
     /// <summary>

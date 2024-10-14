@@ -23,31 +23,34 @@ namespace Hymson.MES.Core.Domain.QualFqcInspectionMaval
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工序Id
         /// </summary>
         public long ProcedureId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 资源Id
         /// </summary>
         public long ResourceId { get; set; }
 
-       /// <summary>
+         /// <summary>
         /// 条码
         /// </summary>
         public string SFC { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 数量
         /// </summary>
         public int Qty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 判定结果1.合格2.不合格
         /// </summary>
         public FqcJudgmentResultsEnum JudgmentResults { get; set; }
 
-       
+        /// <summary>
+        /// 不合格原因
+        /// </summary>
+        public string? Remark { get; set; }
     }
 }

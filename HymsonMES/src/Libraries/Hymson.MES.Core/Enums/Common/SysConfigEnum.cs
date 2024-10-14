@@ -5,7 +5,7 @@ namespace Hymson.MES.Core.Enums
     /// <summary>
     /// 枚举（系统配置）
     /// </summary>
-    public enum SysConfigEnum : sbyte
+    public enum SysConfigEnum : byte
     {
         /// <summary>
         /// AQL检验水平

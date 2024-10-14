@@ -8,7 +8,9 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
@@ -364,6 +366,22 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
                 qualUnqualifiedCodeDtos.Add(qualUnqualifiedCodeDto);
             }
             return qualUnqualifiedCodeDtos;
+        }
+
+        /// <summary>
+        /// 查询编码
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> QueryCodesAsync()
+        {
+            var solutionEntities = await _qualUnqualifiedCodeRepository.GetByAllCodesAsync(_currentSite.SiteId ?? 0);
+            //var solutionEntities = await _qualUnqualifiedGroupRepository.GetEntitiesAsync(new EntityByStatusQuery { SiteId = _currentSite.SiteId ?? 0 });
+            return solutionEntities.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = $"{s.UnqualifiedCode}-{s.UnqualifiedCodeName}",
+                Value = $"{s.UnqualifiedCode}"
+            });
         }
 
         #region 状态变更

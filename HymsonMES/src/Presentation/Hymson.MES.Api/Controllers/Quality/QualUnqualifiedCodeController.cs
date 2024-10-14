@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality.QualUnqualifiedCode;
@@ -112,6 +113,16 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task DeleteQualUnqualifiedCodeAsync(long[] ids)
         {
             await _qualUnqualifiedCodeService.DeletesQualUnqualifiedCodeAsync(ids);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("list")]
+        public async Task<IEnumerable<SelectOptionDto>> QueryCodesAsync()
+        {
+            return await _qualUnqualifiedCodeService.QueryCodesAsync();
         }
 
         #region 状态变更
