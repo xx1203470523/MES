@@ -130,10 +130,15 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     if(dbSfcModel != null)
                     {
+                        dbSfcModel.Id = IdGenProvider.Instance.CreateId();
                         dbSfcModel.UpdatedBy = item.UpdateID;
                         dbSfcModel.UpdatedOn = HymsonClock.Now();
+                        dbSfcModel.IsDeleted = item.IsDeleted == true ? 1 : 0;
                         dbSfcModel.BoxCode = item.BoxCode;
-                        updateList.Add(dbSfcModel);
+                        dbSfcModel.ProductCode = item.ProductCode;
+                        dbSfcModel.ProductNo = item.ProductNo;
+                        //updateList.Add(dbSfcModel);
+                        insertList.Add(dbSfcModel);
                     }
                     else
                     {
