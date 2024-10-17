@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
+using IdGen;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -94,6 +95,24 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<SysAbnormalMessageRecordEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据来源获取最新的一条
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public async Task<SysAbnormalMessageRecordEntity> GetNewBySourceAsync(string source)
+        {
+            string sql = $@"
+                select * 
+                from sys_abnormal_message_record samr 
+                where Source  = '{source}'
+                order by CreatedOn desc 
+                limit 0,1
+            ";
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<SysAbnormalMessageRecordEntity>(sql);
         }
 
         /// <summary>

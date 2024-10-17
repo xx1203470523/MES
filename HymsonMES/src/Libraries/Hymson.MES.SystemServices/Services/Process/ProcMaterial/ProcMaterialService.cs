@@ -123,6 +123,8 @@ namespace Hymson.MES.SystemServices.Services.Process
                         BuyType = materialDto.BuyType,
                         SerialNumber = materialDto.SerialNumber,
                         Remark = materialDto.Description,
+                        Status = SysDataStatusEnum.Enable,
+                        Origin = MaterialOriginEnum.ERP,
 
                         // TODO: 这里需要根据物料编码获取物料信息
 

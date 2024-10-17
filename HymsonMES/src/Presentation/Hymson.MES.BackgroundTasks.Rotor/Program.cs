@@ -49,6 +49,7 @@ Host.CreateDefaultBuilder(args)
 
            q.AddJobAndTrigger<ManuDataJob>(hostContext.Configuration);
            q.AddJobAndTrigger<PackListJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<CheckDataJob>(hostContext.Configuration);
 
            /*
            q.UsePersistentStore((persistentStoreOptions) =>

@@ -58,7 +58,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<SysAbnormalMessageRecordEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 根据来源获取最新的一条
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        Task<SysAbnormalMessageRecordEntity> GetNewBySourceAsync(string source);
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
