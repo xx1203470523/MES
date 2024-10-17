@@ -267,7 +267,7 @@ namespace Hymson.MES.HttpClients
 
             ProductReceiptRequest materialReturnRequest = new()
             {
-                CreateBy = request.CreateBy,
+                CreatedBy = request.CreateBy,
                 SendOn = request.SendOn,
                 SyncCode = request.SyncCode,
                 Details = request.Details,
@@ -346,7 +346,7 @@ namespace Hymson.MES.HttpClients
 
             WasteProductReceiptRequest wasteProductReceiptRequest = new()
             {
-                CreateBy = request.CreateBy,
+                CreatedBy = request.CreateBy,
                 SendOn = request.SendOn,
                 SyncCode = request.SyncCode,
                 Details = request.Details,

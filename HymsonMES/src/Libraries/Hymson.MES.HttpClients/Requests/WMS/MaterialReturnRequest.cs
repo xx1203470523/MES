@@ -201,8 +201,8 @@ namespace Hymson.MES.HttpClients.Requests
         /// <summary>
         /// 操作人
         /// </summary>
-        [JsonPropertyName("createBy")]
-        public string CreateBy { get; set; }
+        [JsonPropertyName("createdBy")]
+        public string CreatedBy { get; set; }
     }
 
     /// <summary>
@@ -328,8 +328,8 @@ namespace Hymson.MES.HttpClients.Requests
         /// <summary>
         /// 操作人
         /// </summary>
-        [JsonPropertyName("createBy")]
-        public string CreateBy { get; set; }
+        [JsonPropertyName("createdBy")]
+        public string CreatedBy { get; set; }
     }
     /// <summary>
     /// 废成品入库

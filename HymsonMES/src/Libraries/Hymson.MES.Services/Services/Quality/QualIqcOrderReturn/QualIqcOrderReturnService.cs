@@ -820,10 +820,15 @@ namespace Hymson.MES.Services.Services.Quality
                 // 生产工单
                 if (entity.WorkOrderId.HasValue)
                 {
-                    var workOrderEntity = workOrderDic[entity.WorkOrderId.Value];
+                    //var workOrderEntity = workOrderDic[entity.WorkOrderId.Value];
+                    var workOrderEntity = workOrderEntities.Where(m => m.Id == entity.WorkOrderId.Value).FirstOrDefault();
                     if (workOrderEntity != null)
                     {
                         dto.WorkOrderCode = workOrderEntity.OrderCode;
+                    }
+                    else
+                    {
+                        dto.WorkOrderCode = "-";
                     }
                 }
                 else

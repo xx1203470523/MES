@@ -127,6 +127,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             string sql = @$"
                 SELECT * FROM qual_unqualified_code 
                 WHERE SiteId = {siteid} 
+                AND Status  = '1'
                 AND IsDeleted = 0
             ";
 
