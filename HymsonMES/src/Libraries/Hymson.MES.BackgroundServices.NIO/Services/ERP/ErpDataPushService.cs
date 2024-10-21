@@ -101,6 +101,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
         private readonly string NIO_USER_ID = "LMS001";
 
         /// <summary>
+        /// 没有配置数量
+        /// </summary>
+        private readonly decimal NO_CONFIG_NUM = -1;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ErpDataPushService(INioPushSwitchRepository nioPushSwitchRepository, 
@@ -141,6 +146,19 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
 
             DateTime now = HymsonClock.Now();
             string nowStr = now.ToString("yyyy-MM-dd 00:00:00");
+
+            SysConfigQuery numQuery = new SysConfigQuery();
+            numQuery.Type = SysConfigEnum.NioStockNum;
+            var numConfigList = await _sysConfigRepository.GetEntitiesAsync(numQuery);
+            SysConfigEntity? sysConfigEntity = new SysConfigEntity();
+            if (numConfigList != null && numConfigList.Count() > 0)
+            {
+                sysConfigEntity = numConfigList.ElementAt(0);
+            }
+            else
+            {
+                sysConfigEntity = null;
+            }
 
             List<StockMesNIODto> paramList = new List<StockMesNIODto>();
             //1. 取配置中的两个生产物料
@@ -219,6 +237,17 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                 dto.ProductBackUpMin = item.ProductBackUpMin;
                 dto.ParaConfigUnit = item.ParaConfigUnit;
 
+                decimal configStockRejection = ConfigConvertToNum(sysConfigEntity, "StockRejection");
+                decimal configStockUndetermined = ConfigConvertToNum(sysConfigEntity, "StockUndetermined");
+                if(configStockRejection != NO_CONFIG_NUM)
+                {
+                    dto.ProductStockRejection = configStockRejection;
+                }
+                if(configStockUndetermined != NO_CONFIG_NUM)
+                {
+                    dto.ProductStockUndetermined = configStockUndetermined;
+                }
+
                 dto.WorkingSchedule = curBaseConfig.WorkingSchedule;
                 dto.PlannedCapacity = curBaseConfig.PlannedCapacity;
                 dto.Efficiency = curBaseConfig.Efficiency;
@@ -278,6 +307,19 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             {
                 string matStr = keyConfigList.First().Value;
                 excludeMatList.AddRange(matStr.Split('&'));
+            }
+
+            SysConfigQuery numQuery = new SysConfigQuery();
+            numQuery.Type = SysConfigEnum.NioKeyNum;
+            var numConfigList = await _sysConfigRepository.GetEntitiesAsync(numQuery);
+            SysConfigEntity? sysConfigEntity = new SysConfigEntity();
+            if(numConfigList != null && numConfigList.Count() > 0)
+            {
+                sysConfigEntity = numConfigList.ElementAt(0);
+            }
+            else
+            {
+                sysConfigEntity = null;
             }
 
             IEnumerable<ProcBomDetailView> materialList = new List<ProcBomDetailView>();
@@ -357,8 +399,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                         dto.SubordinateSource = "WMS没有该信息";
                     }
                     dto.ParaConfigUnit = wmsItem.ParaConfigUnit;
+
+                    decimal configArrivalPlan = ConfigConvertToNum(sysConfigEntity, "ArrivalPlan");
+                    decimal configDemandPlan = ConfigConvertToNum(sysConfigEntity, "DemandPlan");
+
                     //ERP物料信息
-                    if(erpResult != null)
+                    if (erpResult != null)
                     {
                         var curErpMat = erpResult.Data.Where(m => m.MaterialCode == wmsItem.SubordinateCode).FirstOrDefault();
                         if(curErpMat != null)
@@ -366,6 +412,14 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                             dto.SubordinatePartner = curErpMat.SupperialName;
                             dto.SubordinateArrivalPlan = 0;
                             dto.SubordinateDemandPlan = curErpMat.Num; //ERP-MES请购单
+                            if(configArrivalPlan != NO_CONFIG_NUM)
+                            {
+                                dto.SubordinateArrivalPlan = configArrivalPlan;
+                            }
+                            if(configDemandPlan != NO_CONFIG_NUM)
+                            {
+                                dto.SubordinateDemandPlan = configDemandPlan;
+                            }
                         }
                     }
                     else
@@ -373,6 +427,14 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                         dto.SubordinatePartner = "ERP没有该信息";
                         dto.SubordinateArrivalPlan = 0;
                         dto.SubordinateDemandPlan = 0m; //ERP-MES请购单
+                        if (configArrivalPlan != NO_CONFIG_NUM)
+                        {
+                            dto.SubordinateArrivalPlan = configArrivalPlan;
+                        }
+                        if (configDemandPlan != NO_CONFIG_NUM)
+                        {
+                            dto.SubordinateDemandPlan = configDemandPlan;
+                        }
                     }
 
                     //MES物料信息
@@ -409,6 +471,42 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             await _nioPushKeySubordinateRepository.InsertRangeAsync(nioList);
 
             trans.Complete();
+        }
+
+        /// <summary>
+        /// 配置项转为数量
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="keyName"></param>
+        /// <returns></returns>
+        private decimal ConfigConvertToNum(SysConfigEntity? config, string keyName)
+        {
+            if(config == null)
+            {
+                return NO_CONFIG_NUM;
+            }
+            string value = config.Value;
+            if(value == null)
+            {
+                return NO_CONFIG_NUM;
+            }
+            List<string> valArr = value.Split("&").ToList();
+            foreach(var item in valArr)
+            {
+                var curArr = item.Split("=").ToList();
+                if(curArr == null || curArr.Count != 2)
+                {
+                    return NO_CONFIG_NUM;
+                }
+                if (curArr[0] == keyName)
+                {
+                    decimal result = 0;
+                    decimal.TryParse(curArr[1], out result);
+                    return result;
+                }
+            }
+
+            return NO_CONFIG_NUM;
         }
 
         /// <summary>

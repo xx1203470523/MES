@@ -115,5 +115,15 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("NioKeyExcludeMat")]
         NioKeyExcludeMat = 24,
+        /// <summary>
+        /// NIO关键下级键数量配置
+        /// </summary>
+        [Description("NioKeyNum")]
+        NioKeyNum = 25,
+        /// <summary>
+        /// NIO库存数量配置
+        /// </summary>
+        [Description("NioStockNum")]
+        NioStockNum = 26,
     }
 }
