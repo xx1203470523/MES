@@ -526,7 +526,7 @@ namespace Hymson.MES.Services.Services.Quality
             // 判断检验单状态是否允许取消（WMS）
             var response = await _wmsApiClient.CancelIQCEntryAsync(new CancelEntryDto
             {
-                SyncCode = receiptEntity.ReceiptNum,
+                SyncCode = receiptEntity.SyncCode ?? "同步单号为空",
                 UpdatedBy = _currentUser.UserName
             });
 
