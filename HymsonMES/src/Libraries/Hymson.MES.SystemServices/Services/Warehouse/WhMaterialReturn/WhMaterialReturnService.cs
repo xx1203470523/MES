@@ -25,6 +25,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using Newtonsoft.Json;
 
 namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
 {
@@ -140,6 +141,8 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
         /// <returns></returns>
         public async Task<string> WhMaterialReturnConfirmAsync(WhMaterialReturnConfirmDto param)
         {
+            DateTime now = DateTime.Now;
+
             if (param.ReceiptResult == WhWarehouseRequistionResultEnum.CancelMaterialReceipt)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10254));
@@ -155,7 +158,11 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
             {
                 SiteId = siteId,
                 ReturnOrderCode = param.ReturnOrderCode
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15144)).WithData("ReturnOrderCode", param.ReturnOrderCode);
+            });
+            if(manuReturnOrderEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15144)).WithData("ReturnOrderCode", $"{param.ReturnOrderCode}-{siteId}-{now.ToString("yyyyMMdd HH:mm:ss.fff")}");
+            }
 
             if (manuReturnOrderEntity.Status != WhWarehouseMaterialReturnStatusEnum.PendingStorage)
             {
@@ -184,6 +191,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                 UpdatedBy = userName,
                 UpdatedOn = HymsonClock.Now()
             };
+            updateManuReturnOrderStatusByIdCommand.Status = GetManuReturnOrderStatus(param.ReceiptResult, manuReturnOrderEntity.CompleteCount ?? 0);
 
             var whMaterialStandingbookEntities = new List<WhMaterialStandingbookEntity>();
             var updateWhMaterialInventoryStatusAndQtyByIdCommands = new List<UpdateWhMaterialInventoryStatusAndQtyByIdCommand>();

@@ -155,18 +155,42 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<ManuReturnOrderEntity> GetSingleEntityAsync(ManuReturnOrderSingleQuery query)
         {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetSingleEntitySqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("Id DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
-            if (!string.IsNullOrEmpty(query.ReturnOrderCode))
+            string whereSql = string.Empty;
+            if (string.IsNullOrEmpty(query.ReturnOrderCode) == false)
             {
-                sqlBuilder.Where(" ReturnOrderCode = @ReturnOrderCode ");
+                whereSql = $" and ReturnOrderCode = '{query.ReturnOrderCode}' ";
             }
+
+            string sql = $@"
+                select * 
+                from manu_return_order mro 
+                where IsDeleted = 0
+                {whereSql}
+                and SiteId = {query.SiteId}
+                order by id desc
+            ";
+
+            //var sqlBuilder = new SqlBuilder();
+            //var template = sqlBuilder.AddTemplate(GetSingleEntitySqlTemplate);
+            //sqlBuilder.Select("*");
+            //sqlBuilder.OrderBy("Id DESC");
+            //sqlBuilder.Where("IsDeleted = 0");
+            //sqlBuilder.Where("SiteId = @SiteId");
+            //if (!string.IsNullOrEmpty(query.ReturnOrderCode))
+            //{
+            //    sqlBuilder.Where(" ReturnOrderCode = @ReturnOrderCode ");
+            //}
+
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuReturnOrderEntity>(template.RawSql, query);
+            var dbModel = await conn.QueryFirstOrDefaultAsync<ManuReturnOrderEntity>(sql);
+            //if (dbModel == null)
+            //{
+            //    dbModel = new ManuReturnOrderEntity();
+            //    dbModel.Remark = $"{conn.ConnectionString}-{sql}";
+            //}
+            //dbModel.CompleteCount = 999;
+
+            return dbModel;
         }
 
         /// <summary>
