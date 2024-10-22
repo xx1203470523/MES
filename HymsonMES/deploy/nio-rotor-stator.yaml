@@ -18,7 +18,7 @@ spec:
         app: nio-back
     spec:
       containers:
-      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks.nio:20240923173353
+      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks.nio:20241022173510
         name: nio-back
         volumeMounts:
           - mountPath: /logs
