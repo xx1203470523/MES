@@ -1102,6 +1102,8 @@
 
         public const string MES19159 = "条码{SFCS}绑定记录只有{Count}条，请检查条码绑定记录！";
         public const string MES19160 = "工单{WorkOrder}没绑定批次信息,无法正常校验电芯批次,请检查正在生产的工单是否绑定批次箱码";
+
+        public const string MES19161 = "已开启按工艺路线生产，条码{SFC}进站工序与当前在制工序不一致，无法进站（PDA查看当前在制状态）！";
         #endregion
 
         #region 系统对接 MES19201

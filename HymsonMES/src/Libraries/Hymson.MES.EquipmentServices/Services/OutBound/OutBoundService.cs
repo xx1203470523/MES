@@ -176,6 +176,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 ResourceId = procResource.Id
             };
 
+            //根据设备资源获取工序
+            //根据资源获取工序
+            var procedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new() { ResourceId = procResource.Id, SiteId = _currentEquipment.SiteId })
+             ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", procResource.ResCode);
+
             //出站时IsBindVirtualSFC 为true 不能多条一起出站
             var bindVirtualSfcCount = outBoundMoreDto.SFCs.Where(c => c.IsBindVirtualSFC == true).Count();
             if (bindVirtualSfcCount > 1)
@@ -313,6 +318,18 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 //如果是过站
                 if (outBoundSFCDto.IsPassingStation)
                 {
+                    #region 严格按照工艺路线生产
+
+                    //过站没有进站动作，也需要校验部分进站逻辑
+                    // 校验设备资源对应的工序和在制工序是否一致
+                    if (procedureEntity.Id != sfcProduceEntity.ProcedureId)
+                    {
+                        var msgSfc = outBoundMoreDto.SFCs.Select(a => a.SFC);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19161)).WithData("SFC", string.Join(",", msgSfc));
+                    }
+
+                    #endregion
+
                     //复制对象
                     var manuSfcStepPassingEntity = JsonSerializer.Deserialize<ManuSfcStepEntity>(JsonSerializer.Serialize(manuSfcStepEntity));
                     if (manuSfcStepPassingEntity != null)

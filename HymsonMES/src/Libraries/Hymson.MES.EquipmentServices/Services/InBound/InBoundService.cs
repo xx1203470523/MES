@@ -284,7 +284,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES19159))
                             .WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)))
-                            .WithData("Count", includeNoQuality.Count());
+                            .WithData("Count", manuSfcCirculationEntities.Count());
                     }
                 }
             }
@@ -350,6 +350,23 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc && x.WorkOrderId == planWorkOrder.Id);
                 if (sfcProduceEntity != null)
                 {
+
+                    #region 严格按照工艺路线生产
+
+                    var isCheck = true;
+
+                    //部分场景不需要校验
+                    //var procProcedure = procProcedures.FirstOrDefault(a => a.Id == sfcProduceEntity.ProcedureId);
+                    //if (sfcProduceEntity.SFC.Contains("QAM") && procProcedure?.Code == "OP230") isCheck = false;
+
+                    // 校验设备资源对应的工序和在制工序是否一直
+                    if (isCheck && procedureEntity.Id != sfcProduceEntity.ProcedureId)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19161)).WithData("SFC", string.Join(",", inBoundMoreDto.SFCs));
+                    }
+
+                    #endregion
+
                     //进站修改为激活
                     sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
                     //当前SFC的工序信息

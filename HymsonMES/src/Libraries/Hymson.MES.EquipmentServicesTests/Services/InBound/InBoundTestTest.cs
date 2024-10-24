@@ -73,9 +73,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             //string resourceCode = "YTLPACK01ER004";
             //string equipmentCode = "YTLPACK01AE004";
 
-            //端板刻码
-            string resourceCode = "YTLPACK01ER014";
-            string equipmentCode = "YTLPACK01AE014";
+            ////端板刻码
+            //string resourceCode = "YTLPACK01ER014";
+            //string equipmentCode = "YTLPACK01AE014";
 
             ////CCS安装
             //string resourceCode = "YTLPACK01ER016";
@@ -85,9 +85,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             //string resourceCode = "YTLPACK01ER017";
             //string equipmentCode = "YTLPACK01AE017";
 
-            ////模组OCV
-            //string resourceCode = "YTLPACK01ER018";
-            //string equipmentCode = "YTLPACK01AE018";
+            //模组OCV
+            string resourceCode = "YTLPACK01ER018";
+            string equipmentCode = "YTLPACK01AE018";
 
             ////焊缝清洗
             //string resourceCode = "YTLPACK01ER026";
@@ -106,7 +106,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             //string prefix = "YTM20240620003";
 
             //BMU进站测试
-            string prefix = "TESTM001";
+            //string prefix = "CELL20241024002";
+            string prefix = "MODULE20241024001";
 
             await SetEquInfoAsync(equipmentCode);
             await _inBoundService.InBoundAsync(new InBoundDto
@@ -114,7 +115,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
                 IsVerifyVirtualSFC = false,
                 LocalTime = HymsonClock.Now(),
                 ResourceCode = resourceCode,
-                SFC = prefix
+                SFC = prefix,
             });
             Assert.IsTrue(true);
         }
