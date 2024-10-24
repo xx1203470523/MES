@@ -45,7 +45,7 @@
         /// <summary>
         /// 批次号
         /// </summary>
-        public string? LotCode { get; set; }
+        public string? LotNo { get; set; }
 
         /// <summary>
         /// 单位编号

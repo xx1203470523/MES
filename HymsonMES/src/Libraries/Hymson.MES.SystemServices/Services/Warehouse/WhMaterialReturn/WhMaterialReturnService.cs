@@ -191,7 +191,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                 UpdatedBy = userName,
                 UpdatedOn = HymsonClock.Now()
             };
-            updateManuReturnOrderStatusByIdCommand.Status = GetManuReturnOrderStatus(param.ReceiptResult, manuReturnOrderEntity.CompleteCount ?? 0);
+            updateManuReturnOrderStatusByIdCommand.Status = WhWarehouseMaterialReturnStatusEnum.Completed; //GetManuReturnOrderStatus(param.ReceiptResult, manuReturnOrderEntity.CompleteCount ?? 0);
 
             var whMaterialStandingbookEntities = new List<WhMaterialStandingbookEntity>();
             var updateWhMaterialInventoryStatusAndQtyByIdCommands = new List<UpdateWhMaterialInventoryStatusAndQtyByIdCommand>();

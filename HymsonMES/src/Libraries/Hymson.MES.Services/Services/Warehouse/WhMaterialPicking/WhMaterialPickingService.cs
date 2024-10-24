@@ -373,7 +373,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                     ProductionOrderDetailID = requestBo.PlanWorkOrderEntity.WorkPlanProductId,
                     ProductionOrderComponentID = planWorkPlanMaterialEntity.Id, //planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId)?.Id,
                     MaterialCode = procMaterialEntity?.MaterialCode,
-                    LotCode = returnOrderDetailEntity.Batch,
+                    LotNo = returnOrderDetailEntity.Batch,
                     UnitCode = procMaterialEntity?.Unit,
                     Quantity = returnOrderDetailEntity.Qty
                 });

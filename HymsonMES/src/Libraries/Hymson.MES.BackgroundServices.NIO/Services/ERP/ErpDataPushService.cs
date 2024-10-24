@@ -299,7 +299,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             List<NioPushKeySubordinateEntity> nioList = new List<NioPushKeySubordinateEntity>();
 
             List<string> excludeMatList = new List<string>();
-            //取配置中需要过滤的物料
+            //2024-10-24由排除改为使用指定的
             SysConfigQuery configQuery = new SysConfigQuery();
             configQuery.Type = SysConfigEnum.NioKeyExcludeMat;
             var keyConfigList = await _sysConfigRepository.GetEntitiesAsync(configQuery);
@@ -372,7 +372,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                     {
                         continue;
                     }
-                    if(excludeMatList.Contains(wmsItem.SubordinateCode) == true)
+                    if(excludeMatList.Contains(wmsItem.SubordinateCode) == false)
                     {
                         continue;
                     }
