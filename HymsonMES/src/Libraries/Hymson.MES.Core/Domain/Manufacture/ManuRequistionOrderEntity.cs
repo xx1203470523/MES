@@ -24,7 +24,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string ReqOrderCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单Code
         /// </summary>
         public long WorkOrderId { get; set; }
@@ -34,7 +34,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public ManuRequistionTypeEnum Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态
         /// </summary>
         public WhMaterialPickingStatusEnum Status { get; set; }
@@ -57,11 +57,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string Remark { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+        /// <summary>
+        /// 仓库
+        /// </summary>
+        public string? Warehouse { get; set; }
     }
 }

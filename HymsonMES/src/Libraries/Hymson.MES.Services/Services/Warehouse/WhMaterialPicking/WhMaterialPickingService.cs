@@ -175,6 +175,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                 ReqOrderCode = requistionOrderCode,
                 Status = WhMaterialPickingStatusEnum.ApplicationSuccessful,
                 Type = param.Type,
+                Warehouse = param.WarehouseCode,
                 WorkOrderId = planWorkOrderEntity.Id,
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName,
