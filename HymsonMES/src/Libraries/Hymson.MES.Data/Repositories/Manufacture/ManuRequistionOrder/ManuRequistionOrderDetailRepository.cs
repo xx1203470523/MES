@@ -182,7 +182,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             }
             if(string.IsNullOrEmpty(param.Warehouse) == false)
             {
-                whereSql += $" and t2.Warehouse = '{param.Warehouse}' ";
+                whereSql += $" and t2.Warehouse like '%{param.Warehouse}%' ";
             }
             if(string.IsNullOrEmpty(param.MaterialCode) == false)
             {

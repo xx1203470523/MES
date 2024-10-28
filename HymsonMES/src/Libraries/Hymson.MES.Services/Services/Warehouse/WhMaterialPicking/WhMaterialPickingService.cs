@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.WhWareHouse;
+using Hymson.MES.Data.Repositories.WhWareHouse.Query;
 using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
@@ -164,6 +165,19 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                 PlanProductId = planWorkOrderEntity.WorkPlanProductId ?? 0
             });
 
+            WhWarehouseQuery whQuery = new WhWarehouseQuery();
+            whQuery.SiteId = _currentSite.SiteId ?? 0;
+            var warehouesList = await  _whWarehouseRepository.GetWhWarehouseEntitiesAsync(whQuery);
+            string fullWarehouse = param.WarehouseCode ?? "空仓库";
+            if(warehouesList != null && warehouesList.Count() > 0)
+            {
+                var dbWh = warehouesList.Where(m => m.Code == fullWarehouse).FirstOrDefault();
+                if(dbWh != null)
+                {
+                    fullWarehouse = $"【{dbWh.Code}】{dbWh.Name}";
+                }
+            }
+
             // 生成领料单号
             var requistionOrderCode = await GenerateOrderCodeAsync(_currentSite.SiteId ?? 0, _currentUser.UserName);
 
@@ -175,7 +189,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                 ReqOrderCode = requistionOrderCode,
                 Status = WhMaterialPickingStatusEnum.ApplicationSuccessful,
                 Type = param.Type,
-                Warehouse = param.WarehouseCode,
+                Warehouse = fullWarehouse,
                 WorkOrderId = planWorkOrderEntity.Id,
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName,
