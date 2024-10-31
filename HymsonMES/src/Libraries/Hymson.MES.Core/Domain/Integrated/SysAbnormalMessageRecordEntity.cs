@@ -38,27 +38,27 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark1 { get; set; }
+        public string Remark1 { get; set; } = string.Empty;
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark2 { get; set; }
+        public string Remark2 { get; set; } = string.Empty;
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark3 { get; set; }
+        public string Remark3 { get; set; } = string.Empty;
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark4 { get; set; }
+        public string Remark4 { get; set; } = string.Empty;
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark5 { get; set; }
+        public string Remark5 { get; set; } = string.Empty;
 
         /// <summary>
         /// 站点ID

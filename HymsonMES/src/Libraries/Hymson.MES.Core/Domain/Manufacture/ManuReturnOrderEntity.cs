@@ -56,5 +56,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 完成次数
         /// </summary>
         public int? CompleteCount { get; set; }
+
+        /// <summary>
+        /// 仓库
+        /// </summary>
+        public string Warehouse { get; set; }
     }
 }

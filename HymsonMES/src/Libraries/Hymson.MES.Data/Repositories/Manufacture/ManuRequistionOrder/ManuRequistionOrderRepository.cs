@@ -237,7 +237,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
                                             /**select**/
                                            FROM `manu_requistion_order` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_requistion_order`(  `Id`, `ReqOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ReqOrderCode, @WorkOrderId, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `manu_requistion_order`(  `Id`, `ReqOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `Warehouse`) VALUES (   @Id, @ReqOrderCode, @WorkOrderId, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @Warehouse )  ";
 
         const string UpdateSql = "UPDATE `manu_requistion_order` SET   ReqOrderCode = @ReqOrderCode, WorkOrderId = @WorkOrderId, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
 

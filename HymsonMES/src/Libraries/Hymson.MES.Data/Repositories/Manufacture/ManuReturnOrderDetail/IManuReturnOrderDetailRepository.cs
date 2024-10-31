@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuReturnOrderDetail.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
+using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -87,5 +88,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="commands"></param>
         /// <returns></returns>
         Task<int> UpdateManuReturnOrderDetailIsReceivedByIdRangeAsync(IEnumerable<UpdateManuReturnOrderDetailIsReceivedByIdCommand> commands);
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="manuRequistionOrderDetailPagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ReportReturnOrderResultDto>> GetReportPagedInfoAsync(ReportReturnOrderQueryDto param);
     }
 }

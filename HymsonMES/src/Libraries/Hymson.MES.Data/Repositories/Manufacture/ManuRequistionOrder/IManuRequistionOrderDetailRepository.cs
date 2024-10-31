@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
 {
@@ -87,6 +88,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         /// <param name="manuRequistionOrderDetailPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuRequistionOrderDetailEntity>> GetPagedInfoAsync(ManuRequistionOrderDetailPagedQuery manuRequistionOrderDetailPagedQuery);
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="manuRequistionOrderDetailPagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ReportRequistionOrderResultDto>> GetReportPagedInfoAsync(ReportRequistionOrderQueryDto param);
         #endregion
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Hymson.MES.BackgroundServices.Rotor.Dtos.Manu;
+using Hymson.MES.BackgroundServices.Rotor.Dtos.Stator;
+using Hymson.MES.Core.Domain.Mavel.Stator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +20,22 @@ namespace Hymson.MES.BackgroundServices.Rotor.Repositories
         /// <param name="sql"></param>
         /// <returns></returns>
         Task<List<PackListDto>> GetList(string sql);
+
+        /// <summary>
+        /// 获取定子线组装好的数据
+        /// </summary>
+        /// <param name="ProductionCode"></param>
+        /// <returns></returns>
+        Task<List<ManuStatorBarcodeEntity>> GetStatorListAsync(string ProductionCode);
+
+        /// <summary>
+        /// 获取定子线组装好的数据
+        /// </summary>
+        /// <param name="innerId"></param>
+        /// <returns></returns>
+        Task<StatorOp340> GetStatorOp340Async(string innerId);
+
+
+        //OP340
     }
 }

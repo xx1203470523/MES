@@ -232,6 +232,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                 ReceiveWarehouseId = whWarehouseEntity.Id,
                 Type = requestDto.Type,
                 Remark = requestDto.Remark,
+                Warehouse = $"【{whWarehouseEntity.Code}】{whWarehouseEntity.Name}",
                 CreatedBy = baseBo.User,
                 UpdatedBy = baseBo.User,
                 CreatedOn = baseBo.Time,
