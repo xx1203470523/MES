@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
+using Hymson.MES.Services.Dtos.Manufacture;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -217,6 +218,80 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
 
             return await conn.QueryAsync<ManuProductReceiptOrderDetailEntity>(templateData.RawSql, templateData.Parameters);
+        }
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="manuRequistionOrderDetailPagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ReportBoxResultDto>> GetReportPagedInfoAsync(ReportBoxQueryDto param)
+        {
+            string whereSql = string.Empty;
+            if (string.IsNullOrEmpty(param.OrderCode) == false)
+            {
+                whereSql += $" and t4.OrderCode = '{param.OrderCode}' ";
+            }
+            if (string.IsNullOrEmpty(param.WarehouseCode) == false)
+            {
+                whereSql += $" and t1.WarehouseCode like '%{param.WarehouseCode}%' ";
+            }
+            if (string.IsNullOrEmpty(param.MaterialCode) == false)
+            {
+                whereSql += $" and t3.MaterialCode like '%{param.MaterialCode}%' ";
+            }
+            if (string.IsNullOrEmpty(param.MaterialName) == false)
+            {
+                whereSql += $" and t3.MaterialName like '%{param.MaterialName}%' ";
+            }
+            if (param.InWmsData != null && param.InWmsData.Count() == 2)
+            {
+                whereSql += $" and t1.CreatedOn > '{((DateTime)param.InWmsData[0]).ToString("yyyy-MM-dd HH:mm:ss")}' and t1.CreatedOn < '{((DateTime)param.InWmsData[1]).ToString("yyyy-MM-dd HH:mm:ss")}' ";
+            }
+            if (param.Status != null)
+            {
+                whereSql += $" and t2.Status  = {(int)param.Status} ";
+            }
+            if (string.IsNullOrEmpty(param.ContaineCode) == false)
+            {
+                whereSql += $" and t1.ContaineCode like '%{param.ContaineCode}%' ";
+            }
+            if (string.IsNullOrEmpty(param.CreatedBy) == false)
+            {
+                whereSql += $" and t1.CreatedBy like '%{param.CreatedBy}%' ";
+            }
+
+            string sql = $@"
+                select t1.CreatedOn InWmsData, t4.OrderCode, t2.CompletionOrderCode ,t1.Sfc , t1.ContaineCode , t1.MaterialName ,t1.MaterialCode , 
+	                t3.Specifications ,t1.Unit ,t4.Qty , t1.Qty InWmsQty, t5.WorkPlanCode , t1.WarehouseCode , t1.CreatedBy ,t2.Status 
+                from manu_product_receipt_order_detail t1
+                inner join manu_product_receipt_order t2 on t1.ProductReceiptId = t2.Id and t2.IsDeleted = 0
+                inner join proc_material t3 on t3.MaterialCode = t1.MaterialCode and t3.IsDeleted = 0 and t3.SiteId = t1.SiteId 
+                inner join plan_work_order t4 on t4.Id = t2.WorkOrderCode and t4.IsDeleted = 0
+                inner join plan_work_plan t5 on t5.Id = t4.WorkPlanId and t5.IsDeleted = 0
+                where t1.IsDeleted = 0
+                {whereSql}
+                order by t1.CreatedOn desc
+                limit {(param.PageIndex - 1) * param.PageSize},{param.PageSize}
+            ";
+
+            string countSql = $@"
+                select count(*)
+                from manu_product_receipt_order_detail t1
+                inner join manu_product_receipt_order t2 on t1.ProductReceiptId = t2.Id and t2.IsDeleted = 0
+                inner join proc_material t3 on t3.MaterialCode = t1.MaterialCode and t3.IsDeleted = 0 and t3.SiteId = t1.SiteId 
+                inner join plan_work_order t4 on t4.Id = t2.WorkOrderCode and t4.IsDeleted = 0
+                inner join plan_work_plan t5 on t5.Id = t4.WorkPlanId and t5.IsDeleted = 0
+                where t1.IsDeleted = 0
+                {whereSql}
+            ";
+
+            using var conn = GetMESDbConnection();
+            var dbListTask = conn.QueryAsync<ReportBoxResultDto>(sql);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(countSql);
+            var dbList = await dbListTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ReportBoxResultDto>(dbList, param.PageIndex, param.PageSize, totalCount);
         }
 
     }

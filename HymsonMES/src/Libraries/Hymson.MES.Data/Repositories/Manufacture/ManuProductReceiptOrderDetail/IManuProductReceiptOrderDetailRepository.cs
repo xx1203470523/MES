@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
+using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -101,5 +102,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetEntitiesWithoutCancelAsync(QueryManuProductReceiptOrderDetail query);
 
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ReportBoxResultDto>> GetReportPagedInfoAsync(ReportBoxQueryDto param);
     }
 }
