@@ -1104,6 +1104,11 @@
         public const string MES19160 = "工单{WorkOrder}没绑定批次信息,无法正常校验电芯批次,请检查正在生产的工单是否绑定批次箱码";
 
         public const string MES19161 = "已开启按工艺路线生产，条码{SFC}进站工序与当前在制工序不一致，无法进站（PDA查看当前在制状态）！";
+
+        //Pack下线校验
+        public const string MES19162 = "已开启Pack下线校验，条码{SFC}在{procedureName}生成记录为不合格，请复测至合格后下线！";
+        public const string MES19163 = "已开启Pack下线校验，条码{SFC}绑定模组码小于2个，请检查Pack码和模组码的绑定关系！";
+        public const string MES19164 = "已开启Pack下线校验，条码{SFC}在{procedureName}未找到进出站记录，请检查Pack码生产记录！";
         #endregion
 
         #region 系统对接 MES19201

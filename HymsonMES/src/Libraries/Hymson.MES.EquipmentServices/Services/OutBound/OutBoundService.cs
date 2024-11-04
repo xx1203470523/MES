@@ -117,6 +117,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
+
             //使用批量出站Dto
             OutBoundMoreDto outBoundMoreDto = new()
             {
@@ -267,10 +268,19 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 //ProcedureIds = new long[] { currentProcedureId },
                 SFCS = sfclist.Select(c => c.SFC).ToArray()
             };
+
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            var procedureIds = manuSfcSummaryEntities.Select(a => a.ProcedureId).ToArray();
+            var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds);
+
+            var equipmentManuSfcSummaryEntities = manuSfcSummaryEntities.Where(a => a.EquipmentId == _currentEquipment.Id && a.SiteId == _currentEquipment.SiteId);
+
+            //获取条码绑定信息
+            var barcodes = outBoundMoreDto.SFCs.Select(a => a.SFC).ToArray();
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new() { CirculationBarCodes = barcodes });
 
             //条码流转信息
-            List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new List<ManuSfcCirculationEntity>();
+            List<ManuSfcCirculationEntity> manuSfcCirculationCommand = new List<ManuSfcCirculationEntity>();
             List<string> delManuSfcProduces = new List<string>();
             List<ManuSfcStepEntity> manuSfcStepEntities = new List<ManuSfcStepEntity>();
             List<ManuSfcEntity> manuSfcEntities = new List<ManuSfcEntity>();
@@ -288,7 +298,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     throw new CustomerValidationException(nameof(ErrorCode.MES18023)).WithData("SFC", outBoundSFCDto.SFC).WithData("OrderCode", planWorkOrderEntity.OrderCode);
                 }
                 //汇总信息
-                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC).FirstOrDefault();
+                var manuSfcSummaryEntity = equipmentManuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC).FirstOrDefault();
                 // 更新时间
                 sfcProduceEntity.UpdatedBy = _currentEquipment.Name;
                 sfcProduceEntity.UpdatedOn = HymsonClock.Now();
@@ -330,6 +340,49 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
 
                     #endregion
 
+                    #region Pack下线校验箱码绑定关系，前端是否出现NG，过站信息是否完全
+
+                    if (procedureEntity.Code == "OP29")
+                    {
+                        var validateManuSfcSummaryEntities = manuSfcSummaryEntities.Where(a => a.QualityStatus == 0);
+                        //如果下线存在不合格，则提示
+                        if (validateManuSfcSummaryEntities?.Any() == true)
+                        {
+                            var validateData = validateManuSfcSummaryEntities.FirstOrDefault();
+                            var validateProcedure = procedureEntities.FirstOrDefault(a => a.Id == validateData?.ProcedureId);
+                            throw new CustomerDataException(ErrorCode.MES19162).WithData("SFC", validateData?.SFC ?? "").WithData("procedureName", validateProcedure?.Name ?? "");
+                        }
+
+                        //如果未绑定则提示
+                        var manuBinds = manuSfcCirculationEntities.Where(a => a.CirculationBarCode == outBoundSFCDto.SFC);
+
+                        //校验绑定模组数量
+                        //绑定模组数小于2个，则提示
+                        var bindModuleCount = manuBinds.Count(a => a.SFC.StartsWith("YT"));
+                        if (bindModuleCount < 2) throw new CustomerDataException(ErrorCode.MES19163);
+
+                        //校验Pack段是否有缺少的进出站记录
+                        //先写死，后续考虑做到全局配置中动态校验
+                        var validateCodes = new string[] { "OP26", "OP27", "OP28", "OP29", "OP31" };
+                        var validateIds = procedureEntities.Where(a => validateCodes.Equals(a.Code)).Select(a => a.Id).ToList();
+
+                        //校验Pack段生产记录是否完整
+                        var manuSfcSummaryProcedureIds = manuSfcSummaryEntities.Select(a=>a.ProcedureId).ToList();
+                        var manuSfcSummaryValidateIds = validateIds.Where(a =>! manuSfcSummaryProcedureIds.Equals(a));
+
+                        if (manuSfcSummaryValidateIds?.Any() == true)
+                        {
+                            var manuSfcSummaryValidateId = manuSfcSummaryValidateIds.FirstOrDefault();
+                            var procedureName = procedureEntities.Where(a => manuSfcSummaryValidateId == a.Id).Select(a => a.Name);
+
+                            throw new CustomerDataException(ErrorCode.MES19164).WithData("SFC",outBoundSFCDto.SFC)
+                                .WithData("procedureName", procedureName);
+                        }
+
+                    }
+
+                    #endregion
+
                     //复制对象
                     var manuSfcStepPassingEntity = JsonSerializer.Deserialize<ManuSfcStepEntity>(JsonSerializer.Serialize(manuSfcStepEntity));
                     if (manuSfcStepPassingEntity != null)
@@ -350,7 +403,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     //完工删除
                     delManuSfcProduces.Add(manuSfcStepEntity.SFC);
                     //记录流转信息
-                    manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                    manuSfcCirculationCommand.Add(new ManuSfcCirculationEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = sfcProduceEntity.SiteId,
@@ -491,9 +544,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             using var trans = TransactionHelper.GetTransactionScope();
             int rows = 0;
             // 添加流转记录
-            if (manuSfcCirculationEntities.Any())
+            if (manuSfcCirculationCommand.Any())
             {
-                rows += await _manuSfcCirculationRepository.InsertRangeAsync(manuSfcCirculationEntities);
+                rows += await _manuSfcCirculationRepository.InsertRangeAsync(manuSfcCirculationCommand);
             }
             //修改原有虚拟条码绑定记录
             if (manuSfcCirculationUpdateEntities.Any())
