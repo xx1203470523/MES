@@ -69,7 +69,7 @@ namespace Hymson.MES.EquipmentServices.Services.Process
             procBootupparamrecordEntity.UpdatedBy = _currentUser.UserName;
             procBootupparamrecordEntity.CreatedOn = HymsonClock.Now();
             procBootupparamrecordEntity.UpdatedOn = HymsonClock.Now();
-            procBootupparamrecordEntity.SiteId = _currentSite.SiteId ?? 0;
+            procBootupparamrecordEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //入库
             await _procBootupparamrecordRepository.InsertAsync(procBootupparamrecordEntity);

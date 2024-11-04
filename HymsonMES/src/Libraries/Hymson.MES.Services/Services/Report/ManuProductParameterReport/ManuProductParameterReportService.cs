@@ -50,7 +50,7 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
                 pageQuery.SFCStr = pageQuery.SFCStr.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");
             }
             var pagedQuery = pageQuery.ToQuery<ManuProductParameterReportPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _manuProductParameterRepository.GetManuProductParameterReportPagedInfoAsync(pagedQuery);
             var dtos = pagedInfo.Data.Select(s =>
             {
@@ -77,7 +77,7 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
             string fileName = "产品参数";
             pageQuery.PageSize = 1000000;
             var pagedQuery = pageQuery.ToQuery<ManuProductParameterReportPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _manuProductParameterRepository.GetManuProductParameterReportPagedInfoAsync(pagedQuery);
             var manuProductParameterReports = pagedInfo.Data;
             var manuProductParameterReportExports = new List<ManuProductParameterReportExportDto>();

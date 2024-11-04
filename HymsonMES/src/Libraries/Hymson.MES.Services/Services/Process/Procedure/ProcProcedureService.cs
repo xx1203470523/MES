@@ -121,7 +121,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         public async Task<PagedInfo<ProcProcedureViewDto>> GetPageListAsync(ProcProcedurePagedQueryDto procProcedurePagedQueryDto)
         {
             var procProcedurePagedQuery = procProcedurePagedQueryDto.ToQuery<ProcProcedurePagedQuery>();
-            procProcedurePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procProcedurePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procProcedureRepository.GetPagedInfoAsync(procProcedurePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -234,7 +234,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         {
             var query = new ProcProcedurePrintReleationPagedQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ProcedureId = queryDto.ProcedureId,
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
@@ -282,7 +282,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         {
             var query = new InteJobBusinessRelationPagedQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 BusinessId = queryDto.BusinessId,
                 BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
                 PageIndex = queryDto.PageIndex,
@@ -326,7 +326,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         {
             var query = new ProcProductSetQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 SetPointId = queryDto.SetPointId
             };
             var procProductSetEntities = await _procProductSetRepository.GetProcProductSetEntitiesAsync(query);
@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
-            var siteId = _currentSite.SiteId ?? 0;
+            var siteId = _currentSite.SiteId ?? 123456;
             var userName = _currentUser.UserName;
             parm.Procedure.Code = parm.Procedure.Code.ToTrimSpace().ToUpperInvariant();
             parm.Procedure.Name = parm.Procedure.Name.Trim();
@@ -579,7 +579,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            var siteId = _currentSite.SiteId ?? 0;
+            var siteId = _currentSite.SiteId ?? 123456;
             var userName = _currentUser.UserName;
 
             parm.Procedure.Name = parm.Procedure.Name.Trim();

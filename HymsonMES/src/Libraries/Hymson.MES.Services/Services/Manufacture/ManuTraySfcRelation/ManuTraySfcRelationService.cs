@@ -69,7 +69,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuTraySfcRelationEntity.UpdatedBy = _currentUser.UserName;
             manuTraySfcRelationEntity.CreatedOn = HymsonClock.Now();
             manuTraySfcRelationEntity.UpdatedOn = HymsonClock.Now();
-            manuTraySfcRelationEntity.SiteId = _currentSite.SiteId ?? 0;
+            manuTraySfcRelationEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //入库
             await _manuTraySfcRelationRepository.InsertAsync(manuTraySfcRelationEntity);

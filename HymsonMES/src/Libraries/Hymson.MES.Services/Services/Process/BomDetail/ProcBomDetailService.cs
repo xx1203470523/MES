@@ -93,7 +93,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcBomDetailDto>> GetPageListAsync(ProcBomDetailPagedQueryDto procBomDetailPagedQueryDto)
         {
             var procBomDetailPagedQuery = procBomDetailPagedQueryDto.ToQuery<ProcBomDetailPagedQuery>();
-            procBomDetailPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procBomDetailPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procBomDetailRepository.GetPagedInfoAsync(procBomDetailPagedQuery);
 
             //实体到DTO转换 装载数据

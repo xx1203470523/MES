@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 Sfc = param.SFC
             });
             //判断工序是否一致
@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var query = new ManuSfcCirculationQuery
             {
                 Sfc = param.SFC,
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 CirculationTypes = types.ToArray(),
                 ProcedureId = param.ProcedureId,
                 IsDisassemble = TrueOrFalseEnum.No
@@ -142,7 +142,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             //当bom下没有替代物料时，获取 主物料下 维护的 替代物料
                             var mainMaterialReplaces = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(new ProcReplaceMaterialQuery
                             {
-                                SiteId = _currentSite.SiteId ?? 0,
+                                SiteId = _currentSite.SiteId ?? 123456,
                                 MaterialId = long.Parse(item.MaterialId)
                             });
                             foreach (var replace in mainMaterialReplaces)
@@ -309,7 +309,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcCirculationEntity = new ManuSfcCirculationEntity()
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ProcedureId = addDto.ProcedureId,
                 ResourceId = addDto.ResourceId,
                 SFC = addDto.SFC,

@@ -320,7 +320,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 types.Add(SfcCirculationTypeEnum.ModuleReplace);
             }
 
-            var query = new ManuSfcCirculationQuery { Sfc = queryDto.Sfc, SiteId = _currentSite.SiteId ?? 0, CirculationTypes = types.ToArray() };
+            var query = new ManuSfcCirculationQuery { Sfc = queryDto.Sfc, SiteId = _currentSite.SiteId ?? 123456, CirculationTypes = types.ToArray() };
 
             if (queryDto.Type == InProductDismantleTypeEnum.Remove)
             {
@@ -358,7 +358,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //验证条码
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { removeDto.Sfc }, SiteId = _currentSite.SiteId ?? 0 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { removeDto.Sfc }, SiteId = _currentSite.SiteId ?? 123456 };
             // 获取条码列表
             var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (manuSfcProduces == null || !manuSfcProduces.Any())
@@ -436,7 +436,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //验证条码
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { addDto.Sfc }, SiteId = _currentSite.SiteId ?? 0 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { addDto.Sfc }, SiteId = _currentSite.SiteId ?? 123456 };
             // 获取条码列表
             var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (manuSfcProduces == null || !manuSfcProduces.Any())
@@ -614,7 +614,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcCirculationEntity = new ManuSfcCirculationEntity()
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ProcedureId = addDto.ProcedureId,
                 ResourceId = addDto.ResourceId,
                 SFC = addDto.Sfc.ToUpperInvariant(),
@@ -672,7 +672,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //验证条码
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { replaceDto.Sfc }, SiteId = _currentSite.SiteId ?? 0 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { replaceDto.Sfc }, SiteId = _currentSite.SiteId ?? 123456 };
             // 获取条码列表
             var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (manuSfcProduces == null || !manuSfcProduces.Any())
@@ -884,7 +884,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcCirculationEntity = new ManuSfcCirculationEntity()
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ProcedureId = replaceDto.ProcedureId,
                 SFC = replaceDto.Sfc.ToUpperInvariant(),
                 WorkOrderId = manuSfcProduce.WorkOrderId,
@@ -965,7 +965,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var query = new ManuSfcCirculationQuery
             {
                 Sfc = queryDto.Sfc,
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 CirculationTypes = types.ToArray(),
                 ProcedureId = queryDto.ProcedureId,
                 CirculationMainProductId = queryDto.ProductId,
@@ -1251,7 +1251,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Operatetype = type,
                 CurrentStatus = sfc.Status,
                 Remark = remark,
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 CreatedBy = sfc.CreatedBy,
                 UpdatedBy = sfc.UpdatedBy
             };

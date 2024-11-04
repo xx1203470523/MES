@@ -73,11 +73,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             {
                 EquipmentCode = "YTLPACK01AE014",
                 ResourceCode = "YTLPACK01ER014",
-                SFC = "MODULE20241024001",
+                SFC = "MODULE20241028004",
                 ModelCode = "",
                 BindSFCs = new CirculationBindDto[] {
-                    new(){Location="0",SFC= "CELL20241024001",Name= null},
-                    new(){ Location="1",SFC="CELL20241024002",Name =null }
+                    new(){Location="0",SFC= "CELL20241028003",Name= null},
+                    new(){ Location="1",SFC="CELL20241028004",Name =null }
                 },
                 LocalTime = DateTime.Now
             };

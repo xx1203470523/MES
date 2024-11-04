@@ -69,7 +69,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuSfcBindRecordEntity.UpdatedBy = _currentUser.UserName;
             manuSfcBindRecordEntity.CreatedOn = HymsonClock.Now();
             manuSfcBindRecordEntity.UpdatedOn = HymsonClock.Now();
-            manuSfcBindRecordEntity.SiteId = _currentSite.SiteId ?? 0;
+            manuSfcBindRecordEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //入库
             await _manuSfcBindRecordRepository.InsertAsync(manuSfcBindRecordEntity);

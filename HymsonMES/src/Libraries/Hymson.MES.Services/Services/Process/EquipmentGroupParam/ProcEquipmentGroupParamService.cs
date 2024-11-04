@@ -78,7 +78,7 @@ namespace Hymson.MES.Services.Services.Process
             procEquipmentGroupParamEntity.UpdatedBy = _currentUser.UserName;
             procEquipmentGroupParamEntity.CreatedOn = HymsonClock.Now();
             procEquipmentGroupParamEntity.UpdatedOn = HymsonClock.Now();
-            procEquipmentGroupParamEntity.SiteId = _currentSite.SiteId ?? 0;
+            procEquipmentGroupParamEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             procEquipmentGroupParamEntity.Status = SysDataStatusEnum.Build;
 
@@ -86,7 +86,7 @@ namespace Hymson.MES.Services.Services.Process
             var entity = await _procEquipmentGroupParamRepository.GetByCodeAsync(new ProcEquipmentGroupParamCodeQuery
             {
                 Code = procEquipmentGroupParamEntity.Code,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             });
             if (entity != null)
             {
@@ -95,7 +95,7 @@ namespace Hymson.MES.Services.Services.Process
             //验证是否 逻辑 产品、工序、工艺组唯一性
             var entityOne = await _procEquipmentGroupParamRepository.GetByRelatesInformationAsync(new ProcEquipmentGroupParamRelatesInformationQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ProductId = procEquipmentGroupParamEntity.ProductId,
                 ProcedureId = procEquipmentGroupParamEntity.ProcedureId,
                 EquipmentGroupId = procEquipmentGroupParamEntity.EquipmentGroupId
@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Process
                         UpdatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now(),
                         UpdatedOn = HymsonClock.Now(),
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                     });
                 }
             }
@@ -189,7 +189,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcEquipmentGroupParamViewDto>> GetPagedListAsync(ProcEquipmentGroupParamPagedQueryDto procEquipmentGroupParamPagedQueryDto)
         {
             var procEquipmentGroupParamPagedQuery = procEquipmentGroupParamPagedQueryDto.ToQuery<ProcEquipmentGroupParamPagedQuery>();
-            procEquipmentGroupParamPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procEquipmentGroupParamPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procEquipmentGroupParamRepository.GetPagedInfoAsync(procEquipmentGroupParamPagedQuery);
 
             List<ProcEquipmentGroupParamViewDto> procEquipmentGroupParamViewDtos = new List<ProcEquipmentGroupParamViewDto>();
@@ -258,7 +258,7 @@ namespace Hymson.MES.Services.Services.Process
             //验证是否 逻辑 产品、工序、工艺组唯一性
             var entityOne = await _procEquipmentGroupParamRepository.GetByRelatesInformationAsync(new ProcEquipmentGroupParamRelatesInformationQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ProductId = procEquipmentGroupParamEntity.ProductId,
                 ProcedureId = procEquipmentGroupParamEntity.ProcedureId,
                 EquipmentGroupId = procEquipmentGroupParamEntity.EquipmentGroupId
@@ -293,7 +293,7 @@ namespace Hymson.MES.Services.Services.Process
                         UpdatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now(),
                         UpdatedOn = HymsonClock.Now(),
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                     });
                 }
             }

@@ -93,7 +93,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.SiteId = _currentSite.SiteId ?? 123456;
 
             // 编码唯一性验证
             var checkEntity = await _procMaskCodeRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
@@ -194,7 +194,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         public async Task<PagedInfo<ProcMaskCodeDto>> GetPagedListAsync(ProcMaskCodePagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<ProcMaskCodePagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procMaskCodeRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

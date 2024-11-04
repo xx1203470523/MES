@@ -394,7 +394,7 @@ namespace Hymson.MES.Services.Services.Report
             procProcessRouteDetailNodeQuery.ProcessRouteId = planWorkOrderEntity.ProcessRouteId;
             var pagedInfo = await _procProcessRouteDetailNodeRepository.GetPagedInfoAsync(procProcessRouteDetailNodeQuery);
             //查询条码步骤
-            var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = manuSfcEntity.SFC, SiteId = _currentSite.SiteId ?? 0 });
+            var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = manuSfcEntity.SFC, SiteId = _currentSite.SiteId ?? 123456 });
             procSfcProcessRouteViewDtos = pagedInfo.Data.Select(c =>
             {
                 var sfcProcessRouteViewDto = GetProcessRouteDetailStep(c, manuSfcStepEntities);
@@ -546,7 +546,7 @@ namespace Hymson.MES.Services.Services.Report
             procProcessRouteDetailNodeQuery.ProcessRouteId = planWorkOrderEntity.ProcessRouteId;
             var processroutePagedInfo = await _procProcessRouteDetailNodeRepository.GetPagedInfoAsync(procProcessRouteDetailNodeQuery);
             //查询条码步骤
-            var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = manuSfcEntity?.SFC ?? "", SiteId = _currentSite.SiteId ?? 0 });
+            var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = manuSfcEntity?.SFC ?? "", SiteId = _currentSite.SiteId ?? 123456 });
             var procSfcProcessRouteReports = new List<ProcSfcProcessRouteReportExportDto>();
             var processRouteLists = processroutePagedInfo.Data;
             foreach (var procProcess in processRouteLists)

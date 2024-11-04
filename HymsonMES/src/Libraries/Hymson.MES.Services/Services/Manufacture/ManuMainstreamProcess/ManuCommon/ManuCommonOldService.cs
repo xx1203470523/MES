@@ -216,7 +216,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 读取指定类型的流转信息
             var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new Data.Repositories.Manufacture.ManuSfcCirculation.Query.ManuSfcCirculationQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 Sfc = bo.SFC,
                 CirculationTypes = new SfcCirculationTypeEnum[] { sfcCirculationType }
             });
@@ -238,7 +238,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 条码在制表
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 Sfc = sfc
             });
 
@@ -258,7 +258,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 获取锁状态
             var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 Sfc = sfcProduceEntity.SFC,
                 BusinessType = ManuSfcProduceBusinessType.Lock
             });

@@ -121,7 +121,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateButtonEntity.UpdatedBy = _currentUser.UserName;
             manuFacePlateButtonEntity.CreatedOn = HymsonClock.Now();
             manuFacePlateButtonEntity.UpdatedOn = HymsonClock.Now();
-            manuFacePlateButtonEntity.SiteId = _currentSite.SiteId ?? 0;
+            manuFacePlateButtonEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //入库
             await _manuFacePlateButtonRepository.InsertAsync(manuFacePlateButtonEntity);
@@ -155,7 +155,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<PagedInfo<ManuFacePlateButtonDto>> GetPagedListAsync(ManuFacePlateButtonPagedQueryDto manuFacePlateButtonPagedQueryDto)
         {
             var manuFacePlateButtonPagedQuery = manuFacePlateButtonPagedQueryDto.ToQuery<ManuFacePlateButtonPagedQuery>();
-            manuFacePlateButtonPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            manuFacePlateButtonPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _manuFacePlateButtonRepository.GetPagedInfoAsync(manuFacePlateButtonPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -326,7 +326,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (buttonJobs.Any() == false) return result;
 
             // 根据 buttonJobs 读取对应的job对象
-            var jobsOfNotSort = await _inteJobRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+            var jobsOfNotSort = await _inteJobRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 123456 });
 
             List<InteJobEntity> jobs = new();
             foreach (var item in buttonJobs)
@@ -344,7 +344,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 执行Job
             var jobResponses = await _executeJobService.ExecuteAsync(jobs.Select(s => new JobBo { Name = s.ClassProgram }), new JobRequestBo
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 UserName = _currentUser.UserName,
                 ProcedureId = dto.Param["ProcedureId"].ParseToLong(),
                 ResourceId = dto.Param["ResourceId"].ParseToLong(),

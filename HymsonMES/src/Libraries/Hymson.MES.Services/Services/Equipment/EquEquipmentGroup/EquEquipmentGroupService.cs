@@ -197,12 +197,12 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
 
             if (id == 0)
             {
-                equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(new EquEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 0, EquipmentGroupId = id });
+                equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(new EquEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 123456, EquipmentGroupId = id });
             }
             else
             {
                 dto.Info = (await _equEquipmentGroupRepository.GetByIdAsync(id)).ToModel<EquEquipmentGroupListDto>();
-                equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(new EquEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 0, EquipmentGroupId = id });
+                equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(new EquEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 123456, EquipmentGroupId = id });
             }
 
             dto.Equipments = equipmentEntitys.Select(s => s.ToModel<EquEquipmentBaseDto>());

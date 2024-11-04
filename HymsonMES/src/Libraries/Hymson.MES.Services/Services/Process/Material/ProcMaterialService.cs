@@ -123,7 +123,7 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialEntity.UpdatedBy = _currentUser.UserName;
             procMaterialEntity.CreatedOn = HymsonClock.Now();
             procMaterialEntity.UpdatedOn = HymsonClock.Now();
-            procMaterialEntity.SiteId = _currentSite.SiteId ?? 0;
+            procMaterialEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //替代品数据
             List<ProcReplaceMaterialEntity> addProcReplaceList = new List<ProcReplaceMaterialEntity>();
@@ -138,7 +138,7 @@ namespace Hymson.MES.Services.Services.Process
                     procReplaceMaterial.MaterialId = procMaterialEntity.Id;
                     procReplaceMaterial.CreatedBy = _currentUser.UserName;
                     procReplaceMaterial.CreatedOn = HymsonClock.Now();
-                    procReplaceMaterial.SiteId = _currentSite.SiteId ?? 0;
+                    procReplaceMaterial.SiteId = _currentSite.SiteId ?? 123456;
                     addProcReplaceList.Add(procReplaceMaterial);
                 }
             }
@@ -246,7 +246,7 @@ namespace Hymson.MES.Services.Services.Process
             statusList.Add(PlanWorkOrderStatusEnum.InProduction);
             var useMaterilWorkOrders = await _planWorkOrderRepository.GetEqualPlanWorkOrderEntitiesAsync(new PlanWorkOrderQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ProductIds = idsArr.ToList(),
                 StatusList = statusList
             });
@@ -271,7 +271,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcMaterialDto>> GetPageListAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto)
         {
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
-            procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procMaterialRepository.GetPagedInfoAsync(procMaterialPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -304,7 +304,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcMaterialDto>> GetPageListForGroupAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto)
         {
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
-            procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procMaterialRepository.GetPagedInfoForGroupAsync(procMaterialPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -333,7 +333,7 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procMaterialModifyDto);
 
-            var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto.Id, _currentSite.SiteId ?? 0);
+            var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto.Id, _currentSite.SiteId ?? 123456);
             if (modelOrigin == null)
             {
                 throw new NotFoundException(nameof(ErrorCode.MES10204));
@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Process
                     procReplaceMaterial.MaterialId = procMaterialEntity.Id;
                     procReplaceMaterial.CreatedBy = _currentUser.UserName;
                     procReplaceMaterial.CreatedOn = HymsonClock.Now();
-                    procReplaceMaterial.SiteId = _currentSite.SiteId ?? 0;
+                    procReplaceMaterial.SiteId = _currentSite.SiteId ?? 123456;
                     addProcReplaceList.Add(procReplaceMaterial);
                 }
             }
@@ -491,7 +491,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<ProcMaterialViewDto> QueryProcMaterialByIdAsync(long id)
         {
-            var procMaterialView = await _procMaterialRepository.GetByIdAsync(id, _currentSite.SiteId ?? 0);
+            var procMaterialView = await _procMaterialRepository.GetByIdAsync(id, _currentSite.SiteId ?? 123456);
             if (procMaterialView != null)
             {
                 var procMaterialViewDto = procMaterialView.ToModel<ProcMaterialViewDto>();

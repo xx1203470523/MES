@@ -316,7 +316,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     // 删除 manu_sfc_produce
                     var manuSfcProduceDeletePhysicalTask = _manuSfcProduceRepository.DeletePhysicalAsync(new DeletePhysicalBySfcCommand()
                     {
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         Sfc = sfcProduceEntity.SFC
                     });
                     tasks.Add(manuSfcProduceDeletePhysicalTask);

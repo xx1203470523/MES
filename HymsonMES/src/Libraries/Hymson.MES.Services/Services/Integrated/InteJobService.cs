@@ -137,7 +137,7 @@ namespace Hymson.MES.Services.Services.Integrated
             inteJobEntity.Id = IdGenProvider.Instance.CreateId();
             inteJobEntity.CreatedBy = userId;
             inteJobEntity.UpdatedBy = userId;
-            inteJobEntity.SiteId = _currentSite.SiteId ?? 0;
+            inteJobEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             await _inteJobRepository.InsertAsync(inteJobEntity);
         }

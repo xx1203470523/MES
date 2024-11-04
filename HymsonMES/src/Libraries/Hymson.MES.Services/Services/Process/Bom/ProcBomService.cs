@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Process
             //DTO转换实体
             var procBomEntity = procBomCreateDto.ToEntity<ProcBomEntity>();
             procBomEntity.Id = IdGenProvider.Instance.CreateId();
-            procBomEntity.SiteId = _currentSite.SiteId ?? 0;
+            procBomEntity.SiteId = _currentSite.SiteId ?? 123456;
             procBomEntity.CreatedBy = _currentUser.UserName;
             procBomEntity.UpdatedBy = _currentUser.UserName;
             procBomEntity.BomCode = bomCode;
@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 BomCode = bomCode,
                 Version = procBomEntity.Version,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             });
             if (exists != null && exists.Count() > 0)
             {
@@ -179,7 +179,7 @@ namespace Hymson.MES.Services.Services.Process
                         var bomdeail = new ProcBomDetailEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
-                            SiteId = _currentSite.SiteId ?? 0,
+                            SiteId = _currentSite.SiteId ?? 123456,
                             BomId = procBomEntity.Id,
                             MaterialId = item.MaterialId.ParseToLong(),
                             ProcedureId = item.ProcedureId.ParseToLong(),
@@ -201,7 +201,7 @@ namespace Hymson.MES.Services.Services.Process
                         var bomReplacedeail = new ProcBomDetailReplaceMaterialEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
-                            SiteId = _currentSite.SiteId ?? 0,
+                            SiteId = _currentSite.SiteId ?? 123456,
                             BomId = procBomEntity.Id,
                             BomDetailId = mainId,
                             ReplaceMaterialId = item.ReplaceMaterialId.ParseToLong(),
@@ -227,7 +227,7 @@ namespace Hymson.MES.Services.Services.Process
                     // 先将同编码的其他bom设置为非当前版本
                     var procBoms = await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
                     {
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         BomCode = procBomEntity.BomCode,
                     });
 
@@ -315,7 +315,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcBomDto>> GetPageListAsync(ProcBomPagedQueryDto procBomPagedQueryDto)
         {
             var procBomPagedQuery = procBomPagedQueryDto.ToQuery<ProcBomPagedQuery>();
-            procBomPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procBomPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procBomRepository.GetPagedInfoAsync(procBomPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -366,7 +366,7 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procBomModifyDto);
 
-            var siteId = _currentSite.SiteId ?? 0;
+            var siteId = _currentSite.SiteId ?? 123456;
             var user = _currentUser.UserName ?? "";
             //DTO转换实体
             var procBomEntity = procBomModifyDto.ToEntity<ProcBomEntity>();

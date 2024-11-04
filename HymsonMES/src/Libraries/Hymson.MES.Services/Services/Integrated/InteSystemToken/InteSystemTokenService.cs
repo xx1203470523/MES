@@ -63,7 +63,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<PagedInfo<InteSystemTokenDto>> GetPagedListAsync(InteSystemTokenPagedQueryDto inteSystemTokenPagedQueryDto)
         {
             var inteSystemTokenPagedQuery = inteSystemTokenPagedQueryDto.ToQuery<InteSystemTokenPagedQuery>();
-            inteSystemTokenPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            inteSystemTokenPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _inteSystemTokenRepository.GetPagedInfoAsync(inteSystemTokenPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -128,7 +128,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var systemCode = inteSystemTokenCreateDto.SystemCode;
             var inteSystemTokenEntity = await _inteSystemTokenRepository.GetByCodeAsync(new InteSystemTokenQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 SystemCode = systemCode
             });
             if (inteSystemTokenEntity != null)
@@ -141,7 +141,7 @@ namespace Hymson.MES.Services.Services.Integrated
             inteSystemTokenEntity.Id = IdGenProvider.Instance.CreateId();
             inteSystemTokenEntity.CreatedBy = _currentUser.UserName;
             inteSystemTokenEntity.UpdatedBy = _currentUser.UserName;
-            inteSystemTokenEntity.SiteId = _currentSite.SiteId ?? 0;
+            inteSystemTokenEntity.SiteId = _currentSite.SiteId ?? 123456;
             //生成Token
             inteSystemTokenEntity.Token = CreateSystemTokenAsync(inteSystemTokenEntity);
             inteSystemTokenEntity.ExpirationTime = HymsonClock.Now().AddMinutes(_jwtOptions.ExpiresMinutes);
@@ -159,10 +159,10 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             var systemModel = new SystemModel
             {
-                FactoryId = _currentSite.SiteId ?? 0,
+                FactoryId = _currentSite.SiteId ?? 123456,
                 Id = inteSystemToken.Id,
                 Name = inteSystemToken.SystemCode,
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
             };
             return JwtHelper.GenerateJwtToken(systemModel, _jwtOptions);
         }
@@ -189,10 +189,10 @@ namespace Hymson.MES.Services.Services.Integrated
             var systemCode = inteSystemTokenEntity.SystemCode;
             var systemModel = new SystemModel
             {
-                FactoryId = _currentSite.SiteId ?? 0,
+                FactoryId = _currentSite.SiteId ?? 123456,
                 Id = inteSystemTokenEntity.Id,
                 Name = systemCode,
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
             };
             var token = JwtHelper.GenerateJwtToken(systemModel, _jwtOptions);
             var expirationTime = HymsonClock.Now().AddMinutes(_jwtOptions.ExpiresMinutes);

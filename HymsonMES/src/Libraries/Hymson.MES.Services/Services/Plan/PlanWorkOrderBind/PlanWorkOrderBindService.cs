@@ -81,7 +81,7 @@ namespace Hymson.MES.Services.Services.Plan
         //    planWorkOrderBindEntity.UpdatedBy = _currentUser.UserName;
         //    planWorkOrderBindEntity.CreatedOn = HymsonClock.Now();
         //    planWorkOrderBindEntity.UpdatedOn = HymsonClock.Now();
-        //    planWorkOrderBindEntity.SiteId = _currentSite.SiteId ?? 0;
+        //    planWorkOrderBindEntity.SiteId = _currentSite.SiteId ?? 123456;
 
         //    //入库
         //    await _planWorkOrderBindRepository.InsertAsync(planWorkOrderBindEntity);
@@ -209,7 +209,7 @@ namespace Hymson.MES.Services.Services.Plan
                 //检查当前这些工单是否是激活
                 var hasActivationWorkOrders = await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery()
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     LineId = workCenterEntity.Id,
                     WorkOrderIds = bindActivationWorkOrder.WorkOrderIds,
                 });
@@ -226,7 +226,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             //查询已经绑定在该资源上的工单
             var hasBindWorkOrders= await _planWorkOrderBindRepository.GetPlanWorkOrderBindEntitiesAsync(new PlanWorkOrderBindQuery() {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ResourceId= bindActivationWorkOrder.ResourceId
             });
             var hasBindWorkOrderIds = hasBindWorkOrders.Select(x => x.WorkOrderId).ToList();
@@ -252,7 +252,7 @@ namespace Hymson.MES.Services.Services.Plan
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedOn = HymsonClock.Now(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
 
                     ResourceId= bindActivationWorkOrder.ResourceId,
                     WorkOrderId = item
@@ -266,7 +266,7 @@ namespace Hymson.MES.Services.Services.Plan
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedOn = HymsonClock.Now(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
 
                     ResourceId = bindActivationWorkOrder.ResourceId,
                     WorkOrderId = item,
@@ -285,7 +285,7 @@ namespace Hymson.MES.Services.Services.Plan
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedOn = HymsonClock.Now(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
 
                     ResourceId = bindActivationWorkOrder.ResourceId,
                     WorkOrderId = item,

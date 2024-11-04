@@ -85,7 +85,7 @@ namespace Hymson.MES.Services.Services.Plan
             planWorkOrderActivationEntity.UpdatedBy = _currentUser.UserName;
             planWorkOrderActivationEntity.CreatedOn = HymsonClock.Now();
             planWorkOrderActivationEntity.UpdatedOn = HymsonClock.Now();
-            planWorkOrderActivationEntity.SiteId = _currentSite.SiteId ?? 0;
+            planWorkOrderActivationEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //入库
             await _planWorkOrderActivationRepository.InsertAsync(planWorkOrderActivationEntity);
@@ -138,7 +138,7 @@ namespace Hymson.MES.Services.Services.Plan
             var workCenter = await _inteWorkCenterRepository.GetHigherInteWorkCenterAsync(planWorkOrderActivationPagedQueryDto.LineId ?? 0);
 
             var planWorkOrderActivationPagedQuery = planWorkOrderActivationPagedQueryDto.ToQuery<PlanWorkOrderActivationPagedQuery>();
-            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
 
             //将对应的工作中心ID放置查询条件中
             planWorkOrderActivationPagedQuery.WorkCenterIds.Add(planWorkOrderActivationPagedQueryDto.LineId ?? 0);
@@ -179,7 +179,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
 
             var planWorkOrderActivationPagedQuery = param.ToQuery<PlanWorkOrderActivationPagedQuery>();
-            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
 
             //将对应的工作中心ID放置查询条件中
             planWorkOrderActivationPagedQuery.WorkCenterIds.Add(workCenterEntity.Id);
@@ -244,7 +244,7 @@ namespace Hymson.MES.Services.Services.Plan
             var workOrderActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery()
             {
                 WorkOrderId = workOrder.Id,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             })).FirstOrDefault();
 
             var isActivationed = workOrderActivation != null;//是否已经激活
@@ -272,7 +272,7 @@ namespace Hymson.MES.Services.Services.Plan
                         UpdatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now(),
                         UpdatedOn = HymsonClock.Now(),
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
 
                         WorkOrderId = activationWorkOrderDto.Id,
                         LineId = activationWorkOrderDto.LineId,
@@ -292,7 +292,7 @@ namespace Hymson.MES.Services.Services.Plan
             else
             {//不混线
                 //判断当前线体是否有无激活的工单
-                var hasActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery { LineId = activationWorkOrderDto.LineId, SiteId = _currentSite.SiteId ?? 0 })).FirstOrDefault();
+                var hasActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery { LineId = activationWorkOrderDto.LineId, SiteId = _currentSite.SiteId ?? 123456 })).FirstOrDefault();
                 if (hasActivation != null)
                 {
                     var activationWorkOrder = await _planWorkOrderRepository.GetByIdAsync(hasActivation.WorkOrderId);
@@ -323,7 +323,7 @@ namespace Hymson.MES.Services.Services.Plan
                 UpdatedBy = _currentUser.UserName,
                 CreatedOn = HymsonClock.Now(),
                 UpdatedOn = HymsonClock.Now(),
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
 
                 WorkOrderId = activationWorkOrderDto.Id,
                 LineId = activationWorkOrderDto.LineId
@@ -336,7 +336,7 @@ namespace Hymson.MES.Services.Services.Plan
             record.UpdatedBy = _currentUser.UserName;
             record.CreatedOn = HymsonClock.Now();
             record.UpdatedOn = HymsonClock.Now();
-            record.SiteId = _currentSite.SiteId ?? 0;
+            record.SiteId = _currentSite.SiteId ?? 123456;
             record.IsDeleted = 0;
 
             using (TransactionScope ts = new TransactionScope())
@@ -357,7 +357,7 @@ namespace Hymson.MES.Services.Services.Plan
                             UpdatedBy = _currentUser.UserName,
                             CreatedOn = HymsonClock.Now(),
                             UpdatedOn = HymsonClock.Now(),
-                            SiteId = _currentSite.SiteId ?? 0,
+                            SiteId = _currentSite.SiteId ?? 123456,
 
                             WorkOrderId = activationWorkOrderDto.Id,
                             LineId = activationWorkOrderDto.LineId,
@@ -394,7 +394,7 @@ namespace Hymson.MES.Services.Services.Plan
                             UpdatedBy = _currentUser.UserName,
                             CreatedOn = HymsonClock.Now(),
                             UpdatedOn = HymsonClock.Now(),
-                            SiteId = _currentSite.SiteId ?? 0,
+                            SiteId = _currentSite.SiteId ?? 123456,
 
                             WorkOrderId = activationWorkOrderDto.Id,
                             LineId = activationWorkOrderDto.LineId,

@@ -76,11 +76,11 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialGroupEntity.UpdatedBy = _currentUser.UserName;
             procMaterialGroupEntity.CreatedOn = HymsonClock.Now();
             procMaterialGroupEntity.UpdatedOn = HymsonClock.Now();
-            procMaterialGroupEntity.SiteId = _currentSite.SiteId ?? 0;
+            procMaterialGroupEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             #region 参数校验
             //判断编号是否已存在
-            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialGroupCreateDto.GroupCode });
+            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = _currentSite.SiteId ?? 123456, GroupCode = procMaterialGroupCreateDto.GroupCode });
             if (existGroupCodes != null && existGroupCodes.Count() > 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10216)).WithData("groupCode", procMaterialGroupCreateDto.GroupCode);
@@ -218,7 +218,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcMaterialGroupDto>> GetPageListAsync(ProcMaterialGroupPagedQueryDto procMaterialGroupPagedQueryDto)
         {
             var procMaterialGroupPagedQuery = procMaterialGroupPagedQueryDto.ToQuery<ProcMaterialGroupPagedQuery>();
-            procMaterialGroupPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procMaterialGroupPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procMaterialGroupRepository.GetPagedInfoAsync(procMaterialGroupPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -251,7 +251,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> GetPageCustomListAsync(CustomProcMaterialGroupPagedQueryDto customProcMaterialGroupPagedQueryDto)
         {
             var procMaterialGroupCustomPagedQuery = customProcMaterialGroupPagedQueryDto.ToQuery<ProcMaterialGroupCustomPagedQuery>();
-            procMaterialGroupCustomPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procMaterialGroupCustomPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procMaterialGroupRepository.GetPagedCustomInfoAsync(procMaterialGroupCustomPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -283,7 +283,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<ProcMaterialGroupDto> QueryProcMaterialGroupByIdAsync(long id)
         {
-            var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAndSiteIdAsync(id, _currentSite.SiteId ?? 0);
+            var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAndSiteIdAsync(id, _currentSite.SiteId ?? 123456);
             if (procMaterialGroupEntity != null)
             {
                 return procMaterialGroupEntity.ToModel<ProcMaterialGroupDto>();

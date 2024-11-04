@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.SiteId = _currentSite.SiteId ?? 123456;
 
             if (entity.QualTime > 0 && entity.EntryDate > SqlDateTime.MinValue.Value) entity.ExpireDate = entity.EntryDate.AddMonths(entity.QualTime);
 
@@ -173,7 +173,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 theoryCreateCommand.CreatedOn = HymsonClock.Now();
                 theoryCreateCommand.UpdatedBy = _currentUser.UserName;
                 theoryCreateCommand.UpdatedOn = HymsonClock.Now();
-                theoryCreateCommand.SiteId = _currentSite.SiteId ?? 0;
+                theoryCreateCommand.SiteId = _currentSite.SiteId ?? 123456;
                 theoryCreateCommand.EquipmentCode = createDto.EquipmentCode;
                 theoryCreateCommand.OutputQty = createDto.TheoryOutPutQty;
                 theoryCreateCommand.TheoryOutputQty = createDto.TheoryOutPutQty;
@@ -246,7 +246,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 theoryUpdateCommand.CreatedOn = HymsonClock.Now();
                 theoryUpdateCommand.UpdatedBy = _currentUser.UserName;
                 theoryUpdateCommand.UpdatedOn = HymsonClock.Now();
-                theoryUpdateCommand.SiteId = _currentSite.SiteId ?? 0;
+                theoryUpdateCommand.SiteId = _currentSite.SiteId ?? 123456;
                 theoryUpdateCommand.EquipmentCode = modifyDto.EquipmentCode;
                 theoryUpdateCommand.OutputQty = modifyDto.TheoryOutPutQty;
                 theoryUpdateCommand.TheoryOutputQty = modifyDto.TheoryOutPutQty;
@@ -311,7 +311,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         public async Task<PagedInfo<EquEquipmentListDto>> GetPagedListAsync(EquEquipmentPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
 
             var equipmentTheoryEntities = await _equEquipmentTheoryRepository.GetListAsync(new() { EquipmentCodes = pagedQueryDto.EquipmentCodes });
 
@@ -411,7 +411,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             // TODO 
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentLinkApiPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _equEquipmentLinkApiRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -451,7 +451,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             // TODO 
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentLinkHardwarePagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _equEquipmentLinkHardwareRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -517,11 +517,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES12604));
             var equipmentModel = new EquipmentModel
             {
-                FactoryId = _currentSite.SiteId ?? 0,
+                FactoryId = _currentSite.SiteId ?? 123456,
                 Id = equEquipmentEntity.Id,
                 Name = equEquipmentEntity.EquipmentName,
                 Code = equEquipmentEntity.EquipmentCode,
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
             };
             var token = JwtHelper.GenerateJwtToken(equipmentModel, _jwtOptions);
 
@@ -549,7 +549,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedOn = HymsonClock.Now(),
-                    SiteId = _currentSite.SiteId ?? 0
+                    SiteId = _currentSite.SiteId ?? 123456
                 };
                 await _equEquipmentTokenRepository.InsertAsync(equEquipmentTokenEntity);
             }
@@ -594,7 +594,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         {
             return await _equEquipmentRepository.GetByEquipmentCodeAsync(new EntityByCodeQuery
             {
-                Site = _currentSite.SiteId ?? 0,
+                Site = _currentSite.SiteId ?? 123456,
                 Code = equipmentCode.ToUpper()
             });
         }
@@ -608,7 +608,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         {
             return (await _equEquipmentRepository.GetByEquipmentCodeAsync(new EntityByCodeQuery
             {
-                Site = _currentSite.SiteId ?? 0,
+                Site = _currentSite.SiteId ?? 123456,
                 Code = equipmentCode.ToUpper()
             })).ToModel<EquEquipmentDto>();
         }

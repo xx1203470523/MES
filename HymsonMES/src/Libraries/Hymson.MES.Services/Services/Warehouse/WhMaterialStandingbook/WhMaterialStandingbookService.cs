@@ -99,7 +99,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<PagedInfo<WhMaterialStandingbookDto>> GetPageListAsync(WhMaterialStandingbookPagedQueryDto whMaterialStandingbookPagedQueryDto)
         {
             var whMaterialStandingbookPagedQuery = whMaterialStandingbookPagedQueryDto.ToQuery<WhMaterialStandingbookPagedQuery>();
-            whMaterialStandingbookPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            whMaterialStandingbookPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _whMaterialStandingbookRepository.GetPagedInfoAsync(whMaterialStandingbookPagedQuery);
 
             //实体到DTO转换 装载数据

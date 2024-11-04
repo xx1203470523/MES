@@ -256,7 +256,7 @@ namespace Hymson.MES.Services.Services.Report
                 types.Add(SfcCirculationTypeEnum.ModuleReplace);
             }
 
-            var query = new ManuSfcCirculationQuery { Sfc = sfc, SiteId = _currentSite.SiteId ?? 0, CirculationTypes = types.ToArray() };
+            var query = new ManuSfcCirculationQuery { Sfc = sfc, SiteId = _currentSite.SiteId ?? 123456, CirculationTypes = types.ToArray() };
 
             if (type == OriginalSummaryReportTypeEnum.Remove)
             {

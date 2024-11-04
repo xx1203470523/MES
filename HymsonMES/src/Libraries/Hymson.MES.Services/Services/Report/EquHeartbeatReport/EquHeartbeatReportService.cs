@@ -39,7 +39,7 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
         public async Task<PagedInfo<EquHeartbeatReportViewDto>> GetEquHeartbeatReportPageListAsync(EquHeartbeatReportPagedQueryDto pageQuery)
         {
             var pagedQuery = pageQuery.ToQuery<EquHeartbeatReportPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _equHeartbeatRepository.GetEquHeartbeatReportPageListAsync(pagedQuery);
             var dtos = pagedInfo.Data.Select(s =>
             {
@@ -58,7 +58,7 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
             string fileName = "设备心跳";
             pageQuery.PageSize = 10000;
             var pagedQuery = pageQuery.ToQuery<EquHeartbeatReportPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _equHeartbeatRepository.GetEquHeartbeatReportPageListAsync(pagedQuery);
             var equHeartbeatReports = pagedInfo.Data;
             var equHeartbeaExports = new List<EquHeartbeaReportExportDto>();

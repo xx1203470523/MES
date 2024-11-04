@@ -74,7 +74,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<PagedInfo<InteWorkCenterDto>> GetPageListAsync(InteWorkCenterPagedQueryDto pram)
         {
             var inteWorkCenterPagedQuery = pram.ToQuery<InteWorkCenterPagedQuery>();
-            inteWorkCenterPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            inteWorkCenterPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _inteWorkCenterRepository.GetPagedInfoAsync(inteWorkCenterPagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -199,7 +199,7 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = entity.CreatedBy;
             entity.Source = WorkCenterSourceEnum.MES;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.SiteId = _currentSite.SiteId ?? 123456;
 
             List<InteWorkCenterRelation> inteWorkCenterRelations = new();
             List<InteWorkCenterResourceRelation> inteWorkCenterResourceRelations = new();

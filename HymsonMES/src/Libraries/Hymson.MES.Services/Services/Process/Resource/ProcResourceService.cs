@@ -159,7 +159,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcResourceViewDto>> GetPageListAsync(ProcResourcePagedQueryDto query)
         {
             var resourcePagedQuery = query.ToQuery<ProcResourcePagedQuery>();
-            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _resourceRepository.GetPageListAsync(resourcePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -180,7 +180,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcResourceDto>> GetListAsync(ProcResourcePagedQueryDto query)
         {
             var resourcePagedQuery = query.ToQuery<ProcResourcePagedQuery>();
-            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _resourceRepository.GetListAsync(resourcePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -201,7 +201,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<List<ProcResourceDto>> GetListForGroupAsync(ProcResourcePagedQueryDto query)
         {
             var resourcePagedQuery = query.ToQuery<ProcResourcePagedQuery>();
-            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var list = await _resourceRepository.GetListForGroupAsync(resourcePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -222,7 +222,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcResourceDto>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQueryDto query)
         {
             var resourcePagedQuery = query.ToQuery<ProcResourceProcedurePagedQuery>();
-            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _resourceRepository.GettPageListByProcedureIdAsync(resourcePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -333,7 +333,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new InteJobBusinessRelationPagedQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 BusinessId = queryDto.BusinessId,
                 BusinessType = (int)InteJobBusinessTypeEnum.Resource,
                 PageIndex = queryDto.PageIndex,
@@ -379,7 +379,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new ProcProductSetQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 SetPointId = queryDto.SetPointId
             };
             var procProductSetEntities = await _procProductSetRepository.GetProcProductSetEntitiesAsync(query);
@@ -441,7 +441,7 @@ namespace Hymson.MES.Services.Services.Process
             var resCode = parm.ResCode;
             var query = new ProcResourceQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ResCode = resCode
             };
             if (await _resourceRepository.IsExistsAsync(query))
@@ -492,7 +492,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
-            var siteId = _currentSite.SiteId ?? 0;
+            var siteId = _currentSite.SiteId ?? 123456;
             var userName = _currentUser.UserName;
 
             #region 组装数据
@@ -546,7 +546,7 @@ namespace Hymson.MES.Services.Services.Process
                         ResourceId = entity.Id,
                         PrintId = item.PrintId,
                         Remark = "",
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
@@ -587,7 +587,7 @@ namespace Hymson.MES.Services.Services.Process
                         EquipmentId = item.EquipmentId,
                         IsMain = item.IsMain,
                         Remark = "",
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
@@ -645,7 +645,7 @@ namespace Hymson.MES.Services.Services.Process
                         SetType = (int)item.SetType,
                         Value = item.Value.ToString(),
                         Remark = "",
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
@@ -725,7 +725,7 @@ namespace Hymson.MES.Services.Services.Process
                         IsUse = item.IsUse,
                         Parameter = item.Parameter,
                         Remark = "",
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
@@ -793,7 +793,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task UpdateProcResrouceAsync(ProcResourceModifyDto param)
         {
             string userName = _currentUser.UserName;
-            var siteCode = _currentSite.SiteId ?? 0;
+            var siteCode = _currentSite.SiteId ?? 123456;
             #region 验证
             if (param == null)
             {
@@ -919,7 +919,7 @@ namespace Hymson.MES.Services.Services.Process
                         ResourceId = param.Id,
                         PrintId = item.PrintId,
                         Remark = "",
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
@@ -960,7 +960,7 @@ namespace Hymson.MES.Services.Services.Process
                         EquipmentId = item.EquipmentId,
                         IsMain = item.IsMain,
                         Remark = "",
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
@@ -1018,7 +1018,7 @@ namespace Hymson.MES.Services.Services.Process
                         SetType = (int)item.SetType,
                         Value = item?.Value.ToString(),
                         Remark = "",
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
@@ -1099,7 +1099,7 @@ namespace Hymson.MES.Services.Services.Process
                         IsUse = item.IsUse,
                         Parameter = item.Parameter,
                         Remark = "",
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
@@ -1118,7 +1118,7 @@ namespace Hymson.MES.Services.Services.Process
                     relationEntity.ProductId = item.ProductId;
                     relationEntity.SetPointId = param.Id;
                     relationEntity.SemiProductId = item.SemiProductId;
-                    relationEntity.SiteId = _currentSite.SiteId ?? 0;
+                    relationEntity.SiteId = _currentSite.SiteId ?? 123456;
                     relationEntity.CreatedBy = userName;
                     relationEntity.UpdatedBy = userName;
                     productSetList.Add(relationEntity);

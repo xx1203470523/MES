@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         public async Task<PagedInfo<ProcProcessRouteDto>> GetPageListAsync(ProcProcessRoutePagedQueryDto procProcessRoutePagedQueryDto)
         {
             var procProcessRoutePagedQuery = procProcessRoutePagedQueryDto.ToQuery<ProcProcessRoutePagedQuery>();
-            procProcessRoutePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procProcessRoutePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procProcessRouteRepository.GetPagedInfoAsync(procProcessRoutePagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -234,7 +234,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             // DTO转换实体
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
             procProcessRouteEntity.Id = IdGenProvider.Instance.CreateId();
-            procProcessRouteEntity.SiteId = _currentSite.SiteId ?? 0;
+            procProcessRouteEntity.SiteId = _currentSite.SiteId ?? 123456;
             procProcessRouteEntity.CreatedBy = _currentUser.UserName;
             procProcessRouteEntity.UpdatedBy = _currentUser.UserName;
 
@@ -249,7 +249,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             // 工艺路线编码和版本唯一
             var isExistsCode = await _procProcessRouteRepository.IsExistsAsync(new ProcProcessRouteQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 Code = procProcessRouteEntity.Code,
                 Version = procProcessRouteEntity.Version
             });

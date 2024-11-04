@@ -115,7 +115,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerPackEntity.UpdatedBy = _currentUser.UserName;
             manuContainerPackEntity.CreatedOn = HymsonClock.Now();
             manuContainerPackEntity.UpdatedOn = HymsonClock.Now();
-            manuContainerPackEntity.SiteId = _currentSite.SiteId ?? 0;
+            manuContainerPackEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //入库
             await _manuContainerPackRepository.InsertAsync(manuContainerPackEntity);
@@ -155,7 +155,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
                 {
                     Sfcs = manuContainerPackList.Select(x => x.LadeBarCode),
-                    SiteId = _currentSite.SiteId ?? 0
+                    SiteId = _currentSite.SiteId ?? 123456
                 });
                 manuSfcInfolist = await manuSfcInfolistTask;
                 manuSfcProduceList = await manuSfcProduceListTask;
@@ -189,7 +189,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             manuSfcStepList.Add(new ManuSfcStepEntity
                             {
                                 Id = IdGenProvider.Instance.CreateId(),
-                                SiteId = _currentSite.SiteId ?? 0,
+                                SiteId = _currentSite.SiteId ?? 123456,
                                 CreatedBy = _currentUser.UserName,
                                 UpdatedBy = _currentUser.UserName,
                                 SFC = item.LadeBarCode,
@@ -239,7 +239,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
                 {
                     Sfcs = manuContainerPackList.Select(x => x.LadeBarCode),
-                    SiteId = _currentSite.SiteId ?? 0
+                    SiteId = _currentSite.SiteId ?? 123456
                 });
                 manuSfcInfolist = await manuSfcInfolistTask;
                 manuSfcProduceList = await manuSfcProduceListTask;
@@ -273,7 +273,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             manuSfcStepList.Add(new ManuSfcStepEntity
                             {
                                 Id = IdGenProvider.Instance.CreateId(),
-                                SiteId = _currentSite.SiteId ?? 0,
+                                SiteId = _currentSite.SiteId ?? 123456,
                                 CreatedBy = _currentUser.UserName,
                                 UpdatedBy = _currentUser.UserName,
                                 SFC = item.LadeBarCode,
@@ -313,7 +313,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<PagedInfo<ManuContainerPackDto>> GetPagedListAsync(ManuContainerPackPagedQueryDto manuContainerPackPagedQueryDto)
         {
             var manuContainerPackPagedQuery = manuContainerPackPagedQueryDto.ToQuery<ManuContainerPackPagedQuery>();
-            manuContainerPackPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            manuContainerPackPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _manuContainerPackRepository.GetPagedInfoAsync(manuContainerPackPagedQuery);
 
 
@@ -328,12 +328,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                 packBarCodesEntities = await _manuContainerBarcodeRepository.GetByCodesAsync(new ManuContainerBarcodeQuery
                 {
                     BarCodes = barCodes,
-                    SiteId = _currentSite.SiteId ?? 0
+                    SiteId = _currentSite.SiteId ?? 123456
                 });
                 if (packBarCodesEntities.Any())
                 {
                     var packBarCodeIds = packBarCodesEntities.Select(x => x.Id).ToArray();
-                    containerPackEntities = (await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(packBarCodeIds, _currentSite.SiteId ?? 0)).ToList();
+                    containerPackEntities = (await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(packBarCodeIds, _currentSite.SiteId ?? 123456)).ToList();
                 }
             }
 
@@ -471,7 +471,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProcedureId = manuFacePlateContainerPackExJobDto.ProcedureId,
                 ResourceId = manuFacePlateContainerPackExJobDto.ResourceId,
                 ContainerId = manuFacePlateContainerPackExJobDto.ContainerId,
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 UserName = _currentUser.UserName
             };
 

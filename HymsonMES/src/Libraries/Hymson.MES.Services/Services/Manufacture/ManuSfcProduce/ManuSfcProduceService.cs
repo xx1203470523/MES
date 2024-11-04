@@ -354,10 +354,10 @@ namespace Hymson.MES.Services.Services.Manufacture
            new ManuSfcProduceQuery
            {
                Sfcs = parm.Sfcs.Distinct().ToArray(),
-               SiteId = _currentSite.SiteId ?? 0
+               SiteId = _currentSite.SiteId ?? 123456
            });
 
-            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 123456, Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             var sfcList = await sfcListTask;
             var sfcProduceBusinesssList = await sfcProduceBusinesssListTask;
 
@@ -476,7 +476,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var stepEntity = new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     SFC = sfc.SFC,
                     ProductId = sfc.ProductId,
                     WorkOrderId = sfc.WorkOrderId,
@@ -496,7 +496,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 sfcProduceBusinessList.Add(new ManuSfcProduceBusinessEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     SfcProduceId = sfc.Id,
                     BusinessType = ManuSfcProduceBusinessType.Lock,
                     BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
@@ -507,7 +507,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 sfcStepBusinessList.Add(new MaunSfcStepBusinessEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     SfcStepId = stepEntity.Id,
                     BusinessType = ManuSfcProduceBusinessType.Lock,
                     BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
@@ -546,10 +546,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             new ManuSfcProduceQuery
             {
                 Sfcs = parm.Sfcs.Distinct().ToArray(),
-                SiteId = _currentSite.SiteId ?? 00
+                SiteId = _currentSite.SiteId ?? 1234560
             });
 
-            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 123456, Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             var sfcList = await sfcListTask;
             var sfcProduceBusinesssList = await sfcProduceBusinesssListTask;
 
@@ -619,7 +619,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var stepEntity = new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     SFC = sfc.SFC,
                     ProductId = sfc.ProductId,
                     WorkOrderId = sfc.WorkOrderId,
@@ -639,7 +639,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 sfcProduceBusinessList.Add(new ManuSfcProduceBusinessEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     SfcProduceId = sfc.Id,
                     BusinessType = ManuSfcProduceBusinessType.Lock,
                     BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
@@ -650,7 +650,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 sfcStepBusinessList.Add(new MaunSfcStepBusinessEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     SfcStepId = stepEntity.Id,
                     BusinessType = ManuSfcProduceBusinessType.Lock,
                     BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
@@ -676,7 +676,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 await _manuSfcProduceRepository.LockedSfcProcedureAsync(new LockedProcedureCommand
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     Sfcs = parm.Sfcs,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
@@ -697,10 +697,10 @@ namespace Hymson.MES.Services.Services.Manufacture
          new ManuSfcProduceQuery
          {
              Sfcs = parm.Sfcs.Distinct().ToArray(),
-             SiteId = _currentSite.SiteId ?? 00
+             SiteId = _currentSite.SiteId ?? 1234560
          });
 
-            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 123456, Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             var sfcList = await sfcListTask;
             var sfcProduceBusinesssList = await sfcProduceBusinesssListTask;
 
@@ -767,7 +767,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var stepEntity = new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     SFC = sfc.SFC,
                     ProductId = sfc.ProductId,
                     WorkOrderId = sfc.WorkOrderId,
@@ -799,7 +799,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 await _manuSfcProduceRepository.UnLockedSfcProcedureAsync(new UnLockedProcedureCommand
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     Sfcs = lockSfc,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
@@ -831,7 +831,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var sfc = parm.Sfcs.Distinct();
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 1234560 };
             //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (!manuSfcs.Any())
@@ -856,7 +856,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
             var isScrapCommand = new UpdateIsScrapCommand
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 Sfcs = sfcs,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
@@ -906,7 +906,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var sfc = parm.Sfcs.Distinct();
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 1234560 };
             //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (!manuSfcs.Any())
@@ -952,7 +952,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //把更改前的状态作为状态传入
             var isScrapCommand = new UpdateIsScrapCommand
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 Sfcs = sfcs,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
@@ -1018,7 +1018,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     CurrentStatus = sfc.Status,
                     //Lock = sfc.Lock,
                     Remark = remark,
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     CreatedBy = sfc.CreatedBy,
                     UpdatedBy = sfc.UpdatedBy
                 });
@@ -1108,7 +1108,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 Sfc = sfc
             });
             if (manuSfcProduceEntity == null)
@@ -1272,7 +1272,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             long processRouteId = 0;
             //在制数据
-            var manuSfcProduceList = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = manuSfcs });
+            var manuSfcProduceList = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { SiteId = _currentSite.SiteId ?? 123456, Sfcs = manuSfcs });
             if (manuSfcProduceList != null && manuSfcProduceList.Any())
             {
                 if (manuSfcProduceList.GroupBy(it => it.WorkOrderId).Distinct().Count() > 1)
@@ -1422,12 +1422,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 验证条码锁定
             await _manuCommonService.VerifySfcsLockAsync(new ManuProcedureBo
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 SFCs = manuSfcs,
                 ProcedureId = procedureId
             });
             //包装
-            var conPackList = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { LadeBarCodes = manuSfcs, SiteId = _currentSite.SiteId ?? 0 });
+            var conPackList = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { LadeBarCodes = manuSfcs, SiteId = _currentSite.SiteId ?? 123456 });
             if (conPackList != null && conPackList.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFCs", string.Join(",", conPackList.Select(it => it.LadeBarCode).ToArray()));
@@ -1495,7 +1495,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             long processRouteId = 0;
             //在制数据
-            var sfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = manuSfcs });
+            var sfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { SiteId = _currentSite.SiteId ?? 123456, Sfcs = manuSfcs });
             if (sfcProduces != null && sfcProduces.Any())
             {
                 if (sfcProduces.GroupBy(it => it.WorkOrderId).Distinct().Count() > 1)
@@ -1521,7 +1521,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuContainerPacks = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery
             {
                 LadeBarCodes = manuSfcs,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             });
             if (manuContainerPacks != null && manuContainerPacks.Any() == true)
             {
@@ -1551,7 +1551,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         // 入库
                         var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
                         {
-                            SiteId = _currentSite.SiteId ?? 0,
+                            SiteId = _currentSite.SiteId ?? 123456,
                             BarCodes = manuSfcs
                         });
 
@@ -1584,7 +1584,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                     QuantityResidue = procMaterial.Batch,
                                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                                     Source = MaterialInventorySourceEnum.ManuComplete,
-                                    SiteId = _currentSite.SiteId ?? 0,
+                                    SiteId = _currentSite.SiteId ?? 123456,
                                     Id = IdGenProvider.Instance.CreateId(),
                                     CreatedBy = _currentUser.UserName,
                                     UpdatedBy = _currentUser.UserName,
@@ -1604,7 +1604,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                     Unit = procMaterial.Unit ?? "",
                                     Type = WhMaterialInventoryTypeEnum.StepControl,
                                     Source = MaterialInventorySourceEnum.ManuComplete,
-                                    SiteId = _currentSite.SiteId ?? 0,
+                                    SiteId = _currentSite.SiteId ?? 123456,
                                     Id = IdGenProvider.Instance.CreateId(),
                                     CreatedBy = _currentUser.UserName,
                                     UpdatedBy = _currentUser.UserName,
@@ -1627,7 +1627,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
                         {
                             BarCodes = notManuSfcs,
-                            SiteId = _currentSite.SiteId ?? 0
+                            SiteId = _currentSite.SiteId ?? 123456
                         });
                         var productIds = notManuSfcInfoList.Select(it => it.ProductId).ToArray();
                         var procMaterials = await _procMaterialRepository.GetByIdsAsync(productIds);
@@ -1674,7 +1674,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 manuSfcProduceList.Add(new ManuSfcProduceEntity
                                 {
                                     Id = IdGenProvider.Instance.CreateId(),
-                                    SiteId = _currentSite.SiteId ?? 0,
+                                    SiteId = _currentSite.SiteId ?? 123456,
                                     SFC = item.SFC,
                                     ProductId = item.ProductId,
                                     WorkOrderId = item.WorkOrderId,
@@ -1713,7 +1713,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                     Unit = procMaterial.Unit ?? "",
                                     Type = WhMaterialInventoryTypeEnum.StepControl,
                                     Source = MaterialInventorySourceEnum.ManuComplete,
-                                    SiteId = _currentSite.SiteId ?? 0,
+                                    SiteId = _currentSite.SiteId ?? 123456,
                                     Id = IdGenProvider.Instance.CreateId(),
                                     CreatedBy = _currentUser.UserName,
                                     UpdatedBy = _currentUser.UserName,
@@ -1736,7 +1736,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcStepList = sfcProduces.Select(item => new ManuSfcStepEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 SFC = item.SFC,
                 ProductId = item.ProductId,
                 ProcedureId = sfcProduceStepDto.ProcedureId,
@@ -1772,7 +1772,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             // 删除条码记录
                             await _manuSfcProduceRepository.DeletePhysicalRangeAsync(new DeletePhysicalBySfcsCommand()
                             {
-                                SiteId = _currentSite.SiteId ?? 0,
+                                SiteId = _currentSite.SiteId ?? 123456,
                                 Sfcs = manuSfcs
                             });
 
@@ -1801,7 +1801,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             // 指定工序
                             await _manuSfcProduceRepository.UpdateProcedureAndStatusRangeAsync(new UpdateProcedureAndStatusCommand
                             {
-                                SiteId = _currentSite.SiteId ?? 0,
+                                SiteId = _currentSite.SiteId ?? 123456,
                                 ResourceId = null,
                                 Sfcs = manuSfcs,
                                 ProcedureId = sfcProduceStepDto.ProcedureId,
@@ -1819,7 +1819,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         // 指定工序
                         await _manuSfcProduceRepository.UpdateProcedureAndStatusRangeAsync(new UpdateProcedureAndStatusCommand
                         {
-                            SiteId = _currentSite.SiteId ?? 0,
+                            SiteId = _currentSite.SiteId ?? 123456,
                             Sfcs = manuSfcs,
                             ResourceId = null,
                             ProcedureId = sfcProduceStepDto.ProcedureId,
@@ -1952,7 +1952,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18200)).WithData("number", 100);
             }
             //验证条码 在制数据
-            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs });
+            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { SiteId = _currentSite.SiteId ?? 123456, Sfcs = sfcs });
             var workOrderIdDistinct = manuSfcProduces.Select(it => it.WorkOrderId).Distinct();
             if (workOrderIdDistinct.Count() > 1)
             {
@@ -1970,7 +1970,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 验证条码锁定
             await _manuCommonService.VerifySfcsLockAsync(new ManuProcedureBo
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 SFCs = sfcs,
                 ProcedureId = procedureId
             });
@@ -2065,7 +2065,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var sfcStep = new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     SFC = item.SFC,
                     ProductId = item.ProductId,
                     ProcedureId = manuUpdateSaveDto.ProcedureId,
@@ -2106,7 +2106,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProductId = newPlanWorkOrderEntity.ProductId,
                     IsUsed = true,
 
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     Id = IdGenProvider.Instance.CreateId(),
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName,
@@ -2177,7 +2177,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task VerifySfcsLockAsync(ManuSfcProduceEntity[] manuSfcs)
         {
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 123456, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
                 //  var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();

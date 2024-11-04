@@ -94,7 +94,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 UserName = _currentUser.UserName,
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId,

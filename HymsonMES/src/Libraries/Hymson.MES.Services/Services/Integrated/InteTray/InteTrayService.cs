@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.SiteId = _currentSite.SiteId ?? 123456;
 
             // 编码唯一性验证
             var checkEntity = await _inteTrayRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
@@ -112,7 +112,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<PagedInfo<InteTrayDto>> GetPagedListAsync(InteTrayPagedQueryDto parm)
         {
             var pagedQuery = parm.ToQuery<InteTrayPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _inteTrayRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

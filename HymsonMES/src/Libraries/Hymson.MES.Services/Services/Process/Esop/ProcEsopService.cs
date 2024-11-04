@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.Process
             //判断同一物料同一工序只能有一个
             var procEsops = await _procEsopRepository.GetProcEsopEntitiesAsync(new ProcEsopQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ProcedureId = procEsopCreateDto.ProcedureId,
                 MaterialId = procEsopCreateDto.MaterialId,
                 Status= procEsopCreateDto.Status
@@ -127,7 +127,7 @@ namespace Hymson.MES.Services.Services.Process
                 UpdatedBy = _currentUser.UserName,
                 CreatedOn = HymsonClock.Now(),
                 UpdatedOn = HymsonClock.Now(),
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             };
 
             var procEsopFiles = new List<ProcEsopFileEntity>();
@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcEsopDto>> GetPagedListAsync(ProcEsopPagedQueryDto procEsopPagedQueryDto)
         {
             var procEsopPagedQuery = procEsopPagedQueryDto.ToQuery<ProcEsopPagedQuery>();
-            procEsopPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procEsopPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procEsopRepository.GetPagedInfoAsync(procEsopPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -240,7 +240,7 @@ namespace Hymson.MES.Services.Services.Process
             //判断同一物料同一工序只能有一个
             var procEsops = await _procEsopRepository.GetProcEsopEntitiesAsync(new ProcEsopQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 ProcedureId = procEsopModifyDto.ProcedureId,
                 MaterialId = procEsopModifyDto.MaterialId,
                 Status = procEsopModifyDto.Status
@@ -360,7 +360,7 @@ namespace Hymson.MES.Services.Services.Process
                 var attachment = new InteAttachmentEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     Name = item.Name,
                     Path = item.Path,
                     CreatedBy = updatedBy,
@@ -371,7 +371,7 @@ namespace Hymson.MES.Services.Services.Process
                 var annex = new ProcEsopFileEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     EsopId = dto.Id,
                     AttachmentId = attachment.Id,
                     CreatedBy = updatedBy,
@@ -450,7 +450,7 @@ namespace Hymson.MES.Services.Services.Process
             procEsopQuery.ProcedureId = procEsopGetJobQueryDto.ProcedureId;
             procEsopQuery.MaterialIds = materialIds;
             procEsopQuery.Status = DisableOrEnableEnum.Enable;
-            procEsopQuery.SiteId = _currentSite.SiteId ?? 0;
+            procEsopQuery.SiteId = _currentSite.SiteId ?? 123456;
             //获取ESOP数据
             var procEsopEntities = await _procEsopRepository.GetProcEsopEntitiesAsync(procEsopQuery);
             if (procEsopEntities == null || !procEsopEntities.Any())

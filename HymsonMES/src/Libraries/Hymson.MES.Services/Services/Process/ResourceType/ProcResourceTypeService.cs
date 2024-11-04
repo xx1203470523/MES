@@ -76,7 +76,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
             var ids = new List<long> { id };
             var query = new ProcResourceQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 IdsArr = ids.ToArray()
             };
             var resources = await _resourceRepository.GetByResTypeIdsAsync(query);
@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         public async Task<PagedInfo<ProcResourceTypeViewDto>> GetPageListAsync(ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
         {
             var procResourceTypePagedQuery = procResourceTypePagedQueryDto.ToQuery<ProcResourceTypePagedQuery>();
-            procResourceTypePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procResourceTypePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _resourceTypeRepository.GetPageListAsync(procResourceTypePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -113,7 +113,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         public async Task<PagedInfo<ProcResourceTypeDto>> GetListAsync(ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
         {
             var procResourceTypePagedQuery = procResourceTypePagedQueryDto.ToQuery<ProcResourceTypePagedQuery>();
-            procResourceTypePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procResourceTypePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _resourceTypeRepository.GetListAsync(procResourceTypePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
             var userName = _currentUser.UserName;
-            var siteId = _currentSite.SiteId ?? 0;
+            var siteId = _currentSite.SiteId ?? 123456;
             //DTO转换实体
             var id = IdGenProvider.Instance.CreateId();
             var resType = param.ResType;
@@ -269,7 +269,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
 
             //测试于帅动要求可以删除
             //查询资源类型是否关联资源
-            var siteId = _currentSite.SiteId ?? 0;
+            var siteId = _currentSite.SiteId ?? 123456;
             var query = new ProcResourceQuery
             {
                 SiteId = siteId,

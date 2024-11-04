@@ -70,7 +70,7 @@ namespace Hymson.MES.Services.Services.Report
             var barcodeEntity = new ManuContainerBarcodeEntity();
             if (queryDto.Type == PackagingTypeEnum.Container)
             {
-                var query = new ManuContainerBarcodeQuery { BarCode = queryDto.Code, SiteId = _currentSite.SiteId ?? 0 };
+                var query = new ManuContainerBarcodeQuery { BarCode = queryDto.Code, SiteId = _currentSite.SiteId ?? 123456 };
                 barcodeEntity = await _manuContainerBarcodeRepository.GetByCodeAsync(query);
                 if (barcodeEntity == null)
                 {
@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Services.Report
                 var query = new ManuContainerPackQuery
                 {
                     LadeBarCode = queryDto.Code,
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                 };
                 var containerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(query);
                 if (containerPackEntity == null)
@@ -111,7 +111,7 @@ namespace Hymson.MES.Services.Services.Report
             var query = new PlanWorkOrderQuery
             {
                 OrderCode = queryDto.Code,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             };
 
             var planWorkOrder = await _planWorkOrderRepository.GetByCodeAsync(query);
@@ -140,7 +140,7 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<PagedInfo<ManuContainerPackDto>> GetContainerPackPagedListAsync(ManuContainerPackPagedQueryDto manuContainerPackPagedQueryDto)
         {
             var manuContainerPackPagedQuery = manuContainerPackPagedQueryDto.ToQuery<ManuContainerPackPagedQuery>();
-            manuContainerPackPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            manuContainerPackPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _manuContainerPackRepository.GetPagedInfoAsync(manuContainerPackPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -154,7 +154,7 @@ namespace Hymson.MES.Services.Services.Report
             var ladeBarCodes = pagedInfo.Data.Select(X => X.BarCode).Distinct().ToArray();
             var query = new ManuContainerPackQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 LadeBarCodes = ladeBarCodes
             };
             var manuContainerPacks = await _manuContainerPackRepository.GetByLadeBarCodesAsync(query);
@@ -204,7 +204,7 @@ namespace Hymson.MES.Services.Services.Report
             var ladeBarCodes = pagedInfo.Data.Select(X => X.BarCode).ToArray();
             var query = new ManuContainerPackQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 LadeBarCodes = ladeBarCodes
             };
             var manuContainerPacks = await _manuContainerPackRepository.GetByLadeBarCodesAsync(query);
@@ -218,7 +218,7 @@ namespace Hymson.MES.Services.Services.Report
 
             //查询当前容器的子容器信息
             var containerIds = list.Select(x => x.Id).ToArray();
-            var containerPackEntities = await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(containerIds, _currentSite.SiteId ?? 0);
+            var containerPackEntities = await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(containerIds, _currentSite.SiteId ?? 123456);
 
             foreach (var item in pagedInfo.Data)
             {
@@ -246,7 +246,7 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<PagedInfo<PlanWorkPackingDto>> GetPagedRecordListAsync(ManuContainerBarcodePagedQueryDto queryDto)
         {
             var manuContainerBarcodePagedQuery = queryDto.ToQuery<ManuContainerBarcodePagedQuery>();
-            manuContainerBarcodePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            manuContainerBarcodePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             manuContainerBarcodePagedQuery.PackLevel = (int)LevelEnum.One;
             var pagedInfo = await _manuContainerBarcodeRepository.GetPagedListAsync(manuContainerBarcodePagedQuery);
 

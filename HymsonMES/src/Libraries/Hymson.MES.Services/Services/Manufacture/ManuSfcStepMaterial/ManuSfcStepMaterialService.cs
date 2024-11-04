@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuSfcStepMaterialEntity.UpdatedBy = _currentUser.UserName;
             manuSfcStepMaterialEntity.CreatedOn = HymsonClock.Now();
             manuSfcStepMaterialEntity.UpdatedOn = HymsonClock.Now();
-            manuSfcStepMaterialEntity.SiteId = _currentSite.SiteId ?? 0;
+            manuSfcStepMaterialEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //入库
             await _manuSfcStepMaterialRepository.InsertAsync(manuSfcStepMaterialEntity);

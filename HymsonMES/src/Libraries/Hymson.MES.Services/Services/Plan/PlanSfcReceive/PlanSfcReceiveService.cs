@@ -119,14 +119,14 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 ManuContainerPackList = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     LadeBarCodes = param.SFCs,
                 });
             }
             var whMaterialInventoryList = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
                 BarCodes = param.SFCs,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             });
             var manuSfcList = await _manuSfcRepository.GetBySFCsAsync(param.SFCs);
             //TODO  考虑库存中是否存放工单字段 王克明
@@ -322,7 +322,7 @@ namespace Hymson.MES.Services.Services.Plan
                 await _whMaterialInventoryRepository.UpdateWhMaterialInventoryEmptyByBarCodeAync(new UpdateWhMaterialInventoryEmptyCommand
                 {
                     BarCodeList = whMaterialInventoryList.Select(x => x.MaterialBarCode).ToList(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     UserName = _currentUser.UserName,
                     UpdateTime = HymsonClock.Now()
                 });
@@ -331,7 +331,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 await _manuCreateBarcodeService.CreateBarcodeByExternalSFCAsync(new CreateBarcodeByExternalSFCBo
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     UserName = _currentUser.UserName,
                     WorkOrderId = param.WorkOrderId,
                     ExternalSFCs = barcodeList

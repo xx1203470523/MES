@@ -165,7 +165,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<PagedInfo<InteUnitDto>> GetPagedListAsync(InteUnitPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteUnitPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _inteUnitRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

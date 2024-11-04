@@ -62,7 +62,7 @@ namespace Hymson.MES.Services.Services.Quality
         public async Task<PagedInfo<QualUnqualifiedCodeDto>> GetPageListAsync(QualUnqualifiedCodePagedQueryDto pram)
         {
             var qualUnqualifiedCodePagedQuery = pram.ToQuery<QualUnqualifiedCodePagedQuery>();
-            qualUnqualifiedCodePagedQuery.SiteId = _currentSite.SiteId ?? 0; // TODO _currentSite.Name;
+            qualUnqualifiedCodePagedQuery.SiteId = _currentSite.SiteId ?? 123456; // TODO _currentSite.Name;
             var pagedInfo = await _qualUnqualifiedCodeRepository.GetPagedInfoAsync(qualUnqualifiedCodePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -126,7 +126,7 @@ namespace Hymson.MES.Services.Services.Quality
         {
             var query = new QualUnqualifiedCodeQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 UnqualifiedGroupId = groupId,
                 StatusArr = new SysDataStatusEnum[] { SysDataStatusEnum.Enable, SysDataStatusEnum.Retain }
             };
@@ -173,7 +173,7 @@ namespace Hymson.MES.Services.Services.Quality
             qualUnqualifiedCodeEntity.Id = IdGenProvider.Instance.CreateId();
             qualUnqualifiedCodeEntity.CreatedBy = userId;
             qualUnqualifiedCodeEntity.UpdatedBy = userId;
-            qualUnqualifiedCodeEntity.SiteId = _currentSite.SiteId ?? 0;
+            qualUnqualifiedCodeEntity.SiteId = _currentSite.SiteId ?? 123456;
             List<QualUnqualifiedCodeGroupRelation> list = new List<QualUnqualifiedCodeGroupRelation>();
             if (param.UnqualifiedGroupIds != null && param.UnqualifiedGroupIds.Any())
             {

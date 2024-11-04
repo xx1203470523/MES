@@ -89,7 +89,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerPackRecordEntity.UpdatedBy = _currentUser.UserName;
             manuContainerPackRecordEntity.CreatedOn = HymsonClock.Now();
             manuContainerPackRecordEntity.UpdatedOn = HymsonClock.Now();
-            manuContainerPackRecordEntity.SiteId = _currentSite.SiteId ?? 0;
+            manuContainerPackRecordEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //入库
             await _manuContainerPackRecordRepository.InsertAsync(manuContainerPackRecordEntity);
@@ -149,7 +149,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<PagedInfo<ManuContainerPackRecordDto>> GetPagedListAsync(ManuContainerPackRecordPagedQueryDto manuContainerPackRecordPagedQueryDto)
         {
             var manuContainerPackRecordPagedQuery = manuContainerPackRecordPagedQueryDto.ToQuery<ManuContainerPackRecordPagedQuery>();
-            manuContainerPackRecordPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            manuContainerPackRecordPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _manuContainerPackRecordRepository.GetPagedInfoAsync(manuContainerPackRecordPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -261,7 +261,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     manuContainerPackRecordEntity.UpdatedBy = _currentUser.UserName;
                     manuContainerPackRecordEntity.CreatedOn = HymsonClock.Now();
                     manuContainerPackRecordEntity.UpdatedOn = HymsonClock.Now();
-                    manuContainerPackRecordEntity.SiteId = _currentSite.SiteId ?? 0;
+                    manuContainerPackRecordEntity.SiteId = _currentSite.SiteId ?? 123456;
 
                     lst.Add(manuContainerPackRecordEntity);
                 }

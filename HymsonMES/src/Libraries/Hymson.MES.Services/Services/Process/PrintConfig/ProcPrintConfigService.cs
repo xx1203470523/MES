@@ -87,7 +87,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         public async Task<PagedInfo<ProcPrinterDto>> GetPageListAsync(ProcPrinterPagedQueryDto query)
         {
             var printPagedQuery = query.ToQuery<ProcPrinterPagedQuery>();
-            printPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            printPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _printConfigRepository.GetPagedListAsync(printPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         public async Task<PagedInfo<ProcPrinterDto>> GetListAsync(ProcPrinterPagedQueryDto query)
         {
             var resourcePagedQuery = query.ToQuery<ProcPrinterPagedQuery>();
-            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _printConfigRepository.GetListAsync(resourcePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -141,7 +141,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             var entity = new ProcPrinterEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 CreatedBy = userName,
                 UpdatedBy = userName,
                 Remark = param.Remark ?? "",
@@ -206,7 +206,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             }
 
             //查询资源类型是否关联资源
-            var siteId = _currentSite.SiteId ?? 0;
+            var siteId = _currentSite.SiteId ?? 123456;
             var query = new ProcResourceConfigPrintQuery
             {
                 Ids = idsArr

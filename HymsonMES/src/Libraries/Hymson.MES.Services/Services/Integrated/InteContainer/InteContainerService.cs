@@ -98,7 +98,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.SiteId = _currentSite.SiteId ?? 123456;
 
             // 验证是否相同物料或者物料组已经设置过
             var entityByRelation = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
@@ -178,7 +178,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         public async Task<PagedInfo<InteContainerDto>> GetPagedListAsync(InteContainerPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteContainerPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _inteContainerRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

@@ -172,7 +172,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 case FeedingSourceEnum.Equipment:
                     resources.AddRange(await _procResourceRepository.GetByEquipmentCodeAsync(new ProcResourceQuery
                     {
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         EquipmentCode = queryDto.Code
                     }));
                     break;
@@ -180,7 +180,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 case FeedingSourceEnum.Resource:
                     resources.AddRange(await _procResourceRepository.GetByResourceCodeAsync(new ProcResourceQuery
                     {
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         ResCode = queryDto.Code
                     }));
                     break;
@@ -359,7 +359,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.SiteId = _currentSite.SiteId ?? 123456;
             entity.MaterialId = inventory.MaterialId;
             entity.SupplierId = inventory.SupplierId;
 
@@ -444,7 +444,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
                 BarCodes = feeds.Select(s => s.BarCode),
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             });
 
             // 查询物料

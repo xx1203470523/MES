@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
             whMaterialInventoryEntity.CreatedOn = HymsonClock.Now();
             whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
-            whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
+            whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //入库
             await _whMaterialInventoryRepository.InsertAsync(whMaterialInventoryEntity);
@@ -231,7 +231,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 whMaterialInventoryEntity.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
                 whMaterialInventoryEntity.DueDate = item.DueDate;
                 whMaterialInventoryEntity.Source = item.Source;
-                whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
+                whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 123456;
 
 
                 whMaterialInventoryEntity.Id = IdGenProvider.Instance.CreateId();
@@ -258,7 +258,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 whMaterialStandingbookEntity.Unit = materialInfo.Unit ?? "";
                 whMaterialStandingbookEntity.Type = item.Type; //(int)WhMaterialInventorySourceEnum.MaterialReceiving;
                 whMaterialStandingbookEntity.Source = item.Source;
-                whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
+                whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 123456;
 
 
                 whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
@@ -320,7 +320,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<PagedInfo<WhMaterialInventoryPageListViewDto>> GetPageListAsync(WhMaterialInventoryPagedQueryDto whMaterialInventoryPagedQueryDto)
         {
             var whMaterialInventoryPagedQuery = whMaterialInventoryPagedQueryDto.ToQuery<WhMaterialInventoryPagedQuery>();
-            whMaterialInventoryPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            whMaterialInventoryPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _whMaterialInventoryRepository.GetPagedInfoAsync(whMaterialInventoryPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -356,7 +356,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             var pagedInfo = await _whMaterialInventoryRepository.GetWhMaterialInventoryEntitiesAsync(new WhMaterialInventoryQuery
             {
                 MaterialBarCode = materialBarCode,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             });
 
             if (pagedInfo != null && pagedInfo.Any())
@@ -430,7 +430,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15101));
             }
-            var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(new WhSupplierByMaterialCommand { MaterialId = materialInfo.Id, SiteId = _currentSite.SiteId ?? 0 });
+            var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(new WhSupplierByMaterialCommand { MaterialId = materialInfo.Id, SiteId = _currentSite.SiteId ?? 123456 });
             if (!supplierInfo.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15102));

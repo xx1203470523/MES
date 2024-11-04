@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.Process
             procLoadPointEntity.UpdatedBy = _currentUser.UserName;
             procLoadPointEntity.CreatedOn = HymsonClock.Now();
             procLoadPointEntity.UpdatedOn = HymsonClock.Now();
-            procLoadPointEntity.SiteId = _currentSite.SiteId ?? 0;
+            procLoadPointEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             #region 数据库验证
             var isExists = (await _procLoadPointRepository.GetProcLoadPointEntitiesAsync(new ProcLoadPointQuery()
@@ -275,7 +275,7 @@ namespace Hymson.MES.Services.Services.Process
             var procLoadPointEntity = procLoadPointModifyDto.ToEntity<ProcLoadPointEntity>();
             procLoadPointEntity.UpdatedBy = _currentUser.UserName;
             procLoadPointEntity.UpdatedOn = HymsonClock.Now();
-            procLoadPointEntity.SiteId = _currentSite.SiteId ?? 0;
+            procLoadPointEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             #region 数据库验证
             var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10705));
@@ -465,7 +465,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcLoadPointDto>> GetPageListAsync(ProcLoadPointPagedQueryDto procLoadPointPagedQueryDto)
         {
             var procLoadPointPagedQuery = procLoadPointPagedQueryDto.ToQuery<ProcLoadPointPagedQuery>();
-            procLoadPointPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procLoadPointPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procLoadPointRepository.GetPagedInfoAsync(procLoadPointPagedQuery);
 
             //实体到DTO转换 装载数据

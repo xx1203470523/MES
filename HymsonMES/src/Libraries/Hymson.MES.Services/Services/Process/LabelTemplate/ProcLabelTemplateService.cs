@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateEntity.UpdatedBy = _currentUser.UserName;
             procLabelTemplateEntity.CreatedOn = HymsonClock.Now();
             procLabelTemplateEntity.UpdatedOn = HymsonClock.Now();
-            procLabelTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
+            procLabelTemplateEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             /*
             //同步模板文件到打印服务器
@@ -150,7 +150,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         public async Task<PagedInfo<ProcLabelTemplateDto>> GetPageListAsync(ProcLabelTemplatePagedQueryDto procLabelTemplatePagedQueryDto)
         {
             var procLabelTemplatePagedQuery = procLabelTemplatePagedQueryDto.ToQuery<ProcLabelTemplatePagedQuery>();
-            procLabelTemplatePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            procLabelTemplatePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _procLabelTemplateRepository.GetPagedInfoAsync(procLabelTemplatePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -236,7 +236,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         }
         private async Task<ProcLabelTemplateEntity> QueryProcLabelTemplateByNameAsync(string name)
         {
-            return await _procLabelTemplateRepository.GetByNameAsync(new ProcLabelTemplateByNameQuery() { SiteId = _currentSite.SiteId ?? 0, Name = name });
+            return await _procLabelTemplateRepository.GetByNameAsync(new ProcLabelTemplateByNameQuery() { SiteId = _currentSite.SiteId ?? 123456, Name = name });
 
         }
     }

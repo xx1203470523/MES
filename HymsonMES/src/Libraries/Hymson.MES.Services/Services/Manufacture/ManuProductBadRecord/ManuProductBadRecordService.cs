@@ -134,7 +134,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
 
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = createDto.Sfcs, SiteId = _currentSite.SiteId ?? 0 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = createDto.Sfcs, SiteId = _currentSite.SiteId ?? 123456 };
             // 获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
@@ -156,7 +156,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 Sfcs = sfcs,
                 Status = ProductBadRecordStatusEnum.Open,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             });
             var existUnqualifiedIds = productBadRecordList.Select(x => x.UnqualifiedId).Distinct().ToList();
             // 获取不合格代码列表
@@ -190,7 +190,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
 
                 //判断是否有未关闭的维修业务，有不允许添加
-                var sfcRepairs = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Repair });
+                var sfcRepairs = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 123456, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Repair });
                 if (sfcRepairs != null && sfcRepairs.Any())
                 {
                     var strs = string.Join(",", sfcRepairs.Select(x => x.Sfc));
@@ -216,7 +216,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     manuProductBadRecords.Add(new ManuProductBadRecordEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         FoundBadOperationId = createDto.FoundBadOperationId,
                         FoundBadResourceId = badResourceId,
                         OutflowOperationId = createDto.OutflowOperationId,
@@ -261,7 +261,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             ProcessRouteId = manuSfc.ProcessRouteId, //createDto.BadProcessRouteId ?? 0,
                             ProcedureId = manuSfc.ProcedureId //processRouteProcedure.ProcedureId
                         }),
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         CreatedBy = manuSfc.CreatedBy,
                         UpdatedBy = manuSfc.UpdatedBy
                     };
@@ -295,7 +295,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
                 var isScrapCommand = new UpdateIsScrapCommand
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     Sfcs = sfcs,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
@@ -371,7 +371,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SFC = queryDto.SFC,
                 Status = queryDto.Status,
                 Type = queryDto.Type,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             };
             var manuProductBads = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(query);
 
@@ -415,7 +415,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SFC = sfc,
                 Status = ProductBadRecordStatusEnum.Open,
                 Type = QualUnqualifiedCodeTypeEnum.Defect,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             };
             var badRecordList = (await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(query)).ToList();
             if (!badRecordList.Any())
@@ -425,7 +425,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 组装数据
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = sfcs, SiteId = _currentSite.SiteId ?? 0 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = sfcs, SiteId = _currentSite.SiteId ?? 123456 };
             // 获取条码信息
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (manuSfcs == null || !manuSfcs.Any())
@@ -456,7 +456,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 updateCommandList.Add(new ManuProductBadRecordCommand
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     Sfc = sfc,
                     UnqualifiedId = unqualified.UnqualifiedId,
                     DisposalResult = ProductBadDisposalResultEnum.ReJudgmentRepair,
@@ -517,7 +517,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //{
                 //    Status = ProductBadRecordStatusEnum.Open,
                 //    SFC = badReJudgmentDto.Sfc,
-                //    SiteId = _currentSite.SiteId ?? 0
+                //    SiteId = _currentSite.SiteId ?? 123456
                 //});
                 //foreach (var item in productBadRecordList)
                 //{
@@ -615,7 +615,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var sfcs = cancelDto.UnqualifiedLists.Select(x => x.Sfc).Distinct().ToArray();
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = sfcs, SiteId = _currentSite.SiteId ?? 0 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = sfcs, SiteId = _currentSite.SiteId ?? 123456 };
             // 获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
             if (!manuSfcs.Any())
@@ -644,7 +644,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 updateCommandList.Add(new ManuProductBadRecordCommand
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     Sfc = unqualified.Sfc,
                     UnqualifiedId = unqualified.UnqualifiedId,
                     Remark = unqualified.Remark ?? "",
@@ -699,7 +699,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 CurrentStatus = sfc.Status,
                 //Lock = sfc.Lock,
                 Remark = remark,
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 CreatedBy = sfc.CreatedBy,
                 UpdatedBy = sfc.UpdatedBy
             };
@@ -798,7 +798,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task VerifySfcsLockAsync(ManuSfcProduceInfoView[] manuSfcs)
         {
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 123456, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
                 //var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();

@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.Process
                 UpdatedOn = HymsonClock.Now(),
                 ParameterType = procParameterLinkTypeCreateDto.ParameterType ?? ParameterTypeEnum.Equipment,
                 ParameterID = s,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             });
 
             var currentEntities = await _procParameterLinkTypeRepository.GetProcParameterLinkTypeEntitiesAsync(new ProcParameterLinkTypeQuery

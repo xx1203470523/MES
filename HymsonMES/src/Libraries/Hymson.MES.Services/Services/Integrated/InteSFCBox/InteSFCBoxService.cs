@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             var query = new PlanWorkOrderQuery
             {
                 OrderCode = validate.WorkOrderCode,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             };
             var workOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(query)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16003));
@@ -429,7 +429,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
         public async Task<PagedInfo<InteSFCBoxDto>> GetPagedListAsync(InteSFCBoxQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteSFCBoxQueryRep>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _inteSFCBoxRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Services.Process
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.SiteId = _currentSite.SiteId ?? 123456;
 
             // 编码唯一性验证
             var checkEntity = await _procProcessEquipmentGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
@@ -154,7 +154,7 @@ namespace Hymson.MES.Services.Services.Process
                     {
                         EquipmentGroupId = entity.Id,
                         EquipmentId = long.Parse(item),
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         Id = IdGenProvider.Instance.CreateId(),
                         CreatedBy = updatedBy,
                         CreatedOn = updatedOn,
@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Services.Process
             var entity = saveDto.ToEntity<ProcProcessEquipmentGroupEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.SiteId = _currentSite.SiteId ?? 123456;
 
             //Update Relation
             // 更新时间
@@ -245,7 +245,7 @@ namespace Hymson.MES.Services.Services.Process
                     {
                         EquipmentGroupId = entity.Id,
                         EquipmentId = long.Parse(item),
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         Id = IdGenProvider.Instance.CreateId(),
                         CreatedBy = updatedBy,
                         CreatedOn = updatedOn,
@@ -325,7 +325,7 @@ namespace Hymson.MES.Services.Services.Process
 
             if (id == 0)
             {
-                processEquipmentGroupRelationEntities = await _procProcessEquipmentGroupRelationRepository.GetByGroupIdAsync(new ProcProcessEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 0, ProcessEquipmentGroupId = id });
+                processEquipmentGroupRelationEntities = await _procProcessEquipmentGroupRelationRepository.GetByGroupIdAsync(new ProcProcessEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 123456, ProcessEquipmentGroupId = id });
             }
             else
             {
@@ -338,12 +338,12 @@ namespace Hymson.MES.Services.Services.Process
                 dto.Info.ProcedureCode = procedureEntity.Code;
                 dto.Info.ProcedureName = procedureEntity.Name;
 
-                processEquipmentGroupRelationEntities = await _procProcessEquipmentGroupRelationRepository.GetByGroupIdAsync(new ProcProcessEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 0, ProcessEquipmentGroupId = id });
+                processEquipmentGroupRelationEntities = await _procProcessEquipmentGroupRelationRepository.GetByGroupIdAsync(new ProcProcessEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 123456, ProcessEquipmentGroupId = id });
             }
 
             var equipmentEntities = await _equipmentRepository.GetEntitiesAsync(new EquEquipmentQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
             });
 
             List<ProcProcessEquipmentBaseDto> euipments = new();

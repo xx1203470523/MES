@@ -123,7 +123,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateEntity.UpdatedBy = _currentUser.UserName;
             manuFacePlateEntity.CreatedOn = HymsonClock.Now();
             manuFacePlateEntity.UpdatedOn = HymsonClock.Now();
-            manuFacePlateEntity.SiteId = _currentSite.SiteId ?? 0;
+            manuFacePlateEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //入库
             await _manuFacePlateRepository.InsertAsync(manuFacePlateEntity);
@@ -169,7 +169,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<PagedInfo<ManuFacePlateDto>> GetPagedListAsync(ManuFacePlatePagedQueryDto manuFacePlatePagedQueryDto)
         {
             var manuFacePlatePagedQuery = manuFacePlatePagedQueryDto.ToQuery<ManuFacePlatePagedQuery>();
-            manuFacePlatePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            manuFacePlatePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _manuFacePlateRepository.GetPagedInfoAsync(manuFacePlatePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -587,7 +587,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateEntity.UpdatedBy = _currentUser.UserName;
             manuFacePlateEntity.CreatedOn = HymsonClock.Now();
             manuFacePlateEntity.UpdatedOn = HymsonClock.Now();
-            manuFacePlateEntity.SiteId = _currentSite.SiteId ?? 0;
+            manuFacePlateEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             #region 生产过站
             ManuFacePlateProductionEntity manuFacePlateProductionEntity = new ManuFacePlateProductionEntity();
@@ -603,7 +603,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuFacePlateProductionEntity.UpdatedBy = _currentUser.UserName;
                 manuFacePlateProductionEntity.CreatedOn = HymsonClock.Now();
                 manuFacePlateProductionEntity.UpdatedOn = HymsonClock.Now();
-                manuFacePlateProductionEntity.SiteId = _currentSite.SiteId ?? 0;
+                manuFacePlateProductionEntity.SiteId = _currentSite.SiteId ?? 123456;
             }
             #endregion
 
@@ -621,7 +621,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuFacePlateRepairEntity.UpdatedBy = _currentUser.UserName;
                 manuFacePlateRepairEntity.CreatedOn = HymsonClock.Now();
                 manuFacePlateRepairEntity.UpdatedOn = HymsonClock.Now();
-                manuFacePlateRepairEntity.SiteId = _currentSite.SiteId ?? 0;
+                manuFacePlateRepairEntity.SiteId = _currentSite.SiteId ?? 123456;
             }
             #endregion
 
@@ -639,7 +639,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuFacePlateContainerPackEntity.UpdatedBy = _currentUser.UserName;
                 manuFacePlateContainerPackEntity.CreatedOn = HymsonClock.Now();
                 manuFacePlateContainerPackEntity.UpdatedOn = HymsonClock.Now();
-                manuFacePlateContainerPackEntity.SiteId = _currentSite.SiteId ?? 0;
+                manuFacePlateContainerPackEntity.SiteId = _currentSite.SiteId ?? 123456;
             }
             #endregion
 
@@ -694,7 +694,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     manuFacePlateButtonEntity.UpdatedBy = _currentUser.UserName;
                     manuFacePlateButtonEntity.UpdatedOn = HymsonClock.Now();
                     manuFacePlateButtonEntity.FacePlateId = manuFacePlateEntity.Id;
-                    manuFacePlateButtonEntity.SiteId = _currentSite.SiteId ?? 0;
+                    manuFacePlateButtonEntity.SiteId = _currentSite.SiteId ?? 123456;
                     manuFacePlateButtonEntityList.Add(manuFacePlateButtonEntity);
                     int i = 0;
                     //按钮关联JOb关系表
@@ -740,7 +740,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         manuFacePlateButtonJobRelationEntity.UpdatedBy = _currentUser.UserName;
                         manuFacePlateButtonJobRelationEntity.UpdatedOn = HymsonClock.Now();
                         manuFacePlateButtonJobRelationEntity.FacePlateButtonId = manuFacePlateButtonEntity.Id;
-                        manuFacePlateButtonJobRelationEntity.SiteId = _currentSite.SiteId ?? 0;
+                        manuFacePlateButtonJobRelationEntity.SiteId = _currentSite.SiteId ?? 123456;
                         manuFacePlateButtonJobRelationEntityList.Add(manuFacePlateButtonJobRelationEntity);
                     }
                 }

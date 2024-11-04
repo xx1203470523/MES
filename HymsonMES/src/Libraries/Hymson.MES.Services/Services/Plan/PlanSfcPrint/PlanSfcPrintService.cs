@@ -293,13 +293,13 @@ namespace Hymson.MES.Services.Services.Plan
                 });
                 rows += await _manuSfcProduceRepository.DeletePhysicalRangeAsync(new Data.Repositories.Manufacture.ManuSfcProduce.Command.DeletePhysicalBySfcsCommand()
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     Sfcs = sfcEntities.Select(s => s.SFC).ToArray()
                 });
                 rows += await _manuSfcStepRepository.InsertRangeAsync(sfcEntities.Select(s => new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     SFC = s.SFC,
                     Qty = s.Qty,
                     ProductId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.ProductId,
@@ -363,7 +363,7 @@ namespace Hymson.MES.Services.Services.Plan
         {
             return await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderBo
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 UserName = _currentUser.UserName,
                 WorkOrderId = parm.WorkOrderId,
                 Qty = parm.Qty
@@ -379,7 +379,7 @@ namespace Hymson.MES.Services.Services.Plan
         {
             var list = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderBo
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 UserName = _currentUser.UserName,
                 WorkOrderId = param.WorkOrderId,
                 Qty = param.Qty

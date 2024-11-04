@@ -102,7 +102,7 @@ namespace Hymson.MES.Services.Services.Plan
             // 判断编号是否已存在
             var haveEntities = await _planWorkOrderRepository.GetEqualPlanWorkOrderEntitiesAsync(new PlanWorkOrderQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 OrderCode = command.OrderCode
             });
             if (haveEntities != null && haveEntities.Any() == true)
@@ -117,7 +117,7 @@ namespace Hymson.MES.Services.Services.Plan
             planWorkOrderEntity.UpdatedBy = _currentUser.UserName;
             planWorkOrderEntity.CreatedOn = HymsonClock.Now();
             planWorkOrderEntity.UpdatedOn = HymsonClock.Now();
-            planWorkOrderEntity.SiteId = _currentSite.SiteId ?? 0;
+            planWorkOrderEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             //关联批次箱码
             var boxCodeBindWorkOrder = new List<InteSFCBoxWorkOrderEntity>();
@@ -155,7 +155,7 @@ namespace Hymson.MES.Services.Services.Plan
                     boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        Siteid = _currentSite.SiteId ?? 0,
+                        Siteid = _currentSite.SiteId ?? 123456,
                         UpdatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),
                         CreatedOn = HymsonClock.Now(),
@@ -191,7 +191,7 @@ namespace Hymson.MES.Services.Services.Plan
                 //        boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
                 //        {
                 //            Id = IdGenProvider.Instance.CreateId(),
-                //            Siteid = _currentSite.SiteId ?? 0,
+                //            Siteid = _currentSite.SiteId ?? 123456,
                 //            UpdatedBy = _currentUser.UserName,
                 //            UpdatedOn = HymsonClock.Now(),
                 //            CreatedOn = HymsonClock.Now(),
@@ -209,7 +209,7 @@ namespace Hymson.MES.Services.Services.Plan
                 Id = IdGenProvider.Instance.CreateId(),
                 UpdatedBy = _currentUser.UserName,
                 CreatedBy = _currentUser.UserName,
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 WorkOrderId = planWorkOrderEntity.Id,
                 InputQty = 0,
                 UnqualifiedQuantity = 0,
@@ -345,7 +345,7 @@ namespace Hymson.MES.Services.Services.Plan
                     boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        Siteid = _currentSite.SiteId ?? 0,
+                        Siteid = _currentSite.SiteId ?? 123456,
                         UpdatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),
                         CreatedOn = HymsonClock.Now(),
@@ -390,7 +390,7 @@ namespace Hymson.MES.Services.Services.Plan
                 //            boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
                 //            {
                 //                Id = IdGenProvider.Instance.CreateId(),
-                //                Siteid = _currentSite.SiteId ?? 0,
+                //                Siteid = _currentSite.SiteId ?? 123456,
                 //                UpdatedBy = _currentUser.UserName,
                 //                UpdatedOn = HymsonClock.Now(),
                 //                CreatedOn = HymsonClock.Now(),
@@ -529,7 +529,7 @@ namespace Hymson.MES.Services.Services.Plan
                         UpdatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now(),
                         UpdatedOn = HymsonClock.Now(),
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = _currentSite.SiteId ?? 123456,
 
                         WorkOrderId = item.WorkOrderId,
                         LineId = item.LineId,
@@ -550,7 +550,7 @@ namespace Hymson.MES.Services.Services.Plan
                 record.UpdatedBy = _currentUser.UserName;
                 record.CreatedOn = HymsonClock.Now();
                 record.UpdatedOn = HymsonClock.Now();
-                record.SiteId = _currentSite.SiteId ?? 0;
+                record.SiteId = _currentSite.SiteId ?? 123456;
                 record.IsDeleted = 0;
 
                 planWorkOrderStatusRecordEntities.Add(record);
@@ -671,7 +671,7 @@ namespace Hymson.MES.Services.Services.Plan
                 record.UpdatedBy = _currentUser.UserName;
                 record.CreatedOn = HymsonClock.Now();
                 record.UpdatedOn = HymsonClock.Now();
-                record.SiteId = _currentSite.SiteId ?? 0;
+                record.SiteId = _currentSite.SiteId ?? 123456;
                 record.IsDeleted = 0;
 
                 planWorkOrderStatusRecordEntities.Add(record);
@@ -733,7 +733,7 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
 
             var planWorkOrderConversionEntities = await _planWorkOrderConversionRepository.GetListAsync(new() { });
 
@@ -767,7 +767,7 @@ namespace Hymson.MES.Services.Services.Plan
             var query = new PlanWorkOrderQuery
             {
                 OrderCode = workOrderCode,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             };
             var workOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(query)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16003));
@@ -860,7 +860,7 @@ namespace Hymson.MES.Services.Services.Plan
         {
             var query = new PlanWorkOrderQuery()
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? 123456,
                 OrderCode = workOrderCode
 
             };
@@ -876,7 +876,7 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<PagedInfo<PlanWorkOrderProductionReportViewDto>> GetPlanWorkOrderProductionReportPageListAsync(PlanWorkOrderProductionReportPagedQueryDto queryDto)
         {
             var pagedQuery = queryDto.ToQuery<PlanWorkOrderProductionReportPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _planWorkOrderRepository.GetPlanWorkOrderProductionReportPageListAsync(pagedQuery);
             var dtos = pagedInfo.Data.Select(s =>
             {

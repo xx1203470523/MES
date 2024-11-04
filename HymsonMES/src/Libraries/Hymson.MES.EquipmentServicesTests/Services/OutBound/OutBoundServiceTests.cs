@@ -68,13 +68,13 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
             //string resourceCode = "YTLPACK01ER014";
             //string equipmentCode = "YTLPACK01AE014";
 
-            ////CCS安装
-            //string resourceCode = "YTLPACK01ER016";
-            //string equipmentCode = "YTLPACK01AE016";
+            //CCS安装
+            string resourceCode = "YTLPACK01ER016";
+            string equipmentCode = "YTLPACK01AE016";
 
-            //CCS焊接
-            string resourceCode = "YTLPACK01ER017";
-            string equipmentCode = "YTLPACK01AE017";
+            ////CCS焊接
+            //string resourceCode = "YTLPACK01ER017";
+            //string equipmentCode = "YTLPACK01AE017";
 
             ////模组OCV
             //string resourceCode = "YTLPACK01ER018";
@@ -109,7 +109,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
                 Passed = 1,
                 LocalTime = HymsonClock.Now(),
                 //SFC = "CELL20241024002",
-                SFC = "MODULE20241024001",
+                SFC = "YTLSM202410280084A",
                 ParamList = outBoundParams.ToArray(),
 
                 //过站测试

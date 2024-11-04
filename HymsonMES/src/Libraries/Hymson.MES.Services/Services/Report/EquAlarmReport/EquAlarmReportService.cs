@@ -39,7 +39,7 @@ namespace Hymson.MES.Services.Services.Report.EquAlarmReport
         public async Task<PagedInfo<EquAlarmReportViewDto>> GetEquAlarmReportPageListAsync(EquAlarmReportPagedQueryDto pageQuery)
         {
             var pagedQuery = pageQuery.ToQuery<EquAlarmReportPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _equAlarmRepository.GetEquAlarmReportPageListAsync(pagedQuery);
             var dtos = pagedInfo.Data.Select(s =>
             {
@@ -57,7 +57,7 @@ namespace Hymson.MES.Services.Services.Report.EquAlarmReport
             string fileName = "设备报警";
             pageQuery.PageSize = 10000;
             var pagedQuery = pageQuery.ToQuery<EquAlarmReportPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _equAlarmRepository.GetEquAlarmReportPageListAsync(pagedQuery);
             var equAlarmReports = pagedInfo.Data;
             var equHeartbeaReportExports = new List<EquAlarmReportExportDto>();
