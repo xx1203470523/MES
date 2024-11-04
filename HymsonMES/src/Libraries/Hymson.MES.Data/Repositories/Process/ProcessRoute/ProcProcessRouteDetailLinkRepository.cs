@@ -75,12 +75,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetNextProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query)
         {
-            var key = $"proc_process_route_detail_link&{query.ProcessRouteId}&{query.ProcedureId}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(GetNextProcedureIDsSql, query);
-            });
+            //var key = $"proc_process_route_detail_link&{query.ProcessRouteId}&{query.ProcedureId}";
+            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            //{
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(GetNextProcedureIDsSql, query);
+            //});
         }
 
         /// <summary>
