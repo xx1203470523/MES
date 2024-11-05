@@ -26,7 +26,7 @@ namespace Hymson.MES.Api
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            MemoryCacheExtensions.EnableCache = false;
+            //MemoryCacheExtensions.EnableCache = false;
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
