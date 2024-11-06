@@ -206,7 +206,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             }
 
             string sql = $@"
-                select t4.CreatedOn ReqDate,t4.UpdatedOn OutWmsDate,t3.OrderCode ,t5.MaterialCode ,t5.MaterialName , t5.Specifications ,t6.Name Unit ,
+                select t1.CreatedOn ReqDate,t1.UpdatedOn OutWmsDate,t3.OrderCode ,t5.MaterialCode ,t5.MaterialName , t5.Specifications ,t6.Name Unit ,
 	                t3.Qty OrderQty,t1.Qty ReqQty, t4.WorkPlanCode , t2.Warehouse , t1.CreatedBy ,t2.Status ,  t2.ReqOrderCode ,t2.`Type` 
                 from manu_requistion_order_detail t1
                 inner join manu_requistion_order t2 on t1.RequistionOrderId = t2.Id and t2.IsDeleted = 0
