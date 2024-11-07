@@ -87,6 +87,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal? Batch { get; set; } = 0;
 
         /// <summary>
+        /// 最小包装数量
+        /// </summary>
+        public decimal? MinPackageQty { get; set; }
+
+        /// <summary>
         /// 标包数量
         /// </summary>
         public int? PackageNum { get; set; }
@@ -224,6 +229,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 批次大小
         /// </summary>
         public decimal? Batch { get; set; } = 0;
+
+        /// <summary>
+        /// 最小包装数量
+        /// </summary>
+        public decimal? MinPackageQty { get; set; }
 
         /// <summary>
         /// 标包数量
@@ -405,6 +415,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 批次大小
         /// </summary>
         public decimal? Batch { get; set; } = 0;
+
+        /// <summary>
+        /// 最小包装数量
+        /// </summary>
+        public decimal? MinPackageQty { get; set; }
 
         /// <summary>
         /// 标包数量

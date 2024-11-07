@@ -400,10 +400,11 @@ namespace Hymson.MES.Services.Services.Process
                     UpdatedOn = procMaterialEntity.UpdatedOn,
                     ConsumeRatio = procMaterialEntity.ConsumeRatio,
                     QuantityLimit = procMaterialEntity.QuantityLimit,
-                     ProductModel = procMaterialEntity.ProductModel,
-                      Specifications= procMaterialEntity.Specifications,
-                       MaterialType = procMaterialEntity.MaterialType,
-                       ValidTime=procMaterialEntity.ValidTime,
+                    ProductModel = procMaterialEntity.ProductModel,
+                    Specifications= procMaterialEntity.Specifications,
+                    MaterialType = procMaterialEntity.MaterialType,
+                    ValidTime=procMaterialEntity.ValidTime,
+                    MinPackageQty = procMaterialEntity.MinPackageQty,
                 });
 
                 if (response == 0)

@@ -90,6 +90,12 @@ namespace Hymson.MES.Core.Domain.Process
         public decimal? Batch { get; set; }
 
         /// <summary>
+        /// 描述 :最小包装数量 
+        /// 空值 : true  
+        /// </summary>
+        public decimal? MinPackageQty { get; set; }
+
+        /// <summary>
         /// 有效时间
         /// </summary>
         public int? ValidTime { get; set; }
