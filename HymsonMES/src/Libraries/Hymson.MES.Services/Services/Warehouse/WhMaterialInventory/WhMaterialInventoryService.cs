@@ -720,7 +720,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             if (oldWhMEntirty.QuantityResidue < adjustDto.Qty) throw new CustomerValidationException(nameof(ErrorCode.MES15126));
 
-            if (HasDecimalPart(adjustDto.Qty)) throw new CustomerValidationException(nameof(ErrorCode.MES15133));
+            //if (HasDecimalPart(adjustDto.Qty)) throw new CustomerValidationException(nameof(ErrorCode.MES15133));
 
             var remainsQty = oldWhMEntirty.QuantityResidue - adjustDto.Qty;
 
