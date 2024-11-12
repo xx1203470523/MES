@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Enums;
+﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -349,6 +350,27 @@ namespace Hymson.MES.HttpClients.Requests
         public string CreateBy { get; set; }
     }
     /// <summary>
+    /// 获取物料库存的可用数量入参
+    /// </summary>
+    public record GetStockQuantityDto
+    {
+
+        public string MaterialCode { get; set; }
+
+        public string WarehouseCode { get; set; }
+    }
+    /// <summary>
+    /// 获取物料库存的可用数量返回值
+    /// </summary>
+    public record GetStockQuantityRequest
+    {
+        /// <summary>
+        /// 库存的可用数量
+        /// </summary>
+        [JsonPropertyName("Quantity")]
+        public decimal Quantity { get; set; }
+    }
+    /// <summary>
     /// 废成品入库明细item
     /// </summary>
     public record WasteProductReceiptItemDto
@@ -403,5 +425,37 @@ namespace Hymson.MES.HttpClients.Requests
         [JsonPropertyName("msg")]
         public string Message { get; set; } = "";
     }
+
+    /// <summary>
+    /// 库存信息输出
+    /// </summary>
+    public record StockInfoOutputDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 物料信息
+        /// </summary>
+        //public BaseMaterialOutputDto? BaseMaterialOutputDto { get; set; }
+
+        /// <summary>
+        /// 库存数量
+        /// </summary>
+        public decimal? Quantity { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class BaseResponse<T> where T : BaseEntityDto
+    {
+        [JsonPropertyName("data")]
+        public T Data { get; set; }
+
+        [JsonPropertyName("code")]
+        public int Code { get; set; }
+
+        [JsonPropertyName("msg")]
+        public string Message { get; set; } = "";
+    }
+
 
 }

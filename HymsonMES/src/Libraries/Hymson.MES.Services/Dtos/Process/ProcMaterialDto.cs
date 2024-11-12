@@ -37,6 +37,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public string MaterialName { get; set; }
 
         /// <summary>
+        /// 物料库存剩余数量
+        /// </summary>
+        public decimal QuantityResidue { get; set; }
+
+        /// <summary>
         /// 规格型号
         /// </summary>
         public string Specifications { get; set; }
@@ -506,6 +511,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 物料编码
         /// </summary>
         public string? MaterialCode { get; set; } = "";
+
+        /// <summary>
+        /// 库存编码
+        /// </summary>
+        public string? Warehouse { get; set; } = "";
 
         /// <summary>
         /// 版本

@@ -8,15 +8,18 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Extension;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
+using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Requests.Rotor;
 using Hymson.MES.HttpClients.RotorHandle;
 using Hymson.MES.Services.Dtos.Common;
@@ -32,6 +35,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Attributes;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -57,6 +61,8 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+
+        private readonly IWMSApiClient _wmsRequest;
 
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
@@ -104,7 +110,8 @@ namespace Hymson.MES.Services.Services.Process
             IExcelService excelService,
             IMinioService minioService, IProcMaterialGroupRepository procMaterialGroupRepository,
             ISysConfigRepository sysConfigRepository,
-            IRotorApiClient rotorApiClient)
+            IRotorApiClient rotorApiClient,
+            IWMSApiClient wmsRequest)
         {
             _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
@@ -128,7 +135,8 @@ namespace Hymson.MES.Services.Services.Process
             _procMaterialGroupRepository = procMaterialGroupRepository;
             _sysConfigRepository = sysConfigRepository;
             _rotorApiClient = rotorApiClient;
-        }
+            _wmsRequest = wmsRequest;
+    }
 
 
         /// <summary>
@@ -537,6 +545,22 @@ namespace Hymson.MES.Services.Services.Process
             {
                 var materialGroupEntity = materialGroupEntities.Where(a => a.Id == item.GroupId).FirstOrDefault();
                 item.MaterialGroupCode = materialGroupEntity?.GroupCode ?? "";
+
+                //根据库存和物料编码，调WMS接口，获取库存的剩余数量
+                var response = await _wmsRequest.GetStockQuantityRequestAsync(new HttpClients.Requests.GetStockQuantityDto
+                {
+                    MaterialCode = item.MaterialCode,
+                    WarehouseCode = procMaterialPagedQueryDto.Warehouse
+                });
+                if (response.Code == 0)
+                {
+                    ////赋值剩余数量
+                    item.QuantityResidue = (decimal)response.Data.Quantity;
+                }
+                else
+                {
+                    item.QuantityResidue = 0;
+                }
             }
 
             return new PagedInfo<ProcMaterialDto>(procMaterialDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);

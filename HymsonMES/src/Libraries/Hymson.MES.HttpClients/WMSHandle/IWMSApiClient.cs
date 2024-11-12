@@ -112,5 +112,12 @@ namespace Hymson.MES.HttpClients
         /// <param name="request"></param>
         /// <returns></returns>
         Task<BaseResponse> WasteProductReceiptRequestAsync(WasteProductReceiptRequestDto request);
+
+        /// <summary>
+        /// 获取库存的剩余数量
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<BaseResponse<StockInfoOutputDto>> GetStockQuantityRequestAsync(GetStockQuantityDto request);
     }
 }

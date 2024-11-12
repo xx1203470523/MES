@@ -74,6 +74,12 @@
         /// 废成品入库单配置 
         /// </summary>
         public WMSBusinessOptions WasteProductReceipt { get; set; }
+
+        /// <summary>
+        /// 库存的剩余数量配置 
+        /// </summary>
+        public WMSBusinessOptions GetStockQuantityReceipt { get; set; }
+        
     }
 
     /// <summary>

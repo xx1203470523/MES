@@ -3,9 +3,11 @@ using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.WMS;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Hymson.MES.HttpClients.Responses.NioWms;
+using Hymson.MES.HttpClients.Responses.Rotor;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -361,6 +363,24 @@ namespace Hymson.MES.HttpClients
             _logger.LogDebug($"副成品入库 -> Response: {jsonResponse}");
 
             return await httpResponse.Content.ReadFromJsonAsync<BaseResponse>();
+        }
+
+        /// <summary>
+        /// MES通过库存和物料编码，调用WMS接口：/wms/Stock/getStockQuantity，获取物料库存的可用数量
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<BaseResponse<StockInfoOutputDto>> GetStockQuantityRequestAsync(GetStockQuantityDto request)
+        {
+            _logger.LogDebug($"获取物料库存的可用数量 -> Request: {request.ToSerialize()}");
+
+            var httpResponse = await _httpClient.GetAsync($"{_options.Value.GetStockQuantityReceipt.Route}?MaterialCode={request.MaterialCode}&WarehouseCode={request.WarehouseCode}");
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"获取物料库存的可用数量 -> Response: {jsonResponse}");
+
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse<StockInfoOutputDto>>();
         }
     }
 }
