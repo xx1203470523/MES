@@ -46,7 +46,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("generated")]
-        [LogDescription("生成IQC检验单", BusinessType.INSERT)]
+        [LogDescription("生成IQC来料检验单", BusinessType.INSERT)]
         public async Task<long> GeneratedOrderAsync([FromBody] GenerateOrderLiteDto requestDto)
         {
             // 生成IQC检验单

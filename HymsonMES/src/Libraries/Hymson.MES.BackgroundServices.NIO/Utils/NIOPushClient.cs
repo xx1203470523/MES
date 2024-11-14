@@ -150,7 +150,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <param name="hostsuffix"></param>
         /// <returns></returns>
         public static async Task<RestResponse> ExecuteAsync(this NioPushSwitchEntity config, string body, 
-            string host, string hostsuffix)
+            string host, string hostsuffix, string appsec)
         {
             if(string.IsNullOrEmpty(host) == true)
             {
@@ -159,6 +159,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             if(string.IsNullOrEmpty(hostsuffix) == true)
             {
                 hostsuffix = HOSTSUFFIX;
+            }
+            if(string.IsNullOrEmpty(appsec) == true)
+            {
+                appsec = APP_SECRET;
             }
 
             if (config == null || string.IsNullOrWhiteSpace(body)) return new RestResponse { IsSuccessStatusCode = false };

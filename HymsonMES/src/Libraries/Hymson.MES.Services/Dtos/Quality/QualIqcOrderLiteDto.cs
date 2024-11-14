@@ -91,6 +91,32 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string ReceiptNum { get; set; }
 
         /// <summary>
+        /// 通知单号
+        /// </summary>
+        public string? InformCode { get; set; }
+
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        public string? SyncCode { get; set; }
+
+        /// <summary>
+        /// 仓库名称
+        /// </summary>
+        public string? WarehouseName { get; set; }
+
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName { get; set; }
+
+        /// <summary>
         /// 供应商ID
         /// </summary>
         public long SupplierId { get; set; }
@@ -361,6 +387,44 @@ namespace Hymson.MES.Services.Dtos.Quality
 
     }
 
+
+    /// <summary>
+    /// iqc检验单物料Dto（详情）
+    /// </summary>
+    public record QualIqcOrderLiteMatDetailDto : BaseEntityDto
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// IQC检验单Id
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+        /// <summary>
+        /// 物料id
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string MaterialVersion { get; set; }
+
+    }
+
     /// <summary>
     /// iqc检验单分页Dto
     /// </summary>
@@ -371,7 +435,27 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string? InspectionOrder { get; set; }
 
-        /*
+        /// <summary>
+        /// 收货单号
+        /// </summary>
+        public string? ReceiptNum { get; set; }
+
+        /// <summary>
+        /// 通知单号
+        /// </summary>
+        public string? InformCode { get; set; }
+
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        public string? SyncCode { get; set; }
+
+        /// <summary>
+        /// 仓库名称
+        /// </summary>
+        public string? WarehouseName { get; set; }
+
+
         /// <summary>
         /// 物料编码
         /// </summary>
@@ -382,16 +466,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string? MaterialName { get; set; }
 
+        /*
         /// <summary>
         /// 物料版本
         /// </summary>
         public string? MaterialVersion { get; set; }
         */
-
-        /// <summary>
-        /// 收货单号
-        /// </summary>
-        public string? ReceiptNum { get; set; }
 
         /// <summary>
         /// 供应商编码
@@ -416,7 +496,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         */
 
         /// <summary>
-        /// 状态;1、待检验2、检验中3、已检验4、已关闭
+        /// 检验状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
         public IQCLiteStatusEnum? Status { get; set; }
 

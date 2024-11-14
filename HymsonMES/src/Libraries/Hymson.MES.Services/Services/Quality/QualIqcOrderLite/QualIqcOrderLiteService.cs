@@ -31,6 +31,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -670,6 +671,20 @@ namespace Hymson.MES.Services.Services.Quality
             }
             */
 
+
+            // 转换物料编码、物料名称变为物料ID
+            //if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode) || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName))
+            //{
+            //    var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
+            //    {
+            //        SiteId = pagedQuery.SiteId,
+            //        MaterialCode = pagedQueryDto.MaterialCode,
+            //        MaterialName = pagedQueryDto.MaterialName
+            //    });
+            //    if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.MaterialIds = procMaterialEntities.Select(s => s.Id);
+            //    else pagedQuery.MaterialIds = Array.Empty<long>();
+            //}
+
             // 将收货单号转换为收货单ID
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.ReceiptNum))
             {
@@ -682,7 +697,7 @@ namespace Hymson.MES.Services.Services.Quality
                 else pagedQuery.ReceiptIds = Array.Empty<long>();
             }
 
-            // 转换供应商编码变为供应商ID
+            // 转换供应商编码、供应商名称变为供应商ID
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode)
                 || !string.IsNullOrWhiteSpace(pagedQueryDto.SupplierName))
             {
@@ -717,8 +732,109 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 实体到DTO转换 装载数据
             var dtos = await PrepareOrderDtosAsync(pagedInfo.Data);
+
+            // 遍历
+            foreach (var dto in dtos)
+            {
+                QualIqcOrderLiteMatDetailDto resultResp = await QueryMatDetailAsync(dto.Id);
+                dto.MaterialCode = resultResp.MaterialCode;
+                dto.MaterialName = resultResp.MaterialName;
+            }
+
+
             return new PagedInfo<QualIqcOrderLiteDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
+
+
+
+        /// <summary>
+        /// 查询检验单物料明细数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<QualIqcOrderLiteMatDetailDto?> QueryMatDetailAsync(long id)
+        {
+            List<QualIqcOrderLiteDetailDto> dtos = new();
+
+            QualIqcOrderLiteMatDetailDto resultResp = new();
+
+            // 检验单
+            var orderEntity = await _qualIqcOrderLiteRepository.GetByIdAsync(id);
+            if (orderEntity == null) return resultResp;
+
+            // 检验单明细
+            var detailEntities = await _qualIqcOrderLiteDetailRepository.GetEntitiesAsync(new QualIqcOrderLiteDetailQuery
+            {
+                SiteId = orderEntity.SiteId,
+                IQCOrderId = orderEntity.Id
+            });
+            if (detailEntities == null || !detailEntities.Any()) return resultResp;
+
+            // 读取产品
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(detailEntities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
+            var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
+
+            // 遍历
+            foreach (var entity in detailEntities)
+            {
+                var dto = entity.ToModel<QualIqcOrderLiteDetailDto>();
+
+                // 产品
+                if (entity.MaterialId.HasValue)
+                {
+                    var materialEntity = materialDic[entity.MaterialId.Value];
+                    if (materialEntity != null)
+                    {
+                        dto.MaterialCode = materialEntity.MaterialCode;
+                        dto.MaterialName = materialEntity.MaterialName;
+                        dto.MaterialVersion = materialEntity.Version ?? "";
+                    }
+                }
+                else
+                {
+                    dto.MaterialCode = "-";
+                    dto.MaterialName = "-";
+                    dto.MaterialVersion = "-";
+                }
+                dtos.Add(dto);
+            }
+
+            StringBuilder sbCode = new StringBuilder();
+            StringBuilder sbName = new StringBuilder();
+
+            for (int i = 0; i < dtos.Count; i++)
+            {
+                sbCode.Append(dtos[i].MaterialCode);
+                if (i < dtos.Count - 1) // 检查是否为最后一个元素
+                {
+                    sbCode.Append(",");
+                }
+                sbName.Append(dtos[i].MaterialName);
+                if (i < dtos.Count - 1) // 检查是否为最后一个元素
+                {
+                    sbName.Append(",");
+                }
+            }
+
+            string resultCode = sbCode.ToString();
+            // 移除最后的逗号
+            if (resultCode.EndsWith(","))
+            {
+                resultCode = resultCode.Substring(0, resultCode.Length - 1);
+            }
+            resultResp.MaterialCode = resultCode;
+
+            string resultName = sbName.ToString();
+            // 移除最后的逗号
+            if (resultName.EndsWith(","))
+            {
+                resultName = resultName.Substring(0, resultName.Length - 1);
+            }
+            resultResp.MaterialName = resultName;
+
+            return resultResp;
+        }
+
 
         /// <summary>
         /// 根据ID查询附件
@@ -807,6 +923,7 @@ namespace Hymson.MES.Services.Services.Quality
                 if (receiptEntity != null)
                 {
                     dto.ReceiptNum = receiptEntity.ReceiptNum;
+                    dto.SyncCode = receiptEntity.SyncCode;
                 }
 
                 // 检验人

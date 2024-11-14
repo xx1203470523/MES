@@ -181,7 +181,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     if (config.IsEnabled == TrueOrFalseEnum.Yes)
                     {
                         // 推送
-                        var restResponse = await config.ExecuteAsync(data.Content, host, hostsuffix);
+                        var restResponse = await config.ExecuteAsync(data.Content, host, hostsuffix, "");
 
                         // 处理推送结果
                         data.Status = PushStatusEnum.Failure;
@@ -294,7 +294,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     if (config.IsEnabled == TrueOrFalseEnum.Yes)
                     {
                         // 推送
-                        var restResponse = await config.ExecuteAsync(data.Content, host, hostsuffix);
+                        var restResponse = await config.ExecuteAsync(data.Content, host, hostsuffix, "");
 
                         // 处理推送结果
                         data.Status = PushStatusEnum.Failure;
@@ -359,6 +359,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //站点配置
             string host = string.Empty;
             string hostsuffix = string.Empty;
+            string appsec = string.Empty;
             IEnumerable<SysConfigEntity>? nioUrlList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.NioUrl });
             if (nioUrlList != null && nioUrlList.Count() > 0)
             {
@@ -371,6 +372,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 if (hostsuffixEntity != null)
                 {
                     hostsuffix = hostsuffixEntity.Value;
+                }
+                var appsecEntity = nioUrlList.Where(m => m.Code.ToLower() == "appsecrect").FirstOrDefault();
+                if(appsecEntity != null)
+                {
+                    appsec = appsecEntity.Value;
                 }
             }
 
@@ -426,7 +432,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
                         if(string.IsNullOrEmpty(pushContent) == false)
                         {
-                            var restResponse = await config.ExecuteAsync(pushContent, host, hostsuffix);
+                            var restResponse = await config.ExecuteAsync(pushContent, host, hostsuffix, appsec);
 
                             // 处理推送结果
                             data.Status = PushStatusEnum.Failure;

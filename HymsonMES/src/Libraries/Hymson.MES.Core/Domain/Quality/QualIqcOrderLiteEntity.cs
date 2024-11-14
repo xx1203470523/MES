@@ -28,12 +28,38 @@ namespace Hymson.MES.Core.Domain.Quality
         public long MaterialReceiptId { get; set; }
 
         /// <summary>
+        /// 通知单号
+        /// </summary>
+        public string? InformCode { get; set; }
+
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        public string? SyncCode { get; set; }
+
+        /// <summary>
+        /// 仓库名称
+        /// </summary>
+        public string? WarehouseName { get; set; }
+
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName { get; set; }
+
+        /// <summary>
         /// 供应商Id
         /// </summary>
         public long? SupplierId { get; set; }
 
         /// <summary>
-        /// 状态;1、待检验2、检验中3、已检验4、取消检验
+        /// 检验状态;1、待检验2、检验中3、已检验4、取消检验
         /// </summary>
         public IQCLiteStatusEnum Status { get; set; }
 
