@@ -30,12 +30,12 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         }
 
         /// <summary>
-        /// 领料
+        /// 工单Bom领料，保存所调方法
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [LogDescription("领料", BusinessType.INSERT)]
+        [LogDescription("工单Bom领料", BusinessType.INSERT)]
         public async Task MaterialReturnAsync([FromBody] PickMaterialDto parm)
         {
             await _whMaterialPickingService.PickMaterialsRequestAsync(parm);

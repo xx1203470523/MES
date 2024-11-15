@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking
         public long OrderId { get; set; }
 
         /// <summary>
-        /// 退仓类型1：实仓，2：虚仓
+        /// 领仓类型1：实仓，2：虚仓
         /// </summary>
         public ManuRequistionTypeEnum Type { get; set; }
 
