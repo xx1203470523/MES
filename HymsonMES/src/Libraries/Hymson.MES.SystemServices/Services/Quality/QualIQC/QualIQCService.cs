@@ -153,6 +153,8 @@ namespace Hymson.MES.SystemServices.Services.Quality
             entity.UpdatedOn = updateTime;
             entity.SiteId = siteId;
             entity.SupplierId = supplierEntities.FirstOrDefault()?.Id ?? 0;
+            entity.InformCode = dto.InformCode;
+            entity.WarehouseName = dto.WarehouseName;
 
             // 是否重复收货单号
             var isHasReceipt = await _whMaterialReceiptRepository.GetEntitiesAsync(new WhMaterialReceiptQuery { ReceiptNum = entity.ReceiptNum });
