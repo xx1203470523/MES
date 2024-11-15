@@ -193,7 +193,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplateAs);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplateAs);
-            sqlBuilder.Select(@" t1.*, t1.id,t1.InspectionOrder,t1.MaterialReceiptId, t2.ReceiptNum, t2.SyncCode,t1.InformCode,t.WarehouseName, t1.SupplierId,t3.`Code` as supplierCode,t3.`Name` as supplierName,t1.`Status`,t1.CreatedBy,t1.CreatedOn,t4.MaterialCode,t4.MaterialName");
+            sqlBuilder.Select(@" t1.*, t1.id,t1.InspectionOrder,t1.MaterialReceiptId, t2.ReceiptNum, t2.SyncCode,t1.InformCode,t1.WarehouseName, t1.SupplierId,t3.`Code` as supplierCode,t3.`Name` as supplierName,t1.`Status`,t1.CreatedBy,t1.CreatedOn,t4.MaterialCode,t4.MaterialName");
             sqlBuilder.OrderBy(string.IsNullOrWhiteSpace(pagedQuery.Sorting) ? " t1.CreatedOn DESC " : pagedQuery.Sorting);
             sqlBuilder.Where("t1.IsDeleted = 0");
             sqlBuilder.Where("t1.SiteId = @SiteId");
