@@ -217,7 +217,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             if (!string.IsNullOrWhiteSpace(pagedQuery.InformCode))
             {
                 pagedQuery.InformCode = $"%{pagedQuery.InformCode}%";
-                sqlBuilder.Where(" t2.InformCode LIKE @InformCode ");
+                sqlBuilder.Where(" t1.InformCode LIKE @InformCode ");
             }
 
             //同步单号
@@ -231,7 +231,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             if (!string.IsNullOrWhiteSpace(pagedQuery.WarehouseName))
             {
                 pagedQuery.WarehouseName = $"%{pagedQuery.WarehouseName}%";
-                sqlBuilder.Where(" t2.WarehouseName LIKE @WarehouseName ");
+                sqlBuilder.Where(" t1.WarehouseName LIKE @WarehouseName ");
             }
 
             //物料编码
