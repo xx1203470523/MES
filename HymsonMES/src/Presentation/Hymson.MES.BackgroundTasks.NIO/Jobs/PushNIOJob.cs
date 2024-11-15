@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.BackgroundServices.NIO.Services;
+using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
@@ -33,6 +34,7 @@ namespace Hymson.MES.BackgroundTasks.NIO
         {
             try
             {
+                _logger.LogInformation($"【PushNIOJob】推送NIO的定时任务 -> 入口");
                 await _pushNIOService.ExecutePushAsync(250);
             }
             catch (Exception ex)

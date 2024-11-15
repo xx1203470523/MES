@@ -3,8 +3,15 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.NIO;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.NIO;
+using Hymson.MES.Data.Repositories.NioPushCollection;
+using Hymson.MES.Data.Repositories.NioPushSwitch;
+using Hymson.Utils;
+using Hymson.WaterMark;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.NIO
@@ -14,11 +21,15 @@ namespace Hymson.MES.Data.NIO
     /// </summary>
     public partial class NioPushRepository : BaseRepository, INioPushRepository
     {
+        private readonly ILogger<NioPushRepository> _logger;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public NioPushRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public NioPushRepository(ILogger<NioPushRepository> logger,IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        {
+            _logger = logger;
+        }
 
         /// <summary>
         /// 新增
@@ -72,6 +83,9 @@ namespace Hymson.MES.Data.NIO
         public async Task<int> UpdateRangeAsync(IEnumerable<NioPushEntity> entities)
         {
             using var conn = GetMESDbConnection();
+
+            _logger.LogInformation($"【UpdateRangeAsync】MES推送NIO的定时任务，更新语句 -> UpdatesSql = {UpdatesSql}；参数Request = {entities.ToSerialize()} 时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             return await conn.ExecuteAsync(UpdatesSql, entities);
         }
 

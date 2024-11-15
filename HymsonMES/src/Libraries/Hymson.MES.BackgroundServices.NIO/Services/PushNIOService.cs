@@ -25,6 +25,8 @@ using Hymson.MES.Data.Repositories.NioPushCollection;
 using Hymson.MES.BackgroundServices.NIO.Dtos.ERP;
 using Hymson.MES.Data.Repositories.NIO;
 using RestSharp;
+using Microsoft.Extensions.Logging;
+using Quartz.Logging;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -33,6 +35,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
     /// </summary>
     public class PushNIOService : IPushNIOService
     {
+        private readonly ILogger<PushNIOService> _logger;
+
         /// <summary>
         /// 服务接口（水位）
         /// </summary>
@@ -79,7 +83,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <param name="waterMarkService"></param>
         /// <param name="nioPushSwitchRepository"></param>
         /// <param name="nioPushRepository"></param>
-        public PushNIOService(IWaterMarkService waterMarkService,
+        public PushNIOService(ILogger<PushNIOService> logger,
+            IWaterMarkService waterMarkService,
             INioPushSwitchRepository nioPushSwitchRepository,
             INioPushRepository nioPushRepository,
             ISysConfigRepository sysConfigRepository,
@@ -88,6 +93,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             INioPushKeySubordinateRepository nioPushKeySubordinateRepository,
             INioPushActualDeliveryRepository nioPushActualDeliveryRepository)
         {
+            _logger = logger;
             _waterMarkService = waterMarkService;
             _nioPushSwitchRepository = nioPushSwitchRepository;
             _nioPushRepository = nioPushRepository;
@@ -432,13 +438,24 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
                         if(string.IsNullOrEmpty(pushContent) == false)
                         {
+                            //MES推送业务数据到NIO系统，执行的方法
+
+                            _logger.LogInformation($"MES推送NIO的定时任务，推送前 -> pushContent = {pushContent}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
+                            _logger.LogInformation($"MES推送NIO的定时任务，推送前 -> Request: {data.ToSerialize()}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
                             var restResponse = await config.ExecuteAsync(pushContent, host, hostsuffix, appsec);
+
+                            _logger.LogInformation($"MES推送NIO的定时任务，推送后 -> 结果【restResponse】= {restResponse}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
                             // 处理推送结果
                             data.Status = PushStatusEnum.Failure;
                             if (restResponse.IsSuccessStatusCode)
                             {
                                 var responseContent = restResponse.Content?.ToDeserializeLower<NIOResponseDto>();
+
+                                _logger.LogInformation($"MES推送NIO的定时任务，推送后 -> 结果【responseContent】= {responseContent}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
                                 if (responseContent != null && responseContent.NexusOpenapi.Code == "QM-000000")
                                 {
                                     data.Status = PushStatusEnum.Success;
@@ -462,6 +479,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
                 data.UpdatedBy = "PushToNIO";
                 data.UpdatedOn = HymsonClock.Now();
+
+                _logger.LogInformation($"MES推送NIO的定时任务，推送后 -> data = {data}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
+
                 updates.Add(data);
             }
 
