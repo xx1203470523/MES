@@ -112,7 +112,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task<int> ExecutePushByBuzSceneAsync(BuzSceneEnum buzScene, int limitCount = 100)
         {
-            // 获取步骤表数据
+            // 根据业务场景枚举，和最小数量，查询nio_push表，获取待推送表数据
             var waitPushEntities = await _nioPushRepository.GetListByStartWaterMarkIdAndBuzSceneAsync(new EntityByWaterMarkQuery
             {
                 BuzScene = buzScene,

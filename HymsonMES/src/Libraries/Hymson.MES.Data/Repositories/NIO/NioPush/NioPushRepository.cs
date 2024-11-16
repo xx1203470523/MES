@@ -123,7 +123,7 @@ namespace Hymson.MES.Data.NIO
         }
 
         /// <summary>
-        /// 根据水位批量获取数据
+        /// 根据业务场景枚举，和最小数量，查询nio_push表，获取待推送表数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
