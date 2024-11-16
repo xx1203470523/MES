@@ -123,6 +123,17 @@ namespace Hymson.MES.Data.NIO
         }
 
         /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<NioPushEntity>> GetListByStartWaterMarkIdAndBuzSceneAsync(EntityByWaterMarkQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<NioPushEntity>(GetListByStartWaterMarkIdAndBuzSceneSql, query);
+        }
+
+        /// <summary>
         /// 获取推送失败的数据
         /// </summary>
         /// <param name="ids"></param>
@@ -218,6 +229,7 @@ namespace Hymson.MES.Data.NIO
         const string DeletesSql = "UPDATE nio_push SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetListByStartWaterMarkIdSql = @"SELECT * FROM nio_push WHERE Status = 1 ORDER BY Id DESC LIMIT @Rows";
+        const string GetListByStartWaterMarkIdAndBuzSceneSql = @"SELECT * FROM nio_push WHERE Status = 1 AND BuzScene = @BuzScene ORDER BY Id DESC LIMIT @Rows";
         const string GetFailListByStartWaterMarkIdSql = @"SELECT * FROM nio_push WHERE Status = 3 ORDER BY UpdatedOn DESC LIMIT @Rows";
         const string GetByIdSql = @"SELECT * FROM nio_push WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM nio_push WHERE Id IN @Ids ";

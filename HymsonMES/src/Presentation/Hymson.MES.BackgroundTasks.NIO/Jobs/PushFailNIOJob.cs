@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.BackgroundServices.NIO.Services;
+using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
@@ -38,11 +39,12 @@ namespace Hymson.MES.BackgroundTasks.NIO.Jobs
         {
             try
             {
+                _logger.LogInformation($"【PushFailNIOJob】推送NIO的定时任务 -> 入口；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await _pushNIOService.ExecutePushFailAsync(20);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "推送 -> NIO:");
+                _logger.LogError(ex, "【PushFailNIOJob】推送 -> NIO:");
             }
         }
 

@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.Data.Repositories.Common.Query
+﻿using Hymson.MES.Core.Enums.Mavel;
+
+namespace Hymson.MES.Data.Repositories.Common.Query
 {
     /// <summary>
     /// 水位查询实体
@@ -14,6 +16,11 @@
         /// 条数
         /// </summary>
         public int Rows { set; get; }
+
+        /// <summary>
+        /// 业务场景
+        /// </summary>
+        public BuzSceneEnum BuzScene { set; get; }
 
     }
 

@@ -67,6 +67,13 @@ namespace Hymson.MES.Data.NIO
         Task<IEnumerable<NioPushEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query);
 
         /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<NioPushEntity>> GetListByStartWaterMarkIdAndBuzSceneAsync(EntityByWaterMarkQuery query);
+
+        /// <summary>
         /// 获取失败的的数据
         /// </summary>
         /// <param name="query"></param>

@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.BackgroundServices.NIO.Services;
+using Hymson.MES.Core.Enums.Mavel;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 using Quartz;
@@ -9,9 +10,9 @@ namespace Hymson.MES.BackgroundTasks.NIO
     /// 推送蔚来作业
     /// </summary>
     [DisallowConcurrentExecution]
-    internal class PushNIOJob : IJob
+    internal class PushNIOErpActualDeliveryJob : IJob
     {
-        private readonly ILogger<PushNIOJob> _logger;
+        private readonly ILogger<PushNIOErpActualDeliveryJob> _logger;
         private readonly IPushNIOService _pushNIOService;
 
         /// <summary>
@@ -19,14 +20,14 @@ namespace Hymson.MES.BackgroundTasks.NIO
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="pushNIOService"></param>
-        public PushNIOJob(ILogger<PushNIOJob> logger, IPushNIOService pushNIOService)
+        public PushNIOErpActualDeliveryJob(ILogger<PushNIOErpActualDeliveryJob> logger, IPushNIOService pushNIOService)
         {
             _logger = logger;
             _pushNIOService = pushNIOService;
         }
 
         /// <summary>
-        /// 执行
+        /// 执行：ERP（实际交付情况）汇总 4030
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -34,12 +35,12 @@ namespace Hymson.MES.BackgroundTasks.NIO
         {
             try
             {
-                _logger.LogInformation($"【PushNIOJob】推送NIO的定时任务 -> 入口；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
-                await _pushNIOService.ExecutePushAsync(250);
+                _logger.LogInformation($"【PushNIOErpActualDeliveryJob】推送NIO的定时任务 -> 入口；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                await _pushNIOService.ExecutePushByBuzSceneAsync(BuzSceneEnum.ERP_ActualDelivery_Summary, 250);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "【PushNIOJob】推送 -> NIO:");
+                _logger.LogError(ex, "【PushNIOErpActualDeliveryJob】推送 -> NIO:");
             }
         }
 
