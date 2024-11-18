@@ -33,7 +33,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
     /// <summary>
     /// 推送服务（蔚来）
     /// </summary>
-    public class PushNIOService : IPushNIOService
+    public class PushNIOBackService : IPushNIOBackService
     {
         private readonly ILogger<PushNIOService> _logger;
 
@@ -83,7 +83,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <param name="waterMarkService"></param>
         /// <param name="nioPushSwitchRepository"></param>
         /// <param name="nioPushRepository"></param>
-        public PushNIOService(ILogger<PushNIOService> logger,
+        public PushNIOBackService(ILogger<PushNIOService> logger,
             IWaterMarkService waterMarkService,
             INioPushSwitchRepository nioPushSwitchRepository,
             INioPushRepository nioPushRepository,
@@ -102,36 +102,6 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _nioPushProductioncapacityRepository = nioPushProductioncapacityRepository;
             _nioPushKeySubordinateRepository = nioPushKeySubordinateRepository;
             _nioPushActualDeliveryRepository = nioPushActualDeliveryRepository;
-        }
-
-
-        /// <summary>
-        /// 发送推送
-        /// </summary>
-        /// <param name="limitCount"></param>
-        /// <returns></returns>
-        public async Task<int> ExecutePushByBuzSceneAsync(BuzSceneEnum buzScene, int limitCount = 100)
-        {
-            // 根据业务场景枚举，和最小数量，查询nio_push表，获取待推送表数据
-            var waitPushEntities = await _nioPushRepository.GetListByStartWaterMarkIdAndBuzSceneAsync(new EntityByWaterMarkQuery
-            {
-                BuzScene = buzScene,
-                Rows = limitCount
-            });
-            if (waitPushEntities == null || !waitPushEntities.Any()) return default;
-
-            List<Task<int>> tasks = new();
-
-            int maxNum = 30;
-            int batchNum = limitCount / maxNum + 1;
-            for (int i = 0; i < batchNum; ++i)
-            {
-                var curList = waitPushEntities.Skip(i * maxNum).Take(maxNum);
-                tasks.Add(ExecuteAsync(limitCount, curList));
-            }
-            var rowArray = await Task.WhenAll(tasks);
-
-            return 0;
         }
 
         /// <summary>
@@ -159,7 +129,107 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
             var rowArray = await Task.WhenAll(tasks);
 
+            //return await ExecuteAsync(limitCount, waitPushEntities);
+
             return 0;
+
+            // 查询全部开关配置
+            var configEntities = await _nioPushSwitchRepository.GetEntitiesAsync(new NioPushSwitchQuery { });
+            if (configEntities == null || !configEntities.Any()) return default;
+
+            // 总开关是否开启
+            var masterConfig = configEntities.FirstOrDefault(f => f.BuzScene == BuzSceneEnum.All);
+            if (masterConfig == null || masterConfig.IsEnabled != TrueOrFalseEnum.Yes) return default;
+
+            //站点配置
+            string host = string.Empty;
+            string hostsuffix = string.Empty;
+            IEnumerable<SysConfigEntity>? nioUrlList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.NioUrl });
+            if (nioUrlList != null && nioUrlList.Count() > 0)
+            {
+                var hostEntity = nioUrlList.Where(m => m.Code.ToLower() == "host").FirstOrDefault();
+                if(hostEntity != null)
+                {
+                    host = hostEntity.Value;
+                }
+                var hostsuffixEntity = nioUrlList.Where(m => m.Code.ToLower() == "hostsuffix").FirstOrDefault();
+                if (hostsuffixEntity != null)
+                {
+                    hostsuffix = hostsuffixEntity.Value;
+                }
+            }
+
+            // 水位ID
+            var waterMarkId = await _waterMarkService.GetWaterMarkAsync(WaterMarkKey.PushToNIO);
+
+            // 获取步骤表数据
+            //var waitPushEntities = await _nioPushRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            //{
+            //    StartWaterMarkId = waterMarkId,
+            //    Rows = limitCount
+            //});
+            //if (waitPushEntities == null || !waitPushEntities.Any()) return default;
+
+            // 遍历推送数据
+            List<NioPushEntity> updates = new();
+            foreach (var data in waitPushEntities)
+            {
+                var config = configEntities.FirstOrDefault(f => f.BuzScene == data.BuzScene);
+                if (config == null)
+                {
+                    //data.Status = PushStatusEnum.NotConfigured;
+                    continue;
+                }
+                else
+                {
+                    config.IsEnabled = GetMapEnum(data, config, configEntities);
+
+                    if (config.IsEnabled == TrueOrFalseEnum.Yes)
+                    {
+                        // 推送
+                        var restResponse = await config.ExecuteAsync(data.Content, host, hostsuffix, "");
+
+                        // 处理推送结果
+                        data.Status = PushStatusEnum.Failure;
+                        if (restResponse.IsSuccessStatusCode)
+                        {
+                            var responseContent = restResponse.Content?.ToDeserializeLower<NIOResponseDto>();
+                            if (responseContent != null && responseContent.NexusOpenapi.Code == "QM-000000")
+                            {
+                                data.Status = PushStatusEnum.Success;
+                            }
+                        }
+
+                        data.Result = restResponse.Content;
+                    }
+                    else
+                    {
+                        //data.Status = PushStatusEnum.Off;
+                        continue;
+                    }
+                }
+
+                data.UpdatedBy = "PushToNIO";
+                data.UpdatedOn = HymsonClock.Now();
+                updates.Add(data);
+            }
+
+            if(updates == null || updates.Count == 0)
+            {
+                return 0;
+            }
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            // 更新状态
+            rows = await _nioPushRepository.UpdateRangeAsync(updates);
+
+            // 更新水位
+            await _waterMarkService.RecordWaterMarkAsync(WaterMarkKey.PushToNIO, waitPushEntities.Max(x => x.Id));
+            trans.Complete();
+
+            return rows;
         }
 
         /// <summary>
@@ -176,6 +246,103 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             });
             if (waitPushEntities == null || !waitPushEntities.Any()) return default;
             return await ExecuteAsync(limitCount, waitPushEntities);
+
+            // 查询全部开关配置
+            var configEntities = await _nioPushSwitchRepository.GetEntitiesAsync(new NioPushSwitchQuery { });
+            if (configEntities == null || !configEntities.Any()) return default;
+
+            // 总开关是否开启
+            var masterConfig = configEntities.FirstOrDefault(f => f.BuzScene == BuzSceneEnum.All);
+            if (masterConfig == null || masterConfig.IsEnabled != TrueOrFalseEnum.Yes) return default;
+
+            //站点配置
+            string host = string.Empty;
+            string hostsuffix = string.Empty;
+            IEnumerable<SysConfigEntity>? nioUrlList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.NioUrl });
+            if (nioUrlList != null && nioUrlList.Count() > 0)
+            {
+                var hostEntity = nioUrlList.Where(m => m.Code.ToLower() == "host").FirstOrDefault();
+                if (hostEntity != null)
+                {
+                    host = hostEntity.Value;
+                }
+                var hostsuffixEntity = nioUrlList.Where(m => m.Code.ToLower() == "hostsuffix").FirstOrDefault();
+                if (hostsuffixEntity != null)
+                {
+                    hostsuffix = hostsuffixEntity.Value;
+                }
+            }
+
+            // 水位ID
+            //var waterMarkId = await _waterMarkService.GetWaterMarkAsync(WaterMarkKey.PushToNIO);
+
+            // 获取步骤表数据
+            //var waitPushEntities = await _nioPushRepository.GetFailListAsync(new EntityByWaterMarkQuery
+            //{
+            //    Rows = limitCount
+            //});
+            //if (waitPushEntities == null || !waitPushEntities.Any()) return default;
+
+            // 遍历推送数据
+            List<NioPushEntity> updates = new();
+            foreach (var data in waitPushEntities)
+            {
+                var config = configEntities.FirstOrDefault(f => f.BuzScene == data.BuzScene);
+                if (config == null)
+                {
+                    //data.Status = PushStatusEnum.NotConfigured;
+                    continue;
+                }
+                else
+                {
+                    config.IsEnabled = GetMapEnum(data, config, configEntities);
+
+                    if (config.IsEnabled == TrueOrFalseEnum.Yes)
+                    {
+                        // 推送
+                        var restResponse = await config.ExecuteAsync(data.Content, host, hostsuffix, "");
+
+                        // 处理推送结果
+                        data.Status = PushStatusEnum.Failure;
+                        if (restResponse.IsSuccessStatusCode)
+                        {
+                            var responseContent = restResponse.Content?.ToDeserializeLower<NIOResponseDto>();
+                            if (responseContent != null && responseContent.NexusOpenapi.Code == "QM-000000")
+                            {
+                                data.Status = PushStatusEnum.Success;
+                            }
+                        }
+
+                        data.Result = restResponse.Content;
+                    }
+                    else
+                    {
+                        //data.Status = PushStatusEnum.Off;
+                        continue;
+                    }
+                }
+
+                data.UpdatedBy = "PushToNIO";
+                data.UpdatedOn = HymsonClock.Now();
+                updates.Add(data);
+            }
+
+            if (updates == null || updates.Count == 0)
+            {
+                return 0;
+            }
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            // 更新状态
+            rows = await _nioPushRepository.UpdateRangeAsync(updates);
+
+            // 更新水位
+            await _waterMarkService.RecordWaterMarkAsync(WaterMarkKey.PushToNIO, waitPushEntities.Max(x => x.Id));
+            trans.Complete();
+
+            return rows;
         }
 
         /// <summary>
@@ -220,7 +387,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
 
             // 水位ID
-            //var waterMarkId = await _waterMarkService.GetWaterMarkAsync(WaterMarkKey.PushToNIO);
+            var waterMarkId = await _waterMarkService.GetWaterMarkAsync(WaterMarkKey.PushToNIO);
 
             //// 获取步骤表数据
             //var waitPushEntities = await _nioPushRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
@@ -273,9 +440,9 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                         {
                             //MES推送业务数据到NIO系统，执行的方法
 
-                            _logger.LogInformation($"MES推送NIO的定时任务，推送前 -> data = {data.ToSerialize()}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                            _logger.LogInformation($"MES推送NIO的定时任务，推送前 -> pushContent = {pushContent}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-                            _logger.LogInformation($"MES推送NIO的定时任务，推送前，入参 -> pushContent = {pushContent}；host = {host}；hostsuffix = {hostsuffix}；appsec = {appsec}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                            _logger.LogInformation($"MES推送NIO的定时任务，推送前 -> Request: {data.ToSerialize()}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
                             var restResponse = await config.ExecuteAsync(pushContent, host, hostsuffix, appsec);
 
@@ -287,7 +454,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                             {
                                 var responseContent = restResponse.Content?.ToDeserializeLower<NIOResponseDto>();
 
-                                _logger.LogInformation($"MES推送NIO的定时任务，推送后 -> 结果【responseContent】= {responseContent}； 蔚来返回的Code = {responseContent.NexusOpenapi.Code}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                                _logger.LogInformation($"MES推送NIO的定时任务，推送后 -> 结果【responseContent】= {responseContent}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
                                 if (responseContent != null && responseContent.NexusOpenapi.Code == "QM-000000")
                                 {
@@ -313,7 +480,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 data.UpdatedBy = "PushToNIO";
                 data.UpdatedOn = HymsonClock.Now();
 
-                _logger.LogInformation($"MES推送NIO的定时任务，推送后 -> data = {data.ToSerialize()}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                _logger.LogInformation($"MES推送NIO的定时任务，推送后 -> data = {data}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
 
                 updates.Add(data);

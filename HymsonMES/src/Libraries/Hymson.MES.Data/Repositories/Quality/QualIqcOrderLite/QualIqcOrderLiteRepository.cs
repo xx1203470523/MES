@@ -191,22 +191,71 @@ namespace Hymson.MES.Data.Repositories.Quality
         public async Task<PagedInfo<QualIqcOrderLiteEntity>> GetPagedListAsync(QualIqcOrderLitePagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
-            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy(string.IsNullOrWhiteSpace(pagedQuery.Sorting) ? "CreatedOn DESC" : pagedQuery.Sorting);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplateAs);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplateAs);
+            sqlBuilder.Select(@" t1.*, t1.id,t1.InspectionOrder,t1.MaterialReceiptId, t2.ReceiptNum, t2.SyncCode,t1.InformCode,t1.WarehouseName, t1.SupplierId,t3.`Code` as supplierCode,t3.`Name` as supplierName,t1.`Status`,t1.CreatedBy,t1.CreatedOn,t4.MaterialCode,t4.MaterialName");
+            sqlBuilder.OrderBy(string.IsNullOrWhiteSpace(pagedQuery.Sorting) ? " t1.CreatedOn DESC " : pagedQuery.Sorting);
+            sqlBuilder.Where("t1.IsDeleted = 0");
+            sqlBuilder.Where("t1.SiteId = @SiteId");
 
+            sqlBuilder.LeftJoin(" wh_material_receipt t2 on t1.MaterialReceiptId = t2.id ");
+            sqlBuilder.LeftJoin(" wh_supplier t3 on t1.SupplierId = t3.id ");
+            sqlBuilder.LeftJoin(" (SELECT t.IQCOrderId, GROUP_CONCAT(t.MaterialCode SEPARATOR ',') AS MaterialCode, GROUP_CONCAT(t.MaterialName SEPARATOR ',') AS MaterialName FROM (select t.IQCOrderId,p.MaterialCode,p.MaterialName from qual_iqc_order_lite_detail t inner JOIN proc_material p on t.MaterialId = p.id) t GROUP BY t.IQCOrderId) t4 on t1.id = t4.IQCOrderId ");
+
+
+            //检验单号
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder))
             {
                 pagedQuery.InspectionOrder = $"%{pagedQuery.InspectionOrder}%";
-                sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
+                sqlBuilder.Where(" t1.InspectionOrder LIKE @InspectionOrder ");
             }
-            if (pagedQuery.SupplierIds != null) sqlBuilder.Where(" SupplierId IN @SupplierIds ");
-            if (pagedQuery.ReceiptIds != null) sqlBuilder.Where(" MaterialReceiptId IN @ReceiptIds ");
-            if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
-            if (pagedQuery.IsQualified.HasValue) sqlBuilder.Where("IsQualified = @IsQualified");
+
+            //收货单ID
+            if (pagedQuery.ReceiptIds != null) sqlBuilder.Where(" t1.MaterialReceiptId IN @ReceiptIds ");
+
+            //通知单号
+            if (!string.IsNullOrWhiteSpace(pagedQuery.InformCode))
+            {
+                pagedQuery.InformCode = $"%{pagedQuery.InformCode}%";
+                sqlBuilder.Where(" t1.InformCode LIKE @InformCode ");
+            }
+
+            //同步单号
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SyncCode))
+            {
+                pagedQuery.SyncCode = $"%{pagedQuery.SyncCode}%";
+                sqlBuilder.Where(" t2.SyncCode LIKE @SyncCode ");
+            }
+
+            //仓库名称
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WarehouseName))
+            {
+                pagedQuery.WarehouseName = $"%{pagedQuery.WarehouseName}%";
+                sqlBuilder.Where(" t1.WarehouseName LIKE @WarehouseName ");
+            }
+
+            //物料编码
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialCode))
+            {
+                pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" t4.MaterialCode LIKE @MaterialCode ");
+            }
+
+            //物料名称
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialName))
+            {
+                pagedQuery.MaterialName = $"%{pagedQuery.MaterialName}%";
+                sqlBuilder.Where(" t4.MaterialName LIKE @MaterialName ");
+            }
+
+            //供应商ID
+            if (pagedQuery.SupplierIds != null) sqlBuilder.Where(" t1.SupplierId IN @SupplierIds ");
+
+            //检验状态;1、待检验2、检验中3、已检验4、已关闭
+            if (pagedQuery.Status.HasValue) sqlBuilder.Where(" t1.Status = @Status ");
+
+            //是否合格;0、不合格 1、合格
+            if (pagedQuery.IsQualified.HasValue) sqlBuilder.Where(" t1.IsQualified = @IsQualified ");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -230,11 +279,13 @@ namespace Hymson.MES.Data.Repositories.Quality
     public partial class QualIqcOrderLiteRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_lite /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplateAs = @"SELECT /**select**/ FROM qual_iqc_order_lite t1 /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order_lite /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoCountSqlTemplateAs = "SELECT COUNT(*) FROM qual_iqc_order_lite t1 /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_lite /**where**/ /**orderby**/ LIMIT @MaxRows ";
         const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_lite /**where**/ /**orderby**/ LIMIT 1 ";
 
-        const string InsertSql = "INSERT INTO qual_iqc_order_lite(`Id`, `SiteId`, `InspectionOrder`, `MaterialReceiptId`, `SupplierId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialReceiptId, @SupplierId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_iqc_order_lite(`Id`, `SiteId`, `InspectionOrder`, `MaterialReceiptId`, `SupplierId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `InformCode`, `WarehouseName`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialReceiptId, @SupplierId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @InformCode, @WarehouseName) ";
        
         const string UpdateSql = "UPDATE qual_iqc_order_lite SET Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 

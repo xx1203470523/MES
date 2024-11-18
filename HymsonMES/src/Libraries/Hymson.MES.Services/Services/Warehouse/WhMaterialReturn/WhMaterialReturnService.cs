@@ -410,9 +410,6 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                 await _qualIqcOrderReturnDetailRepository.InsertRangeAsync(qualIqcOrderReturnDetailEntities);
             }
 
-            trans.Complete();
-            trans.Dispose();
-
             // 退虚拟库
             if (requestDto.Type == ManuReturnTypeEnum.WorkOrderBorrow)
             {
@@ -420,6 +417,9 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                 if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "结果返回异常，请检查！");
                 if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
             }
+
+            trans.Complete();
+            trans.Dispose();
         }
 
         /// <summary>

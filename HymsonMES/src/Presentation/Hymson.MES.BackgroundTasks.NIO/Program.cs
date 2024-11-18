@@ -78,6 +78,12 @@ Host.CreateDefaultBuilder(args)
 
            //q.AddJobAndTrigger<MockHelloJob>(hostContext.Configuration);
            q.AddJobAndTrigger<PushNIOJob>(hostContext.Configuration);
+
+           //将三种场景的定时任务添加到【定时任务触发器】里面
+           q.AddJobAndTrigger<PushNIOErpProductioncapacityJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<PushNIOErpKeySubordinateJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<PushNIOErpActualDeliveryJob>(hostContext.Configuration);
+
            q.AddJobAndTrigger<PushFailNIOJob>(hostContext.Configuration);
            q.AddJobAndTrigger<AbnormalParamDataJob>(hostContext.Configuration);
            #endregion

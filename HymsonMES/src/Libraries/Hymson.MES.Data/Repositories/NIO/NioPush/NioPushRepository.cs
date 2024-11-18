@@ -3,8 +3,15 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.NIO;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.NIO;
+using Hymson.MES.Data.Repositories.NioPushCollection;
+using Hymson.MES.Data.Repositories.NioPushSwitch;
+using Hymson.Utils;
+using Hymson.WaterMark;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.NIO
@@ -14,11 +21,15 @@ namespace Hymson.MES.Data.NIO
     /// </summary>
     public partial class NioPushRepository : BaseRepository, INioPushRepository
     {
+        private readonly ILogger<NioPushRepository> _logger;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public NioPushRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public NioPushRepository(ILogger<NioPushRepository> logger,IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        {
+            _logger = logger;
+        }
 
         /// <summary>
         /// 新增
@@ -72,6 +83,9 @@ namespace Hymson.MES.Data.NIO
         public async Task<int> UpdateRangeAsync(IEnumerable<NioPushEntity> entities)
         {
             using var conn = GetMESDbConnection();
+
+            _logger.LogInformation($"【UpdateRangeAsync】MES推送NIO的定时任务，更新语句 -> UpdatesSql = {UpdatesSql}；参数Request = {entities.ToSerialize()} 时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             return await conn.ExecuteAsync(UpdatesSql, entities);
         }
 
@@ -106,6 +120,17 @@ namespace Hymson.MES.Data.NIO
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<NioPushEntity>(GetListByStartWaterMarkIdSql, query);
+        }
+
+        /// <summary>
+        /// 根据业务场景枚举，和最小数量，查询nio_push表，获取待推送表数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<NioPushEntity>> GetListByStartWaterMarkIdAndBuzSceneAsync(EntityByWaterMarkQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<NioPushEntity>(GetListByStartWaterMarkIdAndBuzSceneSql, query);
         }
 
         /// <summary>
@@ -203,8 +228,9 @@ namespace Hymson.MES.Data.NIO
         const string DeleteSql = "UPDATE nio_push SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE nio_push SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetListByStartWaterMarkIdSql = @"SELECT * FROM nio_push WHERE Status = 1 ORDER BY Id ASC LIMIT @Rows";
-        const string GetFailListByStartWaterMarkIdSql = @"SELECT * FROM nio_push WHERE Status = 3 ORDER BY UpdatedOn ASC LIMIT @Rows";
+        const string GetListByStartWaterMarkIdSql = @"SELECT * FROM nio_push WHERE Status = 1 ORDER BY Id DESC LIMIT @Rows";
+        const string GetListByStartWaterMarkIdAndBuzSceneSql = @"SELECT * FROM nio_push WHERE Status = 1 AND BuzScene = @BuzScene ORDER BY Id DESC LIMIT @Rows";
+        const string GetFailListByStartWaterMarkIdSql = @"SELECT * FROM nio_push WHERE Status = 3 ORDER BY UpdatedOn DESC LIMIT @Rows";
         const string GetByIdSql = @"SELECT * FROM nio_push WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM nio_push WHERE Id IN @Ids ";
 

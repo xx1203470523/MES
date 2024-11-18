@@ -30,7 +30,7 @@ namespace Hymson.MES.BackgroundTasks.NIO.Jobs.ERP
         }
 
         /// <summary>
-        /// 执行
+        /// 执行汇总的定时任务
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>

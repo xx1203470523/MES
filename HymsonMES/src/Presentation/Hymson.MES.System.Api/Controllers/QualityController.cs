@@ -38,7 +38,7 @@ namespace Hymson.MES.System.Api.Controllers
         }
 
         /// <summary>
-        /// 提交（来料检验）
+        /// 提交（来料检验） WMS回调MES的接口
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
