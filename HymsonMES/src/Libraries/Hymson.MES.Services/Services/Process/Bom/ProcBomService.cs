@@ -16,6 +16,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.HttpClients;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Common;
@@ -24,6 +25,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
+using Minio.DataModel;
 using System.Collections.Generic;
 using System.Transactions;
 
@@ -69,6 +71,8 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
 
+        private readonly IWMSApiClient _wmsRequest;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -106,8 +110,10 @@ namespace Hymson.MES.Services.Services.Process
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcMaterialRepository procMaterialRepository,
             IPlanWorkPlanRepository planWorkPlanRepository,
-            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository)
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
+            IWMSApiClient wmsRequest)
         {
+            _wmsRequest = wmsRequest;
             _currentSite = currentSite;
             _currentUser = currentUser;
             _procBomRepository = procBomRepository;
@@ -806,6 +812,109 @@ namespace Hymson.MES.Services.Services.Process
                     MaterialId = procMaterialEntity.Id,
                     MaterialCode = procMaterialEntity.MaterialCode,
                     MaterialName = procMaterialEntity.MaterialName,
+                    Version = procMaterialEntity.Version ?? "",
+                    Unit = procMaterialEntity.Unit ?? "",
+                    Usages = needQty - receiveQty,
+                    BomId = planMaterial?.BomId ?? 0,
+                    Batch = procMaterialEntity.Batch ?? 0
+                });
+            }
+
+            return procBomDetailViews;
+        }
+
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<List<ProcOrderBomDetailDto>> GetOrderBomMaterialAsyncByWarehouse(PickQueryDto dto)
+        {
+            var procBomDetailViews = new List<ProcOrderBomDetailDto>();
+
+            // 查询工单信息
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(dto.WorkId);
+
+            // 查询生产计划
+            var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+
+            // 查询生产计划物料
+            var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+            {
+                SiteId = planWorkOrderEntity.SiteId,
+                PlanId = planWorkPlanEntity.Id,
+                PlanProductId = planWorkOrderEntity.WorkPlanProductId ?? 0
+            });
+
+            // 查询物料
+            var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkPlanMaterialEntities.Select(x => x.MaterialId));
+
+            var bomIds = planWorkPlanMaterialEntities.Select(x => x.BomId.GetValueOrDefault()).Distinct().ToArray();
+
+            // 查询bom详情
+            var procBomDetailEntities = await _procBomDetailRepository.GetByIdsAsync(bomIds);
+
+            IEnumerable<ManuRequistionOrderDetailEntity> requistionOrderDetailEntities = new List<ManuRequistionOrderDetailEntity>();
+            // 查找领料单集合
+            var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.Id, planWorkOrderEntity.SiteId);
+            if (requistionOrderEntities.Any())
+            {
+                requistionOrderDetailEntities = await _manuRequistionOrderDetailRepository.GetManuRequistionOrderDetailEntitiesAsync(new ManuRequistionOrderDetailQuery
+                {
+                    SiteId = planWorkOrderEntity.SiteId,
+                    RequistionOrderIds = requistionOrderEntities.Select(r => r.Id).ToArray(),
+                });
+            }
+
+            // 遍历生产计划物料
+            foreach (var planMaterial in planWorkPlanMaterialEntities)
+            {
+                //var mainMaterials = mainBomDetails.Where(x => x.MaterialId == material.Id);
+                //var replaceMaterials = replaceBomDetails.Where(x => x.ReplaceMaterialId == material.Id);
+                var procMaterialEntity = procMaterialEntities.FirstOrDefault(f => f.Id == planMaterial.MaterialId);
+                if (procMaterialEntity == null) continue;
+
+                var procBomDetailEntitie = procBomDetailEntities.FirstOrDefault(f => f.MaterialId == planMaterial.MaterialId);
+                if (procBomDetailEntitie != null && procBomDetailEntitie.BomProductType == ManuProductTypeEnum.ByProduct) continue;
+
+                var needQty = 0M;
+                if (dto.InputQty == 0)
+                {
+                    needQty = planMaterial.Usages * planWorkOrderEntity.Qty;
+                }
+                else
+                {
+                    needQty = planMaterial.Usages * dto.InputQty;
+                }
+
+                var receiveQty = requistionOrderDetailEntities.Where(x => x.MaterialId == planMaterial.Id).Sum(x => x.Qty);
+
+                //如果不传库存，则剩余数量是空；如果传库存，则剩余数量取WMS返回过来的值
+                string QuantityResidue = null;
+                if (!string.IsNullOrEmpty(dto.warehouse))
+                {
+                    //根据库存和物料编码，调WMS接口，获取库存的剩余数量
+                    var response = await _wmsRequest.GetStockQuantityRequestAsync(new HttpClients.Requests.GetStockQuantityDto
+                    {
+                        MaterialCode = procMaterialEntity.MaterialCode,
+                        WarehouseCode = dto.warehouse
+                    });
+                    if (response.Code == 0)
+                    {
+                        //赋值库存的剩余数量
+                        QuantityResidue = (decimal)response.Data.Quantity + "";
+                    }
+                }
+                procBomDetailViews.Add(new ProcOrderBomDetailDto
+                {
+                    MaterialId = procMaterialEntity.Id,
+                    MaterialCode = procMaterialEntity.MaterialCode,
+                    MaterialName = procMaterialEntity.MaterialName,
+                    QuantityResidue = QuantityResidue,
                     Version = procMaterialEntity.Version ?? "",
                     Unit = procMaterialEntity.Unit ?? "",
                     Usages = needQty - receiveQty,

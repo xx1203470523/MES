@@ -294,5 +294,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal InputQty { get; set; } = 0;
 
         public long WorkId { get; set; }
+
+        public string warehouse { get; set; }
     }
 }

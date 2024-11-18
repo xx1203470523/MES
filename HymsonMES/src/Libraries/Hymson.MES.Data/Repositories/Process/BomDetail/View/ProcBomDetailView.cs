@@ -120,6 +120,11 @@ namespace Hymson.MES.Data.Repositories.Process
         public string MaterialName { get; set; }
 
         /// <summary>
+        /// 物料库存剩余数量
+        /// </summary>
+        public string QuantityResidue { get; set; }
+
+        /// <summary>
         /// 物料版本
         /// </summary>
         public string Version { get; set; }

@@ -94,6 +94,23 @@ namespace Hymson.MES.Api.Controllers.Process
             return await _procBomService.GetOrderBomMaterialAsync(dto);
         }
 
+
+        /// <summary>
+        /// 读取工单物料清单
+        /// </summary>
+        /// <param name="workId"></param>
+        /// <param name="inputQty"></param>
+        /// <returns></returns>
+        [HttpGet("order/materialListByWarehouse")]
+        public async Task<List<ProcOrderBomDetailDto>> materialListByWarehouse(long workId, decimal inputQty, string warehouse)
+        {
+            var dto = new PickQueryDto();
+            dto.InputQty = inputQty;
+            dto.WorkId = workId;
+            dto.warehouse = warehouse;
+            return await _procBomService.GetOrderBomMaterialAsyncByWarehouse(dto);
+        }
+
         /// <summary>
         /// 添加（BOM表）
         /// </summary>

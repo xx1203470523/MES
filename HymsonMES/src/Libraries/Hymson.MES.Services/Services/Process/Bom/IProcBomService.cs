@@ -63,6 +63,8 @@ namespace Hymson.MES.Services.Services.Process
 
         Task<List<ProcOrderBomDetailDto>> GetOrderBomMaterialAsync(PickQueryDto dto);
 
+        Task<List<ProcOrderBomDetailDto>> GetOrderBomMaterialAsyncByWarehouse(PickQueryDto dto); 
+
         /// <summary>
         /// 状态变更
         /// </summary>
