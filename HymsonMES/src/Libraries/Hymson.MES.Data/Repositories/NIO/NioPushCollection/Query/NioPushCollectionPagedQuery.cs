@@ -40,8 +40,18 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection.Query
         public TrueOrFalseEnum? IsOk { get; set; }
 
         /// <summary>
-        /// 操作时间
+        /// 合作伙伴产品名称
         /// </summary>
-        public DateTime[]? CreatedOn { get; set; }
+        public String? VendorProductName { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public String? ParameterName { get; set; }
+
+    /// <summary>
+    /// 操作时间
+    /// </summary>
+    public DateTime[]? CreatedOn { get; set; }
     }
 }

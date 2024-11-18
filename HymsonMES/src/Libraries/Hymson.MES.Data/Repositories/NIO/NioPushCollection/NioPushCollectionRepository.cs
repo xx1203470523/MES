@@ -165,6 +165,16 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
             {
                 sqlBuilder.Where("VendorProductTempSn = @VendorProductTempSn");
             }
+            if (string.IsNullOrEmpty(pagedQuery.VendorProductName) == false)
+            {
+                pagedQuery.VendorProductName = $"%{pagedQuery.VendorProductName}%";
+                sqlBuilder.Where("t1.VendorProductName LIKE @VendorProductName");
+            }
+            if (string.IsNullOrEmpty(pagedQuery.ParameterName) == false)
+            {
+                pagedQuery.ParameterName = $"%{pagedQuery.ParameterName}%";
+                sqlBuilder.Where("t1.ParameterName LIKE @ParameterName");
+            }
             if (string.IsNullOrEmpty(pagedQuery.StationId) == false)
             {
                 sqlBuilder.Where("StationId = @StationId");
