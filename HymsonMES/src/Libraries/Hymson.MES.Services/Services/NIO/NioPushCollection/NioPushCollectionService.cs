@@ -320,9 +320,14 @@ namespace Hymson.MES.Services.Services.NioPushCollection
                 {
                     VendorProductSn = item.VendorProductSn ?? "",
                     VendorProductTempSn = item.VendorProductTempSn ?? "",
-                    ProcessType = item.ProcessType ?? "",
-                    DecimalValue = item.DecimalValue,
-                    //StringValue = item.StringValue ?? ""
+                    Status = item.Status,
+                    VendorFieldCode = item.VendorFieldCode ?? "",
+                    ParameterName = item.ParameterName ?? "",
+                    DecimalValue = item.DecimalValue ?? 0,
+                    UpperLimit = item.UpperLimit ?? 0,
+                    LowerLimit = item.LowerLimit ?? 0,
+                    CenterValue = item.CenterValue ?? 0,
+                    ProcedureName = item.ProcedureName ?? ""
                 });
             }
 

@@ -202,7 +202,13 @@ namespace Hymson.MES.Services.Dtos.QualFqcInspectionMaval
         /// <summary>
         /// 站点
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 不合格原因
+        /// </summary>
+        public string? Remark {  get; set; }
+
     }
 
 

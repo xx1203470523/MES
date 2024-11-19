@@ -228,10 +228,6 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// </summary>
         public string VendorProductName { get; set; }
 
-        /// <summary>
-        /// 合作伙伴总成序列号
-        /// </summary>
-        [EpplusTableColumn(Header = "合作伙伴总成序列号", Order = 1)]
         public string VendorProductSn { get; set; }
 
         /// <summary>
@@ -619,13 +615,52 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// 推送状态
         /// </summary>
         [EpplusTableColumn(Header = "推送状态", Order = 3)]
-        public string ProcessType { get; set; }
+        public PushStatusEnum Status { get; set; }
 
         /// <summary>
         /// 参数编码
         /// </summary>
         [EpplusTableColumn(Header = "参数编码", Order = 4)]
-        public decimal? DecimalValue { get; set; }
+        public string VendorFieldCode { get; set; }
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        [EpplusTableColumn(Header = "参数名称", Order = 5)]
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数值
+        /// </summary>
+        [EpplusTableColumn(Header = "参数值（数字）", Order = 6)]
+        public decimal DecimalValue { get; set; }
+
+        /// <summary>
+        /// 上限值
+        /// </summary>
+        [EpplusTableColumn(Header = "上限值", Order = 7)]
+        public decimal UpperLimit { get; set; }
+
+        /// <summary>
+        /// 下限值
+        /// </summary>
+        [EpplusTableColumn(Header = "下限值", Order = 8)]
+        public decimal LowerLimit { get; set; }
+
+        /// <summary>
+        /// 中间值
+        /// </summary>
+        [EpplusTableColumn(Header = "中间值", Order = 9)]
+        public decimal CenterValue { get; set; }
+
+        /// <summary>
+        /// 工序
+        /// </summary>
+        [EpplusTableColumn(Header = "工序", Order = 10)]
+        public string ProcedureName { get; set; }
+
+        
+
     }
 
 }
