@@ -28,10 +28,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// 固定（勿改）
         /// </summary>
         //测试环境
-        //public const string APP_SECRET = "mcqh6XEHPoyvDAbSlXKYR9CCfQfLC4Hj6GAWafgbOmh6ONCkSSDBquhEGXtHKaFS7dOhvdKVPiDTU2zedifWQZ4j5Tuk0d5z4voKsYoUucvOehPC6wHUGWUNP2RvYJPh";
+        public const string APP_SECRET = "mcqh6XEHPoyvDAbSlXKYR9CCfQfLC4Hj6GAWafgbOmh6ONCkSSDBquhEGXtHKaFS7dOhvdKVPiDTU2zedifWQZ4j5Tuk0d5z4voKsYoUucvOehPC6wHUGWUNP2RvYJPh";
 
         //生产环境
-        public const string APP_SECRET = "f073jScZD968hmRFGQDmPCmrSw6AMxa3gTU25QiBuMRUxA7DSmUs6sIAPfZiqaHQhj012oK311RWa2iFQhv1BhxPPQih3HOw8KXZMranyVIkvoW1jwcHsloezUN1W5LF";
+        //public const string APP_SECRET = "f073jScZD968hmRFGQDmPCmrSw6AMxa3gTU25QiBuMRUxA7DSmUs6sIAPfZiqaHQhj012oK311RWa2iFQhv1BhxPPQih3HOw8KXZMranyVIkvoW1jwcHsloezUN1W5LF";
 
         /// <summary>
         /// 公用方法
