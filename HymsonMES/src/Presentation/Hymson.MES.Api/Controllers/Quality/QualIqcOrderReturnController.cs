@@ -150,7 +150,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 分页查询列表（iqc检验单）
+        /// 分页查询列表（iqc退料检验单）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>

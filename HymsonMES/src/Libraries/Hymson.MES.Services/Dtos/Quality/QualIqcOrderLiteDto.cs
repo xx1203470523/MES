@@ -419,6 +419,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string MaterialName { get; set; }
 
         /// <summary>
+        /// 物料收货数量
+        /// </summary>
+        public string qty { get; set; }
+
+        /// <summary>
         /// 物料版本
         /// </summary>
         public string MaterialVersion { get; set; }

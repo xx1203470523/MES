@@ -1,3 +1,4 @@
+using AutoMapper.Execution;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -32,6 +33,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -653,38 +655,6 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderLitePagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
-            /*
-            // 转换产品编码/版本变为产品ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode)
-                || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName)
-                || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialVersion))
-            {
-                var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
-                {
-                    SiteId = pagedQuery.SiteId,
-                    MaterialCode = pagedQueryDto.MaterialCode,
-                    MaterialName = pagedQueryDto.MaterialName,
-                    Version = pagedQueryDto.MaterialVersion
-                });
-                if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.MaterialIds = procMaterialEntities.Select(s => s.Id);
-                else pagedQuery.MaterialIds = Array.Empty<long>();
-            }
-            */
-
-
-            // 转换物料编码、物料名称变为物料ID
-            //if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode) || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName))
-            //{
-            //    var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
-            //    {
-            //        SiteId = pagedQuery.SiteId,
-            //        MaterialCode = pagedQueryDto.MaterialCode,
-            //        MaterialName = pagedQueryDto.MaterialName
-            //    });
-            //    if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.MaterialIds = procMaterialEntities.Select(s => s.Id);
-            //    else pagedQuery.MaterialIds = Array.Empty<long>();
-            //}
-
             // 将收货单号转换为收货单ID
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.ReceiptNum))
             {
@@ -774,6 +744,14 @@ namespace Hymson.MES.Services.Services.Quality
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(detailEntities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
             var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
 
+
+            // 收货单明细
+            var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
+            {
+                SiteId = orderEntity.SiteId,
+                MaterialReceiptId = orderEntity.MaterialReceiptId
+            });
+
             // 遍历
             foreach (var entity in detailEntities)
             {
@@ -788,6 +766,14 @@ namespace Hymson.MES.Services.Services.Quality
                         dto.MaterialCode = materialEntity.MaterialCode;
                         dto.MaterialName = materialEntity.MaterialName;
                         dto.MaterialVersion = materialEntity.Version ?? "";
+                        // 收货单明细
+                        var materialReceiptDetailEntity = receiptDetailEntities.FirstOrDefault(f => f.Id == entity.MaterialReceiptDetailId);
+                        if (materialReceiptDetailEntity != null)
+                        {
+                            var number = materialReceiptDetailEntity.Qty;
+                            string qtyString = Regex.Replace(number.ToString(), @"\.?0+$", "");
+                            dto.Qty = decimal.Parse(qtyString);
+                        }
                     }
                 }
                 else
@@ -804,7 +790,7 @@ namespace Hymson.MES.Services.Services.Quality
 
             for (int i = 0; i < dtos.Count; i++)
             {
-                sbCode.Append(dtos[i].MaterialCode);
+                sbCode.Append(dtos[i].MaterialCode).Append("(").Append(dtos[i].Qty).Append(")");
                 if (i < dtos.Count - 1) // 检查是否为最后一个元素
                 {
                     sbCode.Append(",");

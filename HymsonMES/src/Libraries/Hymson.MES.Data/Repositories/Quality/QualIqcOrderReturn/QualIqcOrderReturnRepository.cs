@@ -186,7 +186,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
-        /// 分页查询
+        /// 分页查询，IQC退料检验单，列表查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
