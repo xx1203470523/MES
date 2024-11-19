@@ -75,6 +75,13 @@ namespace Hymson.MES.Services.Services.Quality
         Task<IEnumerable<QualIqcOrderReturnDetailDto>?> QueryOrderDetailAsync(long id);
 
         /// <summary>
+        /// 查询检验单物料明细数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<QualIqcOrderReturnMatDetailDto?> QueryMatDetailAsync(long id);
+
+        /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>

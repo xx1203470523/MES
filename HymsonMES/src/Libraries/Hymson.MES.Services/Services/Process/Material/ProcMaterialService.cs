@@ -516,6 +516,44 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procMaterialPagedQueryDto"></param>
         /// <returns></returns>
+        public async Task<PagedInfo<ProcMaterialDto>> GetPageListByWmsAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto)
+        {
+            var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
+            procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
+            var pagedInfo = await _procMaterialRepository.GetPagedInfoAsync(procMaterialPagedQuery);
+
+            //实体到DTO转换 装载数据
+            List<ProcMaterialDto> procMaterialDtos = PrepareProcMaterialDtos(pagedInfo);
+
+            //获取物料组信息
+            foreach (var item in procMaterialDtos)
+            {
+                //根据库存和物料编码，调WMS接口，获取库存的可用数
+                var response = await _wmsRequest.GetStockQuantityRequestAsync(new HttpClients.Requests.GetStockQuantityDto
+                {
+                    MaterialCode = item.MaterialCode,
+                    WarehouseCode = procMaterialPagedQueryDto.Warehouse
+                });
+                if (response != null && response.Code == 0)
+                {
+                    ////赋值库存的可用数
+                    item.QuantityResidue = (decimal)response.Data.Quantity;
+                }
+                else
+                {
+                    item.QuantityResidue = 0;
+                }
+            }
+            return new PagedInfo<ProcMaterialDto>(procMaterialDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
+        /// <param name="procMaterialPagedQueryDto"></param>
+        /// <returns></returns>
         public async Task<PagedInfo<ProcMaterialDto>> GetPageListAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto)
         {
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
@@ -545,22 +583,6 @@ namespace Hymson.MES.Services.Services.Process
             {
                 var materialGroupEntity = materialGroupEntities.Where(a => a.Id == item.GroupId).FirstOrDefault();
                 item.MaterialGroupCode = materialGroupEntity?.GroupCode ?? "";
-
-                //根据库存和物料编码，调WMS接口，获取库存的剩余数量
-                var response = await _wmsRequest.GetStockQuantityRequestAsync(new HttpClients.Requests.GetStockQuantityDto
-                {
-                    MaterialCode = item.MaterialCode,
-                    WarehouseCode = procMaterialPagedQueryDto.Warehouse
-                });
-                if (response.Code == 0)
-                {
-                    ////赋值剩余数量
-                    item.QuantityResidue = (decimal)response.Data.Quantity;
-                }
-                else
-                {
-                    item.QuantityResidue = 0;
-                }
             }
 
             return new PagedInfo<ProcMaterialDto>(procMaterialDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
