@@ -724,6 +724,7 @@ namespace Hymson.MES.Services.Services.Quality
                 if (materialReturnDetailEntity != null)
                 {
                     var number = materialReturnDetailEntity.Qty;
+                    //正则表达式，转换退料数量
                     string qtyString = Regex.Replace(number.ToString(), @"\.?0+$", "");
                     dto.Qty = decimal.Parse(qtyString);
                 }
@@ -825,12 +826,12 @@ namespace Hymson.MES.Services.Services.Quality
             var dtos = await PrepareOrderDtosAsync(pagedInfo.Data);
 
             // 遍历
-//            foreach (var dto in dtos)
-//            {
-//                QualIqcOrderReturnMatDetailDto resultResp = await QueryMatDetailAsync(dto.Id);
-//                dto.MaterialCode = resultResp.MaterialCode;
-//                dto.MaterialName = resultResp.MaterialName;
-//            }
+            foreach (var dto in dtos)
+            {
+                QualIqcOrderReturnMatDetailDto resultResp = await QueryMatDetailAsync(dto.Id);
+                dto.MaterialCode = resultResp.MaterialCode;
+                dto.MaterialName = resultResp.MaterialName;
+            }
 
             return new PagedInfo<QualIqcOrderReturnDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }

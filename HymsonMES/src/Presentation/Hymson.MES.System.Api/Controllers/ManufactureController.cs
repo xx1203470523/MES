@@ -85,7 +85,7 @@ namespace Hymson.MES.System.Api.Controllers
         //}
 
         /// <summary>
-        /// 成品入库单结果反馈
+        /// 成品入库单结果反馈：在WMS入库审核后，WMS调用MES的Manufacture/ProductReceiptCallBack的接口
         /// </summary>
         /// <param name="callBackDto"></param>
         /// <returns></returns>

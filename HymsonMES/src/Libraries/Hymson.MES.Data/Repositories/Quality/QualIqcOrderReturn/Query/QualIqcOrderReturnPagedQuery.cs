@@ -19,6 +19,17 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// </summary>
         public string? InspectionOrder { get; set; }
 
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName { get; set; }
+
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>

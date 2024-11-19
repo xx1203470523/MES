@@ -195,26 +195,52 @@ namespace Hymson.MES.Data.Repositories.Quality
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy(string.IsNullOrWhiteSpace(pagedQuery.Sorting) ? "CreatedOn DESC" : pagedQuery.Sorting);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select(" t1.InspectionOrder,t2.ReturnOrderCode,t3.OrderCode,t4.MaterialCode,t4.MaterialName, t1.* ");
+            sqlBuilder.OrderBy(string.IsNullOrWhiteSpace(pagedQuery.Sorting) ? " t1.CreatedOn DESC" : pagedQuery.Sorting);
+            sqlBuilder.Where(" t1.IsDeleted = 0");
+            sqlBuilder.Where(" t1.SiteId = @SiteId");
 
+            sqlBuilder.LeftJoin(" manu_return_order t2 on t1.ReturnOrderId = t2.id ");
+            sqlBuilder.LeftJoin(" plan_work_order t3 on t1.WorkOrderId = t3.id ");
+            sqlBuilder.LeftJoin(" (SELECT t.IQCOrderId, GROUP_CONCAT(t.MaterialCode SEPARATOR ',') AS MaterialCode, GROUP_CONCAT(t.MaterialName SEPARATOR ',') AS MaterialName FROM (select t.IQCOrderId,p.MaterialCode,p.MaterialName from qual_iqc_order_return_detail t inner JOIN proc_material p on t.MaterialId = p.id) t GROUP BY t.IQCOrderId) t4 on t1.id = t4.IQCOrderId ");
+
+            //检验单号
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder))
             {
                 pagedQuery.InspectionOrder = $"%{pagedQuery.InspectionOrder}%";
-                sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
+                sqlBuilder.Where(" t1.InspectionOrder LIKE @InspectionOrder ");
             }
-            if (pagedQuery.ReturnOrderIds != null) sqlBuilder.Where(" ReturnOrderId IN @ReturnOrderIds ");
-            if (pagedQuery.WorkOrderIds != null) sqlBuilder.Where(" WorkOrderId IN @WorkOrderIds ");
-            if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
-            if (pagedQuery.IsQualified.HasValue) sqlBuilder.Where("IsQualified = @IsQualified");
+
+            //退料单号的ID
+            if (pagedQuery.ReturnOrderIds != null) sqlBuilder.Where(" t1.ReturnOrderId IN @ReturnOrderIds ");
+
+            //工单编码的ID
+            if (pagedQuery.WorkOrderIds != null) sqlBuilder.Where(" t1.WorkOrderId IN @WorkOrderIds ");
+
+            if (pagedQuery.Status.HasValue) sqlBuilder.Where(" t1.Status = @Status");
+            if (pagedQuery.IsQualified.HasValue) sqlBuilder.Where(" t1.IsQualified = @IsQualified");
+
+
+
+            //物料编码
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialCode))
+            {
+                pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" t4.MaterialCode LIKE @MaterialCode ");
+            }
+
+            //物料名称
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialName))
+            {
+                pagedQuery.MaterialName = $"%{pagedQuery.MaterialName}%";
+                sqlBuilder.Where(" t4.MaterialName LIKE @MaterialName ");
+            }
 
             // 限定时间
             if (pagedQuery.CreatedOn != null && pagedQuery.CreatedOn.Length >= 2)
             {
                 sqlBuilder.AddParameters(new { DateStart = pagedQuery.CreatedOn[0], DateEnd = pagedQuery.CreatedOn[1] });
-                sqlBuilder.Where(" CreatedOn >= @DateStart AND CreatedOn < @DateEnd ");
+                sqlBuilder.Where(" t1.CreatedOn >= @DateStart AND t1.CreatedOn < @DateEnd ");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
@@ -238,8 +264,8 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualIqcOrderReturnRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order_return /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return t1 /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order_return t1 /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return /**where**/ /**orderby**/ LIMIT @MaxRows ";
         const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return /**where**/ /**orderby**/ LIMIT 1 ";
 
