@@ -3,6 +3,7 @@ using Hymson.MES.Core.Enums.Plan;
 using Hymson.MES.Core.Enums;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.NioPushCollection
 {
@@ -228,8 +229,9 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         public string VendorProductName { get; set; }
 
         /// <summary>
-        /// 
+        /// 合作伙伴总成序列号
         /// </summary>
+        [EpplusTableColumn(Header = "合作伙伴总成序列号", Order = 1)]
         public string VendorProductSn { get; set; }
 
         /// <summary>
@@ -404,6 +406,16 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         public TrueOrFalseEnum? IsOk { get; set; }
 
         /// <summary>
+        /// 合作伙伴产品名称
+        /// </summary>
+        public string? VendorProductName { get; set; }
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string? ParameterName { get; set; }
+
+        /// <summary>
         /// 操作时间
         /// </summary>
         public DateTime[] ? CreatedOn { get; set; }
@@ -454,6 +466,11 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// 合作伙伴总成物料名称，最大长度64
         /// </summary>
         public string VendorProductName { get; set; }
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParameterName { get; set; }
 
         /// <summary>
         /// 合作伙伴总成序列号，最大长度64
@@ -576,4 +593,39 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         [JsonProperty("list")]
         public List<NioCollectionDto> List { get; set; } = new List<NioCollectionDto>();
     }
+
+    public class NioPushCollectionExportResultDto
+    {
+        public string Path { get; set; }
+
+        public string FileName { get; set; }
+    }
+
+    public record NioPushCollectionExportDto : BaseExcelDto {
+
+        /// <summary>
+        /// 合作伙伴总成序列号
+        /// </summary>
+        [EpplusTableColumn(Header = "合作伙伴总成序列号", Order = 1)]
+        public string VendorProductSn { get; set; }
+
+        /// <summary>
+        /// 合作伙伴总成序列号
+        /// </summary>
+        [EpplusTableColumn(Header = "合作伙伴总成临时序列号", Order = 2)]
+        public string VendorProductTempSn { get; set; }
+
+        /// <summary>
+        /// 推送状态
+        /// </summary>
+        [EpplusTableColumn(Header = "推送状态", Order = 3)]
+        public string ProcessType { get; set; }
+
+        /// <summary>
+        /// 参数编码
+        /// </summary>
+        [EpplusTableColumn(Header = "参数编码", Order = 4)]
+        public decimal? DecimalValue { get; set; }
+    }
+
 }
