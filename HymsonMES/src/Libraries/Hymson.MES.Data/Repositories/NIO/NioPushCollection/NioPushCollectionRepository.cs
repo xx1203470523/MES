@@ -308,4 +308,5 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
 
         const string GetByNioPushIdSql = @"SELECT * FROM nio_push_collection WHERE NioPushId = @NioPushId and IsDeleted = 0";
     }
+
 }

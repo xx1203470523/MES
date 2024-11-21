@@ -108,5 +108,6 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<NioPushCollectionEntity>> GetNgEntitiesAsync(NioPushCollectionQuery query);
+
     }
 }
