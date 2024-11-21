@@ -45,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection.Query
         public String? VendorProductName { get; set; }
 
         /// <summary>
-        /// 
+        /// 参数名称
         /// </summary>
         public String? ParameterName { get; set; }
 
