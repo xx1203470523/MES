@@ -27,6 +27,7 @@ using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
 using Minio.DataModel;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -753,7 +754,7 @@ namespace Hymson.MES.Services.Services.Process
             // 查询工单信息
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(dto.WorkId);
 
-            // 查询生产计划
+            // 查询生产计划：指定生产计划未找到,工单编码为：【{WorkOrder}】。
             var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
 
@@ -827,7 +828,7 @@ namespace Hymson.MES.Services.Services.Process
 
 
         /// <summary>
-        /// 
+        /// 读取工单物料清单,工单Bom领料页面，切换选择仓库后，根据工单id和仓库编码获取物料列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -903,11 +904,25 @@ namespace Hymson.MES.Services.Services.Process
                         MaterialCode = procMaterialEntity.MaterialCode,
                         WarehouseCode = dto.warehouse
                     });
-                    if (response.Code == 0)
+                    if (response != null && response.Code == 0)
                     {
-                        //赋值库存的剩余数量
-                        QuantityResidue = (decimal)response.Data.Quantity + "";
+                        var number = response.Data.Quantity;
+                        if (number != 0)
+                        {
+                            //正则表达式，转换库存的可用数，赋值库存的可用数【切换选择仓库】
+                            QuantityResidue = Regex.Replace(number.ToString(), @"\.?0+$", "");
+                        }
+                        else
+                        {
+                            QuantityResidue = "0";
+                        }
                     }
+                    else
+                    {
+                        QuantityResidue = "0";
+                    }
+
+
                 }
                 procBomDetailViews.Add(new ProcOrderBomDetailDto
                 {

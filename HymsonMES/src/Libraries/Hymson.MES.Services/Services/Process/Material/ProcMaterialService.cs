@@ -36,6 +36,7 @@ using OfficeOpenXml.Attributes;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Policy;
+using System.Text.RegularExpressions;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -512,7 +513,7 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 根据查询条件获取分页数据
+        /// 工单列表，点击领料按钮，进入工单Bom领料页面，新增一行后，点击物料后的弹出框加载物料列表，所调方法
         /// </summary>
         /// <param name="procMaterialPagedQueryDto"></param>
         /// <returns></returns>
@@ -529,7 +530,8 @@ namespace Hymson.MES.Services.Services.Process
             //获取物料组信息
             foreach (var item in procMaterialDtos)
             {
-                //根据库存和物料编码，调WMS接口，获取库存的可用数
+                //赋值库存的可用数
+                //根据库存编码和物料编码，调WMS接口，获取库存的可用数
                 var response = await _wmsRequest.GetStockQuantityRequestAsync(new HttpClients.Requests.GetStockQuantityDto
                 {
                     MaterialCode = item.MaterialCode,
@@ -537,13 +539,34 @@ namespace Hymson.MES.Services.Services.Process
                 });
                 if (response != null && response.Code == 0)
                 {
-                    ////赋值库存的可用数
-                    item.QuantityResidue = (decimal)response.Data.Quantity;
+                    var number = response.Data.Quantity;
+                    if(number != 0)
+                    {
+                        //正则表达式，转换库存的可用数，赋值库存的可用数【新增一行后，点击物料弹出物料列表框】
+                        string qtyString = Regex.Replace(number.ToString(), @"\.?0+$", "");
+                        item.QuantityResidue = decimal.Parse(qtyString);
+                    }
+                    else
+                    {
+                        item.QuantityResidue = 0;
+                    }
                 }
                 else
                 {
                     item.QuantityResidue = 0;
                 }
+
+                //2024.11.21确认：1.待领料数量 = 需求数量 - 已领料数量。
+                //2.需求数量 = 子件单件用量 *（1 + 子件损耗 / 100）*生产工单数量。
+                //3.已领料数量 = 根据当前工单和当前物料计算已领料数量之和，领料状态需除去申请取消的
+
+                //赋值物料的需求数量【需求数量 = 子件单件用量 *（1 + 子件损耗 / 100）*生产工单数量。】
+
+                //赋值物料的已领数量【已领料数量 = 根据当前工单和当前物料计算已领料数量之和，领料状态需除去申请取消的】
+
+                //赋值物料的待领数量【待领料数量 = 需求数量 - 已领料数量】
+
+
             }
             return new PagedInfo<ProcMaterialDto>(procMaterialDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
