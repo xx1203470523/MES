@@ -96,6 +96,11 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            if (string.IsNullOrEmpty(qualFqcInspectionMavalPagedQuery.Remark) == false)
+            {
+                qualFqcInspectionMavalPagedQuery.Remark = $"%{qualFqcInspectionMavalPagedQuery.Remark}%";
+                sqlBuilder.Where("Remark LIKE @Remark");
+            }
             sqlBuilder.Select("*");
             sqlBuilder.OrderBy("CreatedOn DESC");
 

@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.QualFqcInspectionMaval;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Microsoft.Extensions.Options;
 
@@ -169,6 +170,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         }
 
         /// <summary>
+        /// 仓库分组名称
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<ManuRequistionOrderGroupDto>> GetManuRequistionOrderGroupListAsync()
+        {
+            string sql = "select Warehouse from manu_requistion_order where Warehouse is not null GROUP BY Warehouse ";
+            using var conn = GetMESDbConnection();
+            var dbListTask = conn.QueryAsync<ManuRequistionOrderGroupDto>(sql);
+            var dbList = await dbListTask;
+            var list = dbList as List<ManuRequistionOrderGroupDto>;
+            list.Insert(0, new ManuRequistionOrderGroupDto());
+            return list;
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuRequistionOrderDetailPagedQuery"></param>
@@ -178,7 +194,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             string whereSql = string.Empty;
             if(string.IsNullOrEmpty(param.OrderCode) == false)
             {
-                whereSql += $" and t3.OrderCode = '{param.OrderCode}' ";
+                whereSql += $" and t3.OrderCode like '%{param.OrderCode}%' ";
             }
             if(string.IsNullOrEmpty(param.Warehouse) == false)
             {
@@ -206,7 +222,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             }
 
             string sql = $@"
-                select t1.CreatedOn ReqDate,t1.UpdatedOn OutWmsDate,t3.OrderCode ,t5.MaterialCode ,t5.MaterialName , t5.Specifications ,t6.Name Unit ,
+                select t1.CreatedOn ReqDate,t1.UpdatedOn OutWmsDate,t3.OrderCode ,t2.ReqOrderCode,t5.MaterialCode ,t5.MaterialName , t5.Specifications ,t6.Name Unit ,
 	                t3.Qty OrderQty,t1.Qty ReqQty, t4.WorkPlanCode , t2.Warehouse , t1.CreatedBy ,t2.Status ,  t2.ReqOrderCode ,t2.`Type` 
                 from manu_requistion_order_detail t1
                 inner join manu_requistion_order t2 on t1.RequistionOrderId = t2.Id and t2.IsDeleted = 0
@@ -237,6 +253,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             var totalCountTask = conn.ExecuteScalarAsync<int>(countSql);
             var dbList = await dbListTask;
             var totalCount = await totalCountTask;
+            
             return new PagedInfo<ReportRequistionOrderResultDto>(dbList, param.PageIndex, param.PageSize, totalCount);
         }
         #endregion

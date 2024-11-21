@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.NioPushCollection;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -14,6 +15,19 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<ReportRequistionOrderResultDto>> GetPagedListAsync(ReportRequistionOrderQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 查询仓库地址分组
+        /// </summary>
+        /// <returns></returns>
+        Task<List<ManuRequistionOrderGroupDto>> GetWarehouseListAsync();
+
+        /// <summary>
+        /// 导出信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<NioPushCollectionExportResultDto> ExprotAsync(ReportRequistionOrderQueryDto param);
 
     }
 }

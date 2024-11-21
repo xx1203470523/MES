@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.NioPushCollection;
 
 namespace Hymson.MES.Services.Services.NioPushCollection
@@ -49,6 +50,13 @@ namespace Hymson.MES.Services.Services.NioPushCollection
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<NioPushCollectionDto>> GetPagedListAsync(NioPushCollectionPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 根据查询条件导出客户维护信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<NioPushCollectionExportResultDto> ExprotNioPushPageListAsync(NioPushCollectionPagedQueryDto param);
 
     }
 }
