@@ -99,7 +99,7 @@ namespace Hymson.MES.Api.Controllers.NioPushCollection
         }
 
         /// <summary>
-        /// 导出客户维护信息
+        /// 导出信息
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
