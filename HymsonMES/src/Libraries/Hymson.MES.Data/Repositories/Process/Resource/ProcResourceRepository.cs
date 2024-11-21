@@ -158,7 +158,77 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 获取资源分页列表(关联资源类型)
+        /// 查询资源维护表列表(关联资源类型，展示资源类型名称);FQC检验马威，点击资源，显示弹出框资源列表所调接口
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceView>> GetPageListByScwAsync(ProcResourcePagedQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlByScwTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlByScwTemplate);
+            sqlBuilder.Where("a.IsDeleted=0");
+            sqlBuilder.Where("a.SiteId = @SiteId");
+            if (string.IsNullOrEmpty(query.Sorting))
+            {
+                sqlBuilder.OrderBy("a.UpdatedOn DESC");
+            }
+            else
+            {
+                sqlBuilder.OrderBy(query.Sorting);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.ProcessCode))
+            {
+                sqlBuilder.Where(" c.Code = @ProcessCode ");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.ResCode))
+            {
+                query.ResCode = $"%{query.ResCode}%";
+                sqlBuilder.Where("a.ResCode like @ResCode");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ResName))
+            {
+                query.ResName = $"%{query.ResName}%";
+                sqlBuilder.Where("a.ResName like @ResName");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ResType))
+            {
+                query.ResType = $"%{query.ResType}%";
+                sqlBuilder.Where("b.ResType like @ResType");
+            }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("a.Status = @Status");
+            }
+            if (query.ResTypeId.HasValue && query.ResTypeId > 0)
+            {
+                sqlBuilder.Where(" a.ResTypeId=@ResTypeId");
+            }
+
+            // 这个是为了查询指定线体下的资源，大部分情况下这个 WorkCenterLineId 是不会有值的
+            if (query.WorkCenterLineId.HasValue)
+            {
+                sqlBuilder.Where("EXISTS (SELECT IWCRR.ResourceId FROM inte_work_center_resource_relation IWCRR WHERE IWCRR.IsDeleted = 0 AND IWCRR.WorkCenterId = @WorkCenterLineId AND IWCRR.ResourceId = a.Id)");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
+
+            using var conn = GetMESDbConnection();
+            var procResourceEntitiesTask = conn.QueryAsync<ProcResourceView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var procResourceEntities = await procResourceEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ProcResourceView>(procResourceEntities, query.PageIndex, query.PageSize, totalCount);
+        }
+
+
+        /// <summary>
+        /// 查询资源维护表列表(关联资源类型，展示资源类型名称)
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -620,6 +690,9 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResType,b.ResTypeName  FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id and b.IsDeleted =0 /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id  /**where**/ ";
+
+        const string GetPagedInfoDataSqlByScwTemplate = "SELECT a.*,b.ResType,b.ResTypeName  FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id and b.IsDeleted =0 left join proc_procedure c on c.ResourceTypeId = b.Id and b.IsDeleted = 0 /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoCountSqlByScwTemplate = "SELECT count(*) FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id and b.IsDeleted =0 left join proc_procedure c on c.ResourceTypeId = b.Id and b.IsDeleted = 0  /**where**/ ";
 
         const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM  proc_resource /**innerjoin**/ /**leftjoin**/ /**where**/ ";

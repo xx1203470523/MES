@@ -199,6 +199,27 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
+        /// 查询资源维护表列表(关联资源类型，展示资源类型名称);FQC检验马威，点击资源，显示弹出框资源列表所调接口
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceViewDto>> GetPageListByScwAsync(ProcResourcePagedQueryDto query)
+        {
+            var resourcePagedQuery = query.ToQuery<ProcResourcePagedQuery>();
+            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _resourceRepository.GetPageListByScwAsync(resourcePagedQuery);
+
+            //实体到DTO转换 装载数据
+            var procResourceDtos = new List<ProcResourceViewDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceViewDto = entity.ToModel<ProcResourceViewDto>();
+                procResourceDtos.Add(resourceViewDto);
+            }
+            return new PagedInfo<ProcResourceViewDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
         /// 查询资源维护表列表(关联资源类型，展示资源类型名称)
         /// </summary>
         /// <param name="query"></param>

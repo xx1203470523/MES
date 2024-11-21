@@ -67,6 +67,12 @@ namespace Hymson.MES.Services.Dtos.Process
     public class ProcResourcePagedQueryDto : PagerInfo
     {
         /// <summary>
+        /// 描述 :工序编码 
+        /// 空值 : false  
+        /// </summary>
+        public string? ProcessCode { get; set; }
+
+        /// <summary>
         /// 描述 :资源代码 
         /// 空值 : false  
         /// </summary>

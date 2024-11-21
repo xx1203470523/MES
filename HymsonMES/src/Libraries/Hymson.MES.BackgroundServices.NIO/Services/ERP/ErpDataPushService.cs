@@ -135,7 +135,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
         }
 
         /// <summary>
-        /// NIO合作伙伴精益与库存信息
+        /// 组装NIO合作伙伴精益与库存信息
         /// </summary>
         /// <returns></returns>
         public async Task NioStockInfoAsync()
@@ -215,49 +215,86 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                     continue;
                 }
 
-                long downNum = 0;
-                var curMaterial = matList.Where(m => m.MaterialCode == item.MaterialCode).FirstOrDefault();
-                if (curMaterial != null)
-                {
-                    var curProductNum = prodcutNumList.Where(m => m.ProductId == curMaterial.Id).FirstOrDefault();
-                    if(curProductNum != null)
-                    {
-                        downNum = curProductNum.Num;
-                    }
-                }
-
                 ProductionCapacityDto dto = new ProductionCapacityDto();
+                //合作业务
                 dto.PartnerBusiness = item.PartnerBusiness;
+                //物料编码
                 dto.MaterialCode = curBaseConfig.NioProductCode;
+                //物料名称
                 dto.MaterialName = curBaseConfig.NioProductName;
+                //成品库存合格量
                 dto.ProductStockQualified = item.ProductStockQualified;
-                dto.ProductStockRejection = item.ProductStockRejection;
-                dto.ProductStockUndetermined = item.ProductStockUndetermined;
+                //成品备库策略（最大值）
                 dto.ProductBackUpMax = item.ProductBackUpMax;
+                //成品备库策略（最小值）
                 dto.ProductBackUpMin = item.ProductBackUpMin;
+                //单位
                 dto.ParaConfigUnit = item.ParaConfigUnit;
+                //排班数/天
+                dto.WorkingSchedule = curBaseConfig.WorkingSchedule;
+                //计划产能/天
+                dto.PlannedCapacity = curBaseConfig.PlannedCapacity;
+                //稼动率（%）
+                dto.Efficiency = curBaseConfig.Efficiency;
+                //节拍（s）
+                dto.Beat = curBaseConfig.Beat;
+                //日生产工单或生产计划
+                dto.DailyProductionPlan = curBaseConfig.Dailyproductionplan;
+                //瓶颈工序
+                dto.BottleneckProcess = curBaseConfig.BottleneckProcess;
 
+                //每天数据传递日期
+                dto.Date = HymsonClock.Now().ToString("yyyy-MM-dd HH:mm:ss");
+
+                //数量配置：StockRejection是成品库存不合格量，StockUndetermined是成品库存待判定，ProductInNum是成品实际入库数量，DownlineNum是下线合格数量。
+                //格式： StockRejection=数量&StockUndetermined=数量&ProductInNum=数量&DownlineNum=数量，
+                //数量为-1时，取的是实际的值；数量不为-1的时候，取的是配置的值。
+
+                //成品库存不合格量(需要可以手动修改)
+                dto.ProductStockRejection = item.ProductStockRejection;
                 decimal configStockRejection = ConfigConvertToNum(sysConfigEntity, "StockRejection");
-                decimal configStockUndetermined = ConfigConvertToNum(sysConfigEntity, "StockUndetermined");
                 if(configStockRejection != NO_CONFIG_NUM)
                 {
                     dto.ProductStockRejection = configStockRejection;
                 }
-                if(configStockUndetermined != NO_CONFIG_NUM)
+
+                //成品库存待判定(需要可以手动输入修改)
+                dto.ProductStockUndetermined = item.ProductStockUndetermined;
+                decimal configStockUndetermined = ConfigConvertToNum(sysConfigEntity, "StockUndetermined");
+                if (configStockUndetermined != NO_CONFIG_NUM)
                 {
                     dto.ProductStockUndetermined = configStockUndetermined;
                 }
 
-                dto.WorkingSchedule = curBaseConfig.WorkingSchedule;
-                dto.PlannedCapacity = curBaseConfig.PlannedCapacity;
-                dto.Efficiency = curBaseConfig.Efficiency;
-                dto.Beat = curBaseConfig.Beat;
-                dto.DailyProductionPlan = curBaseConfig.Dailyproductionplan;
-                dto.BottleneckProcess = curBaseConfig.BottleneckProcess;
+                //成品实际入库数量(需要可以手动输入修改)
                 dto.ProductInNum = item.ProductInNum;
+                decimal configProductInNum = ConfigConvertToNum(sysConfigEntity, "ProductInNum");
+                if (configProductInNum != NO_CONFIG_NUM)
+                {
+                    dto.ProductInNum = configProductInNum;
+                }
 
-                dto.Date = HymsonClock.Now().ToString("yyyy-MM-dd HH:mm:ss");
-                dto.DownlineNum = downNum;
+                //下线合格数量(需要可以手动输入修改)
+                decimal configDownlineNum = ConfigConvertToNum(sysConfigEntity, "DownlineNum");
+                if (configDownlineNum != NO_CONFIG_NUM)
+                {
+                    dto.DownlineNum = configDownlineNum;
+                }
+                else
+                {
+                    long downNum = 0;
+                    var curMaterial = matList.Where(m => m.MaterialCode == item.MaterialCode).FirstOrDefault();
+                    if (curMaterial != null)
+                    {
+                        var curProductNum = prodcutNumList.Where(m => m.ProductId == curMaterial.Id).FirstOrDefault();
+                        if (curProductNum != null)
+                        {
+                            downNum = curProductNum.Num;
+                        }
+                    }
+                    dto.DownlineNum = downNum;
+                }
+
                 dtos.Add(dto);
 
                 var tmpStr = JsonConvert.SerializeObject(dto);

@@ -9,6 +9,12 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
     public class ProcResourcePagedQuery : PagerInfo
     {
         /// <summary>
+        /// 描述 :工序编码 
+        /// 空值 : false  
+        /// </summary>
+        public string ProcessCode { get; set; }
+
+        /// <summary>
         /// 描述 :资源代码 
         /// 空值 : false  
         /// </summary>

@@ -12,20 +12,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers
 {
     /// <summary>
-    /// ×ÊÔ´Î¬»¤±í
+    /// ï¿½ï¿½Ô´Î¬ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcResourceController : ControllerBase
     {
         /// <summary>
-        /// ×ÊÔ´Î¬»¤±í½Ó¿Ú
+        /// ï¿½ï¿½Ô´Î¬ï¿½ï¿½ï¿½ï¿½Ó¿ï¿½
         /// </summary>
         private readonly IProcResourceService _procResourceService;
         private readonly ILogger<ProcResourceController> _logger;
 
         /// <summary>
-        /// ¹¹Ôìº¯Êı
+        /// ï¿½ï¿½ï¿½ìº¯ï¿½ï¿½
         /// </summary>
         /// <param name="procResourceService"></param>
         /// <param name="logger"></param>
@@ -36,7 +36,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// »ñÈ¡·ÖÒ³Êı¾İ
+        /// ï¿½ï¿½È¡ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -48,7 +48,19 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// »ñÈ¡·ÖÒ³Êı¾İ
+        /// æŸ¥è¯¢èµ„æºç»´æŠ¤è¡¨åˆ—è¡¨(å…³è”èµ„æºç±»å‹ï¼Œå±•ç¤ºèµ„æºç±»å‹åç§°);FQCæ£€éªŒé©¬å¨ï¼Œç‚¹å‡»èµ„æºï¼Œæ˜¾ç¤ºå¼¹å‡ºæ¡†èµ„æºåˆ—è¡¨æ‰€è°ƒæ¥å£
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Route("listByScw")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceViewDto>> QueryProcResourceByScwAsync([FromQuery] ProcResourcePagedQueryDto query)
+        {
+            return await _procResourceService.GetPageListByScwAsync(query);
+        }
+
+        /// <summary>
+        /// ï¿½ï¿½È¡ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -60,7 +72,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// ²éÑ¯×ÊÔ´Î¬»¤±íÏêÇé
+        /// ï¿½ï¿½Ñ¯ï¿½ï¿½Ô´Î¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -72,7 +84,7 @@ namespace Hymson.MES.Api.Controllers
 
 
         /// <summary>
-        /// ²éÑ¯×ÊÔ´Î¬»¤±íÏêÇé
+        /// ï¿½ï¿½Ñ¯ï¿½ï¿½Ô´Î¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
@@ -83,7 +95,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// ²éÑ¯×ÊÔ´ÀàĞÍÏÂ¹Ø    ÁªµÄ×ÊÔ´
+        /// ï¿½ï¿½Ñ¯ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½Â¹ï¿½    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -95,7 +107,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// »ñÈ¡·ÖÒ³Êı¾İ
+        /// ï¿½ï¿½È¡ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -107,7 +119,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// ×ÊÔ´¹ØÁª´òÓ¡»úÊı¾İ
+        /// ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -119,7 +131,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// »ñÈ¡×ÊÔ´ÉèÖÃÊı¾İ
+        /// ï¿½ï¿½È¡ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -131,7 +143,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// »ñÈ¡×ÊÔ´¹ØÁªÉè±¸Êı¾İ
+        /// ï¿½ï¿½È¡ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -143,7 +155,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// »ñÈ¡×ÊÔ´¹ØÁª×÷ÒµÊı¾İ
+        /// ï¿½ï¿½È¡ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -155,7 +167,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// »ñÈ¡×ÊÔ´¹ØÁª²ú³öÊı¾İ
+        /// ï¿½ï¿½È¡ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -167,7 +179,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// »ñÈ¡×ÊÖÊÈÏÖ¤ÉèÖÃ
+        /// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -179,12 +191,12 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// Ìí¼Ó×ÊÔ´Êı¾İ
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [LogDescription("×ÊÔ´Î¬»¤", BusinessType.INSERT)]
+        [LogDescription("ï¿½ï¿½Ô´Î¬ï¿½ï¿½", BusinessType.INSERT)]
         [PermissionDescription("proc:resource:insert")]
         public async Task<long> AddProcResourceAsync([FromBody] ProcResourceCreateDto parm)
         {
@@ -192,12 +204,12 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// ¸üĞÂ×ÊÔ´Î¬»¤±í
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Î¬ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
-        [LogDescription("×ÊÔ´Î¬»¤", BusinessType.UPDATE)]
+        [LogDescription("ï¿½ï¿½Ô´Î¬ï¿½ï¿½", BusinessType.UPDATE)]
         [PermissionDescription("proc:resource:update")]
         public async Task UpdateProcResourceAsync([FromBody] ProcResourceModifyDto parm)
         {
@@ -205,12 +217,12 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// É¾³ı×ÊÔ´Î¬»¤±í
+        /// É¾ï¿½ï¿½ï¿½ï¿½Ô´Î¬ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
-        [LogDescription("×ÊÔ´Î¬»¤", BusinessType.DELETE)]
+        [LogDescription("ï¿½ï¿½Ô´Î¬ï¿½ï¿½", BusinessType.DELETE)]
         [PermissionDescription("proc:resource:delete")]
         public async Task DeleteProcResourceAsync(DeleteDto deleteDto)
         {
@@ -218,7 +230,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// ²éÑ¯×ÊÔ´°ó¶¨µÄÉè±¸
+        /// ï¿½ï¿½Ñ¯ï¿½ï¿½Ô´ï¿½ó¶¨µï¿½ï¿½è±¸
         /// </summary>
         /// <param name="resourceId"></param>
         /// <returns></returns>
@@ -228,15 +240,15 @@ namespace Hymson.MES.Api.Controllers
             return await _procResourceService.QueryEquipmentsByResourceIdAsync(resourceId);
         }
 
-        #region ×´Ì¬±ä¸ü
+        #region ×´Ì¬ï¿½ï¿½ï¿½
         /// <summary>
-        /// ÆôÓÃ£¨×ÊÔ´Î¬»¤£©
+        /// ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½Ô´Î¬ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("updateStatusEnable")]
-        [LogDescription("×ÊÔ´Î¬»¤", BusinessType.UPDATE)]
+        [LogDescription("ï¿½ï¿½Ô´Î¬ï¿½ï¿½", BusinessType.UPDATE)]
         [PermissionDescription("proc:resource:updateStatusEnable")]
         public async Task UpdateStatusEnable([FromBody] long id)
         {
@@ -244,13 +256,13 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// ±£Áô£¨×ÊÔ´Î¬»¤£©
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Î¬ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("updateStatusRetain")]
-        [LogDescription("×ÊÔ´Î¬»¤", BusinessType.UPDATE)]
+        [LogDescription("ï¿½ï¿½Ô´Î¬ï¿½ï¿½", BusinessType.UPDATE)]
         [PermissionDescription("proc:resource:updateStatusRetain")]
         public async Task UpdateStatusRetain([FromBody] long id)
         {
@@ -258,13 +270,13 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// ·Ï³ı£¨×ÊÔ´Î¬»¤£©
+        /// ï¿½Ï³ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Î¬ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("updateStatusAbolish")]
-        [LogDescription("×ÊÔ´Î¬»¤", BusinessType.UPDATE)]
+        [LogDescription("ï¿½ï¿½Ô´Î¬ï¿½ï¿½", BusinessType.UPDATE)]
         [PermissionDescription("proc:resource:updateStatusAbolish")]
         public async Task UpdateStatusAbolish([FromBody] long id)
         {

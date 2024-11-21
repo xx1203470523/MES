@@ -31,6 +31,13 @@ namespace Hymson.MES.Services.Services.Process.Resource
         Task<PagedInfo<ProcResourceViewDto>> GetPageListAsync(ProcResourcePagedQueryDto query);
 
         /// <summary>
+        /// 查询资源维护表列表(关联资源类型，展示资源类型名称)
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceViewDto>> GetPageListByScwAsync(ProcResourcePagedQueryDto query);
+
+        /// <summary>
         /// 获取资源分页列表
         /// </summary>
         /// <param name="query"></param>
