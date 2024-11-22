@@ -67,6 +67,24 @@ namespace Hymson.MES.Services.Dtos.Manufacture
 
     }
 
+    /// <summary>
+    /// 领料明细
+    /// </summary>
+    public record ManuRequistionOrderDetailByScwDto
+    {
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 领料数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+    }
+
     public record ManuRequistionOrderExportDto : BaseExcelDto
     {
 

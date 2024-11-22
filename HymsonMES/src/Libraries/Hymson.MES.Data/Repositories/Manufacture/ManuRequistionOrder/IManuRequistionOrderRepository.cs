@@ -80,6 +80,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         /// <param name="siteId"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuRequistionOrderEntity>> GetByOrderCodeAsync(long orderId, long siteId);
+        /// <summary>
+        /// 根据工单查询领料单
+        /// </summary>
+        /// <param name="orderCode"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuRequistionOrderEntity>> GetByOrderCodeByScwAsync(long orderId, long siteId);
 
         /// <summary>
         /// 获取List

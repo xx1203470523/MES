@@ -9,13 +9,16 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Extension;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
@@ -25,6 +28,7 @@ using Hymson.MES.HttpClients.RotorHandle;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Common;
+using Hymson.MES.Services.Services.Plan.PlanWorkOrder;
 using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -76,6 +80,13 @@ namespace Hymson.MES.Services.Services.Process
         private readonly ISysConfigRepository _sysConfigRepository;
         private readonly IRotorApiClient _rotorApiClient;
 
+        private readonly IPlanWorkOrderService _planWorkOrderService;
+        private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
+        private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
+        private readonly IProcBomDetailRepository _procBomDetailRepository;
+        private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
+        private readonly IManuRequistionOrderDetailRepository _manuRequistionOrderDetailRepository;
+
         /// <summary>
         /// 
         /// </summary>
@@ -112,7 +123,14 @@ namespace Hymson.MES.Services.Services.Process
             IMinioService minioService, IProcMaterialGroupRepository procMaterialGroupRepository,
             ISysConfigRepository sysConfigRepository,
             IRotorApiClient rotorApiClient,
-            IWMSApiClient wmsRequest)
+            IWMSApiClient wmsRequest,
+            IPlanWorkOrderService planWorkOrderService,
+            IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
+            IProcBomDetailRepository procBomDetailRepository,
+            IManuRequistionOrderRepository manuRequistionOrderRepository,
+            IManuRequistionOrderDetailRepository manuRequistionOrderDetailRepository
+            )
         {
             _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
@@ -137,7 +155,13 @@ namespace Hymson.MES.Services.Services.Process
             _sysConfigRepository = sysConfigRepository;
             _rotorApiClient = rotorApiClient;
             _wmsRequest = wmsRequest;
-    }
+            _planWorkOrderService = planWorkOrderService;
+            _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkPlanMaterialRepository= planWorkPlanMaterialRepository;
+            _procBomDetailRepository= procBomDetailRepository;
+            _manuRequistionOrderRepository= manuRequistionOrderRepository;
+            _manuRequistionOrderDetailRepository= manuRequistionOrderDetailRepository;
+        }
 
 
         /// <summary>
@@ -527,6 +551,47 @@ namespace Hymson.MES.Services.Services.Process
             //实体到DTO转换 装载数据
             List<ProcMaterialDto> procMaterialDtos = PrepareProcMaterialDtos(pagedInfo);
 
+
+
+            // 查询工单信息
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(procMaterialPagedQueryDto.WorkId);
+
+            // 查询生产计划：指定生产计划未找到,工单编码为：【{WorkOrder}】。
+            var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+
+            // 查询生产计划物料
+            var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+            {
+                SiteId = planWorkOrderEntity.SiteId,
+                PlanId = planWorkPlanEntity.Id,
+                PlanProductId = planWorkOrderEntity.WorkPlanProductId ?? 0
+            });
+
+            // 查询物料
+            var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkPlanMaterialEntities.Select(x => x.MaterialId));
+
+            var bomIds = planWorkPlanMaterialEntities.Select(x => x.BomId.GetValueOrDefault()).Distinct().ToArray();
+
+            // 查询bom详情
+            var procBomDetailEntities = await _procBomDetailRepository.GetByIdsAsync(bomIds);
+
+            IEnumerable<ManuRequistionOrderDetailEntity> requistionOrderDetailEntities = new List<ManuRequistionOrderDetailEntity>();
+            // 查找领料单集合
+            var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.Id, planWorkOrderEntity.SiteId);
+            if (requistionOrderEntities.Any())
+            {
+                requistionOrderDetailEntities = await _manuRequistionOrderDetailRepository.GetManuRequistionOrderDetailEntitiesAsync(new ManuRequistionOrderDetailQuery
+                {
+                    SiteId = planWorkOrderEntity.SiteId,
+                    RequistionOrderIds = requistionOrderEntities.Select(r => r.Id).ToArray(),
+                });
+            }
+
+
+            // 根据工单ID，查询生产领料单信息（manu_requistion_order）,获取物料的已领数量
+            var materialHavePickings = await _planWorkOrderService.GetPickDetailByOrderIdByScwAsync(planWorkOrderEntity.Id);
+
             //获取物料组信息
             foreach (var item in procMaterialDtos)
             {
@@ -556,15 +621,50 @@ namespace Hymson.MES.Services.Services.Process
                     item.QuantityResidue = 0;
                 }
 
-                //2024.11.21确认：1.待领料数量 = 需求数量 - 已领料数量。
+                //2024.11.21确认：1.待领料数量 = 需求数量 - 已领料数量。【工单列表，点击领料按钮，进入工单Bom领料页面，新增一行后，点击物料后的弹出框加载物料列表，所调方法】
                 //2.需求数量 = 子件单件用量 *（1 + 子件损耗 / 100）*生产工单数量。
                 //3.已领料数量 = 根据当前工单和当前物料计算已领料数量之和，领料状态需除去申请取消的
 
-                //赋值物料的需求数量【需求数量 = 子件单件用量 *（1 + 子件损耗 / 100）*生产工单数量。】
+                var procMaterialEntity = procMaterialEntities.FirstOrDefault(f => f.Id == item.Id);
+                if (procMaterialEntity == null) continue;
 
-                //赋值物料的已领数量【已领料数量 = 根据当前工单和当前物料计算已领料数量之和，领料状态需除去申请取消的】
+                var procBomDetailEntitie = procBomDetailEntities.FirstOrDefault(f => f.MaterialId == item.Id);
+                if (procBomDetailEntitie != null && procBomDetailEntitie.BomProductType == ManuProductTypeEnum.ByProduct) continue;
 
-                //赋值物料的待领数量【待领料数量 = 需求数量 - 已领料数量】
+                //赋值物料的需求数量【需求数量 = 子件单件用量 *（1 + 子件损耗 / 100）* 生产工单数量。】
+                var materialNeedQty = 0M;
+                if (procBomDetailEntitie != null)
+                {
+                    materialNeedQty = (decimal)(procBomDetailEntitie.Usages * (1 + procBomDetailEntitie.Loss / 100) * planWorkOrderEntity.Qty);
+                }
+
+                //赋值物料的已领料数量【已领料数量 = 根据当前工单和当前物料计算已领料数量之和，领料状态需除去申请取消的】
+
+                var havePickingQty = 0M;
+                if (materialHavePickings != null && materialHavePickings.Any())
+                {
+                    foreach (var materialHavePicking in materialHavePickings)
+                    {
+                        if (materialHavePicking.MaterialCode == procMaterialEntity.MaterialCode)
+                        {
+                            havePickingQty = materialHavePicking.Qty;
+                            break;
+                        }
+                    }
+                }
+
+                //赋值物料的待领料数量【待领料数量 = 需求数量 - 已领料数量】
+                var waitPickingQty = materialNeedQty - havePickingQty;
+                if (waitPickingQty < 0)
+                {
+                    waitPickingQty = 0;
+                }
+
+                item.WaitPickingQty = waitPickingQty;
+
+                item.HavePickingQty = havePickingQty;
+
+                item.MaterialNeedQty = materialNeedQty;
 
 
             }

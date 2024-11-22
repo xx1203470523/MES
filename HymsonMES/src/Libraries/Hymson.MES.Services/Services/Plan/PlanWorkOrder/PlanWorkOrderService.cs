@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Warehouse;
+using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -23,6 +24,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
@@ -715,27 +717,34 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         public async Task<List<ManuRequistionOrderDetailDto>> GetPickDetailByOrderIdAsync(long workOrderId)
         {
             var details = new List<ManuRequistionOrderDetailDto>();
+            //根据工单ID，查询工单信息（plan_work_order）
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
             if (planWorkOrderEntity == null)
             {
                 return details;
             }
 
+            //根据工单ID，查询生产领料单信息（manu_requistion_order）
             var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.Id, planWorkOrderEntity.SiteId);
             if (requistionOrderEntities == null || !requistionOrderEntities.Any())
             {
                 return details;
             }
 
+            //组装生产领料单ID集合
             var requistionOrderIds = requistionOrderEntities.Select(x => x.Id).ToArray();
+            //根据生产领料单ID，查询生产领料单明细信息（manu_requistion_order_detail）
             var manuRequistionOrderDetails = await _manuRequistionOrderDetailRepository.GetManuRequistionOrderDetailEntitiesAsync(new ManuRequistionOrderDetailQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 RequistionOrderIds = requistionOrderIds
             });
 
+            //组装物料ID集合
             var materialIds = manuRequistionOrderDetails.Select(x => x.MaterialId).ToArray();
+            //根据物料ID集合，获取物料列表
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(materialIds);
+
             foreach (var item in manuRequistionOrderDetails)
             {
                 var requistionOrder = requistionOrderEntities.FirstOrDefault(x => x.Id == item.RequistionOrderId);
@@ -752,6 +761,66 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                     PickTime = requistionOrder?.CreatedOn ?? item.CreatedOn,
                     Status = requistionOrder?.Status,
                     CreatedBy = requistionOrder?.CreatedBy ?? "-"
+                });
+            }
+            return details;
+        }
+
+
+        /// <summary>
+        /// 根据工单查询领料明细
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        public async Task<List<ManuRequistionOrderDetailByScwDto>> GetPickDetailByOrderIdByScwAsync(long workOrderId)
+        {
+            var details = new List<ManuRequistionOrderDetailByScwDto>();
+            //根据工单ID，查询工单信息（plan_work_order）
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
+            if (planWorkOrderEntity == null)
+            {
+                return details;
+            }
+
+            //根据工单ID，查询生产领料单信息（manu_requistion_order），领料状态需除去【5-申请取消】的
+            var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeByScwAsync(planWorkOrderEntity.Id, planWorkOrderEntity.SiteId);
+            if (requistionOrderEntities == null || !requistionOrderEntities.Any())
+            {
+                return details;
+            }
+
+            //组装生产领料单ID集合
+            var requistionOrderIds = requistionOrderEntities.Select(x => x.Id).ToArray();
+            //根据生产领料单ID，查询生产领料单明细信息（manu_requistion_order_detail）
+            var manuRequistionOrderDetails = await _manuRequistionOrderDetailRepository.GetManuRequistionOrderDetailEntitiesAsync(new ManuRequistionOrderDetailQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                RequistionOrderIds = requistionOrderIds
+            });
+
+            //组装物料ID集合
+            var materialIds = manuRequistionOrderDetails.Select(x => x.MaterialId).ToArray();
+            //根据物料ID集合，获取物料列表
+            var procMaterials = await _procMaterialRepository.GetByIdsAsync(materialIds);
+
+            //遍历工单Bom领料的物料列表
+            foreach (var procMaterial in procMaterials)
+            {
+                var detailQty = 0M;
+                //便利工单领料记录的物料记录
+                foreach (var item in manuRequistionOrderDetails)
+                {
+                    //计算
+                    var material = procMaterials.FirstOrDefault(x => x.Id == item.MaterialId);
+                    if (material != null && procMaterial.MaterialCode == material.MaterialCode)
+                    {
+                        detailQty += item.Qty;
+                    }
+                }
+                details.Add(new ManuRequistionOrderDetailByScwDto
+                {
+                    MaterialCode = procMaterial.MaterialCode,
+                    Qty = detailQty,
                 });
             }
             return details;
