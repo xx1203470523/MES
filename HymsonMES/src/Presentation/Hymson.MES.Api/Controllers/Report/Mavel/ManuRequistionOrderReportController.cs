@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,6 +48,31 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<PagedInfo<ReportRequistionOrderResultDto>> QueryPagedListAsync([FromQuery] ReportRequistionOrderQueryDto pagedQueryDto)
         {
             return await _manuRequistionOrderReportService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 查询仓库地址分组
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("warehouselist")]
+        [AllowAnonymous]
+        public async Task<List<ManuRequistionOrderGroupDto>> GetWarehouseListAsync()
+        {
+            return await _manuRequistionOrderReportService.GetWarehouseListAsync();
+        }
+
+        /// <summary>
+        /// 导出信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<NioPushCollectionExportResultDto> ExprotComUsagePageListAsync([FromQuery] ReportRequistionOrderQueryDto param)
+        {
+            return await _manuRequistionOrderReportService.ExprotAsync(param);
         }
 
     }

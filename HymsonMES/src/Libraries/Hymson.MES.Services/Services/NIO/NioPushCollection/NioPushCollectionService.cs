@@ -1,20 +1,26 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.NioPushCollection;
 using Hymson.MES.Core.NIO;
 using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.NIO.NioPushCollection.View;
 using Hymson.MES.Data.Repositories.NioPushCollection;
 using Hymson.MES.Data.Repositories.NioPushCollection.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.NioPushCollection;
+using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -37,6 +43,7 @@ namespace Hymson.MES.Services.Services.NioPushCollection
         /// </summary>
         private readonly ICurrentSite _currentSite;
 
+        private readonly IExcelService _excelService;
         /// <summary>
         /// 参数验证器
         /// </summary>
@@ -57,22 +64,31 @@ namespace Hymson.MES.Services.Services.NioPushCollection
         /// </summary>
         private readonly INioPushRepository _nioPushRepository;
 
+        private readonly ILocalizationService _localizationService;
+        private readonly IMinioService _minioService;
+
         /// <summary>
         /// 
         /// </summary>
         public NioPushCollectionService(ICurrentUser currentUser, 
-            ICurrentSite currentSite, 
+            ICurrentSite currentSite,
+            IExcelService excelService,
             AbstractValidator<NioPushCollectionSaveDto> validationSaveRules, 
             INioPushCollectionRepository nioPushCollectionRepository,
             IProcProductParameterGroupRepository procProductParameterGroupRepository,
+            ILocalizationService localizationService,
+            IMinioService minioService,
             INioPushRepository nioPushRepository)
         {
+            _excelService = excelService;
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _nioPushCollectionRepository = nioPushCollectionRepository;
             _procProductParameterGroupRepository = procProductParameterGroupRepository;
             _nioPushRepository = nioPushRepository;
+            _localizationService = localizationService;
+            _minioService = minioService;
         }
 
 
@@ -255,6 +271,75 @@ namespace Hymson.MES.Services.Services.NioPushCollection
            if (nioPushCollectionEntity == null) return null;
            
            return nioPushCollectionEntity.ToModel<NioPushCollectionDto>();
+        }
+
+        /// <summary>
+        /// 根据查询条件导出参数数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<NioPushCollectionExportResultDto> ExprotNioPushPageListAsync(NioPushCollectionPagedQueryDto pagedQueryDto)
+        {
+            
+            if (pagedQueryDto.CreatedOn == null)
+            {
+                string nowStr = HymsonClock.Now().ToString("yyyy-MM-dd 00:00:00");
+                DateTime now = Convert.ToDateTime(nowStr);
+                DateTime[] dateArr = new DateTime[] { now, now.AddDays(1) };
+                pagedQueryDto.CreatedOn = dateArr;
+            }
+            var pagedQuery = pagedQueryDto.ToQuery<NioPushCollectionPagedQuery>();
+            pagedQuery.PageSize = 1000;
+            //pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfoList = await _nioPushCollectionRepository.GetPagedListAsync(pagedQuery);
+            var dtos = await CheckParamStatusAsync(pagedInfoList);
+
+            // 实体到DTO转换 装载数据
+            //var dtos = pagedInfo.Data.Select(s => s.ToModel<NioPushCollectionDto>());
+            
+            var pagedInfo = new PagedInfo<NioPushCollectionDto>(dtos, pagedInfoList.PageIndex, pagedInfoList.PageSize, pagedInfoList.TotalCount);
+
+            //实体到DTO转换 装载数据
+            List<NioPushCollectionExportDto> listDto = new();
+
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("NioPushCollection"), _localizationService.GetResource("NioPushCollection"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new NioPushCollectionExportResultDto
+                {
+                    FileName = _localizationService.GetResource("NioPushCollection"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            foreach (var item in pagedInfo.Data)
+            {
+                listDto.Add(new NioPushCollectionExportDto()
+                {
+                    VendorProductSn = item.VendorProductSn ?? "",
+                    VendorProductTempSn = item.VendorProductTempSn ?? "",
+                    Status = item.Status,
+                    VendorFieldCode = item.VendorFieldCode ?? "",
+                    ParameterName = item.ParameterName ?? "",
+                    DecimalValue = item.DecimalValue ?? 0,
+                    UpperLimit = item.UpperLimit ?? 0,
+                    LowerLimit = item.LowerLimit ?? 0,
+                    CenterValue = item.CenterValue ?? 0,
+                    ProcedureName = item.ProcedureName ?? ""
+                });
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("NioPushCollection"), _localizationService.GetResource("NioPushCollection"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new NioPushCollectionExportResultDto
+            {
+                FileName = _localizationService.GetResource("NioPushCollection"),
+                Path = uploadResult.AbsoluteUrl,
+            };
+
         }
 
         /// <summary>

@@ -56,14 +56,14 @@ namespace Hymson.MES.Api
         {
             try
             {
-                await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] {
-                 ServiceTypeEnum.User,
-                 ServiceTypeEnum.MES
-                }, stoppingToken);
-                await _resourceService.InitEnumAsync();
-                await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
-                await InitExcelDtoAsync();
-                await _resourceService.HotLoadingAsync();
+                //await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] {
+                // ServiceTypeEnum.User,
+                // ServiceTypeEnum.MES
+                //}, stoppingToken);
+                //await _resourceService.InitEnumAsync();
+                //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
+                //await InitExcelDtoAsync();
+                //await _resourceService.HotLoadingAsync();
             }
             catch (Exception e)
             {

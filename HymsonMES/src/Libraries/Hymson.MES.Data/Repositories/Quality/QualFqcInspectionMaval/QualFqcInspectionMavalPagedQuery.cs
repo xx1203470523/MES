@@ -19,5 +19,10 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// </summary>
         public long SiteId { get; set; }
 
+        /// <summary>
+        /// 不合格原因
+        /// </summary>
+        public string? Remark { get; set; }
+
     }
 }

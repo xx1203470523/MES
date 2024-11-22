@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Services.NioPushCollection;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -94,6 +96,19 @@ namespace Hymson.MES.Api.Controllers.NioPushCollection
         public async Task<PagedInfo<NioPushCollectionDto>> QueryPagedListAsync([FromQuery] NioPushCollectionPagedQueryDto pagedQueryDto)
         {
             return await _nioPushCollectionService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 导出信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<NioPushCollectionExportResultDto> ExprotComUsagePageListAsync([FromQuery] NioPushCollectionPagedQueryDto param)
+        {
+            return await _nioPushCollectionService.ExprotNioPushPageListAsync(param);
         }
 
     }
