@@ -80,7 +80,7 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
-        /// 读取工单物料清单
+        /// 工单列表，点击领料按钮，进入工单Bom领料页面，加载物料列表所调的方法
         /// </summary>
         /// <param name="workId"></param>
         /// <param name="inputQty"></param>
@@ -96,7 +96,7 @@ namespace Hymson.MES.Api.Controllers.Process
 
 
         /// <summary>
-        /// 读取工单物料清单
+        /// 读取工单物料清单,工单Bom领料页面，切换选择仓库后，根据工单id和仓库编码获取物料列表
         /// </summary>
         /// <param name="workId"></param>
         /// <param name="inputQty"></param>

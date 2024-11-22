@@ -84,6 +84,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByOrderIdSql, new { WorkOrderId = orderId, SiteId = siteId });
         }
 
+        public async Task<IEnumerable<ManuRequistionOrderEntity>> GetByOrderCodeByScwAsync(long orderId, long siteId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByOrderIdByScwSql, new { WorkOrderId = orderId, SiteId = siteId });
+        }
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -253,6 +259,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
 
         const string GetByCodeSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND ReqOrderCode = @ReqOrderCode and SiteId=@SiteId ";
         const string GetByOrderIdSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId and SiteId=@SiteId ";
+        const string GetByOrderIdByScwSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND Status != 5 AND WorkOrderId = @WorkOrderId and SiteId=@SiteId ";
         #endregion
     }
 }
