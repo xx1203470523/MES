@@ -170,6 +170,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         }
 
         /// <summary>
+        /// 仓库Code分组名称
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<ManuRequistionOrderCodeGroupDto>> GetManuRequistionOrderCodeGroupListAsync()
+        {
+            string sql = "select WarehouseCode from manu_product_receipt_order_detail where WarehouseCode is not null GROUP BY WarehouseCode ";
+            using var conn = GetMESDbConnection();
+            var dbListTask = conn.QueryAsync<ManuRequistionOrderCodeGroupDto>(sql);
+            var dbList = await dbListTask;
+            var list = dbList as List<ManuRequistionOrderCodeGroupDto>;
+            list.Insert(0, new ManuRequistionOrderCodeGroupDto());
+            return list;
+        }
+
+        /// <summary>
         /// 仓库分组名称
         /// </summary>
         /// <returns></returns>

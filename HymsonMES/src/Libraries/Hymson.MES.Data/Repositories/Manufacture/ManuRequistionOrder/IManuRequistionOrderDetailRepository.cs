@@ -96,6 +96,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         Task<List<ManuRequistionOrderGroupDto>> GetManuRequistionOrderGroupListAsync();
 
         /// <summary>
+        /// 仓库Code分组名称
+        /// </summary>
+        /// <returns></returns>
+        Task<List<ManuRequistionOrderCodeGroupDto>> GetManuRequistionOrderCodeGroupListAsync();
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuRequistionOrderDetailPagedQuery"></param>

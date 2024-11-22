@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +42,19 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<PagedInfo<ReportBoxResultDto>> QueryPagedListAsync([FromQuery] ReportBoxQueryDto pagedQueryDto)
         {
             return await _manuBoxReportService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 导出信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<NioPushCollectionExportResultDto> ExprotComUsagePageListAsync([FromQuery] ReportBoxQueryDto param)
+        {
+            return await _manuBoxReportService.ExprotAsync(param);
         }
 
     }

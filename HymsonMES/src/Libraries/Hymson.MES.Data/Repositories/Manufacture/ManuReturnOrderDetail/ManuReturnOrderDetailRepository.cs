@@ -193,7 +193,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             string whereSql = string.Empty;
             if (string.IsNullOrEmpty(param.OrderCode) == false)
             {
-                whereSql += $" and t3.OrderCode = '{param.OrderCode}' ";
+                whereSql += $" and t3.OrderCode like '%{param.OrderCode}%' ";
             }
             if (string.IsNullOrEmpty(param.Warehouse) == false)
             {
@@ -222,7 +222,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             string sql = $@"
                 select t1.CreatedOn ReturnDate,t3.OrderCode ,t5.MaterialCode ,t5.MaterialName , t5.Specifications ,t6.Name Unit ,
-	                t3.Qty OrderQty,t1.Qty ReqQty, t4.WorkPlanCode , t2.Warehouse , t1.CreatedBy ,t2.Status ,  t2.ReturnOrderCode  ,t2.`Type` 
+	                t3.Qty OrderQty,t1.Qty ReqQty, t4.WorkPlanCode , t2.Warehouse ,t2.ReturnOrderCode, t1.CreatedBy ,t2.Status ,  t2.ReturnOrderCode  ,t2.`Type` 
                 from manu_return_order_detail t1
                 inner join manu_return_order t2 on t1.ReturnOrderId  = t2.Id and t2.IsDeleted = 0
                 inner join plan_work_order t3 on t3.Id = t2.WorkOrderId and t3.IsDeleted = 0

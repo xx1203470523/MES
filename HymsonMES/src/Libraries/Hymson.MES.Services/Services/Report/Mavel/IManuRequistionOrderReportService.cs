@@ -23,11 +23,19 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task<List<ManuRequistionOrderGroupDto>> GetWarehouseListAsync();
 
         /// <summary>
+        /// 查询仓库地址分组Code
+        /// </summary>
+        /// <returns></returns>
+        Task<List<ManuRequistionOrderCodeGroupDto>> GetWarehouseCodeListAsync();
+
+        /// <summary>
         /// 导出信息
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         Task<NioPushCollectionExportResultDto> ExprotAsync(ReportRequistionOrderQueryDto param);
+
+
 
     }
 }
