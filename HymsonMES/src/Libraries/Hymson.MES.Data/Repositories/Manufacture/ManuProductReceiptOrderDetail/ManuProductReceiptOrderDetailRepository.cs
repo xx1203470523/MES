@@ -230,7 +230,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             string whereSql = string.Empty;
             if (string.IsNullOrEmpty(param.OrderCode) == false)
             {
-                whereSql += $" and t4.OrderCode = '{param.OrderCode}' ";
+                whereSql += $" and t4.OrderCode like '%{param.OrderCode}%' ";
             }
             if (string.IsNullOrEmpty(param.WarehouseCode) == false)
             {

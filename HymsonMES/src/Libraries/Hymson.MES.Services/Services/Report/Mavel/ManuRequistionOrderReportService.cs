@@ -96,6 +96,16 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
+        /// 查询仓库地址分组Code
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<ManuRequistionOrderCodeGroupDto>> GetWarehouseCodeListAsync()
+        {
+            var pagedInfo = await _manuRequistionOrderDetailRepository.GetManuRequistionOrderCodeGroupListAsync();
+            return pagedInfo;
+        }
+
+        /// <summary>
         /// 根据查询条件导出参数数据
         /// </summary>
         /// <param name="param"></param>
@@ -116,6 +126,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Specifications = a.Specifications,
                 Unit = a.Unit,
                 OrderQty = a.OrderQty,
+                ReqOrderCode = a.ReqOrderCode,
                 ReqQty = a.ReqQty,
                 WorkPlanCode = a.WorkPlanCode ?? "",
                 Warehouse = a.Warehouse,
@@ -155,6 +166,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Specifications = item.Specifications,
                     Unit = item.Unit,
                     OrderQty = item.OrderQty,
+                    reqOrderCode = item.ReqOrderCode,
                     ReqQty = item.ReqQty,
                     WorkPlanCode = item.WorkPlanCode ?? "",
                     Warehouse = item.Warehouse,

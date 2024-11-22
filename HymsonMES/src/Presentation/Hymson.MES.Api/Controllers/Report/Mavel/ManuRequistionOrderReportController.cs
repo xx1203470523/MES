@@ -63,6 +63,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 查询仓库地址分组Code
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("warehousecodelist")]
+        [AllowAnonymous]
+        public async Task<List<ManuRequistionOrderCodeGroupDto>> GetWarehouseCodeListAsync()
+        {
+            return await _manuRequistionOrderReportService.GetWarehouseCodeListAsync();
+        }
+
+        /// <summary>
         /// 导出信息
         /// </summary>
         /// <param name="param"></param>
