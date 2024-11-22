@@ -152,10 +152,11 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("t1.*,t2.Status");
+            sqlBuilder.Select("t1.*,t2.Status,t3.ParameterName");
             sqlBuilder.OrderBy("t1.UpdatedOn DESC");
             sqlBuilder.Where("t1.IsDeleted = 0");
-            sqlBuilder.InnerJoin("nio_push t2 on t1.NioPushId = t2.Id and t2.IsDeleted = 0");
+            sqlBuilder.InnerJoin(" nio_push t2 on t1.NioPushId = t2.Id and t2.IsDeleted = 0 ");
+            sqlBuilder.InnerJoin(" proc_parameter t3 on t3.ParameterCode = t1.vendorFieldCode ");
             //sqlBuilder.Where("SiteId = @SiteId");
             if (string.IsNullOrEmpty(pagedQuery.VendorProductSn) == false)
             {
@@ -173,7 +174,7 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
             if (string.IsNullOrEmpty(pagedQuery.ParameterName) == false)
             {
                 pagedQuery.ParameterName = $"%{pagedQuery.ParameterName}%";
-                sqlBuilder.Where("t1.ParameterName LIKE @ParameterName");
+                sqlBuilder.Where("t3.ParameterName LIKE @ParameterName");
             }
             if (string.IsNullOrEmpty(pagedQuery.StationId) == false)
             {
