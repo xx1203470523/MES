@@ -104,7 +104,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         }
 
         /// <summary>
-        /// 查询List
+        /// 根据生产领料单ID，查询生产领料单明细信息（manu_requistion_order_detail）
         /// </summary>
         /// <param name="manuRequistionOrderDetailQuery"></param>
         /// <returns></returns>

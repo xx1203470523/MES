@@ -46,7 +46,7 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
-        /// 分页查询列表（物料维护）
+        /// 工单列表，点击领料按钮，进入工单Bom领料页面，新增一行后，点击物料后的弹出框加载物料列表，所调方法
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>

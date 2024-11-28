@@ -42,6 +42,21 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal QuantityResidue { get; set; }
 
         /// <summary>
+        /// 待领料数量
+        /// </summary>
+        public decimal WaitPickingQty { get; set; }
+
+        /// <summary>
+        /// 已领料数量
+        /// </summary>
+        public decimal HavePickingQty { get; set; }
+
+        /// <summary>
+        /// 需求数量
+        /// </summary>
+        public decimal MaterialNeedQty { get; set; }
+
+        /// <summary>
         /// 规格型号
         /// </summary>
         public string Specifications { get; set; }
@@ -516,6 +531,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 库存编码
         /// </summary>
         public string? Warehouse { get; set; } = "";
+
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long WorkId { get; set; }
 
         /// <summary>
         /// 版本

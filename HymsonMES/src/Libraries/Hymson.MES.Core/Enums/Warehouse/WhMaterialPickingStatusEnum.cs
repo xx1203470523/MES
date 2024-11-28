@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums.Warehouse
 {
     /// <summary>
-    /// 退料单状态 1、申请成功待发料 2、发料中 3、发料完成 4、取消发料 5、退料入库完成 6、取消退料
+    /// 领料状态 1、申请成功待发料 2、发料中 3、发料完成 4、取消发料 5、取消申请
     /// </summary>
     public enum WhMaterialPickingStatusEnum : sbyte
     {

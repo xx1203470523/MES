@@ -68,6 +68,24 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
     /// <summary>
+    /// 领料明细
+    /// </summary>
+    public record ManuRequistionOrderDetailByScwDto
+    {
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 领料数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+    }
+
+    /// <summary>
     /// 领料导出
     /// </summary>
     public record ManuRequistionOrderExportDto : BaseExcelDto
@@ -120,7 +138,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         [EpplusTableColumn(Header = "工单数量", Order = 8)]
         public int OrderQty { get; set; }            // t3.Qty
-                                                     // 
+                                                     //
         /// <summary>
         /// 领料单号
         /// </summary>
@@ -137,25 +155,25 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 来源订单号
         /// </summary>
         [EpplusTableColumn(Header = "来源订单号", Order = 11)]
-        public string WorkPlanCode { get; set; }     // t4.WorkPlanCode  
+        public string WorkPlanCode { get; set; }     // t4.WorkPlanCode
 
         /// <summary>
         /// 仓库
         /// </summary>
         [EpplusTableColumn(Header = "仓库", Order = 12)]
-        public string Warehouse { get; set; }        // t2.Warehouse  
+        public string Warehouse { get; set; }        // t2.Warehouse
 
         /// <summary>
         /// 申请人
         /// </summary>
         [EpplusTableColumn(Header = "申请人", Order = 13)]
-        public string CreatedBy { get; set; }        // t1.CreatedBy  
+        public string CreatedBy { get; set; }        // t1.CreatedBy
 
         /// <summary>
         /// 领料状态
         /// </summary>
         [EpplusTableColumn(Header = "领料状态", Order = 14)]
-        public WhMaterialPickingStatusEnum Status { get; set; }           // t2.Status  
+        public WhMaterialPickingStatusEnum Status { get; set; }           // t2.Status
 
     }
 
@@ -169,51 +187,51 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 退料日期
         /// </summary>
         [EpplusTableColumn(Header = "退料日期", Order = 1)]
-        public DateTime ReturnDate { get; set; }        // t4.CreatedOn  
+        public DateTime ReturnDate { get; set; }        // t4.CreatedOn
 
-       
+
         /// <summary>
         /// 生产工单号
         /// </summary>
         [EpplusTableColumn(Header = "生产工单号", Order = 2)]
-        public string OrderCode { get; set; }        // t3.OrderCode  
-       
+        public string OrderCode { get; set; }        // t3.OrderCode
+
         /// <summary>
         /// 物料编码
         /// </summary>
         [EpplusTableColumn(Header = "物料编码", Order = 3)]
-        public string MaterialCode { get; set; }     // t5.MaterialCode  
+        public string MaterialCode { get; set; }     // t5.MaterialCode
 
         /// <summary>
         /// 物料名称
         /// </summary>
         [EpplusTableColumn(Header = "物料名称", Order = 4)]
-        public string MaterialName { get; set; }     // t5.MaterialName  
+        public string MaterialName { get; set; }     // t5.MaterialName
 
         /// <summary>
         /// 规格型号
         /// </summary>
         [EpplusTableColumn(Header = "规格型号", Order = 5)]
-        public string Specifications { get; set; }   // t5.Specifications  
+        public string Specifications { get; set; }   // t5.Specifications
 
         /// <summary>
         /// 单位
         /// </summary>
         [EpplusTableColumn(Header = "单位", Order = 6)]
-        public string Unit { get; set; }             // t6.Name  
+        public string Unit { get; set; }             // t6.Name
 
-        
+
        /// <summary>
        /// 工单数量
        /// </summary>
        [EpplusTableColumn(Header = "工单数量", Order = 7)]
-       public int OrderQty { get; set; }            // t3.Qty  
+       public int OrderQty { get; set; }            // t3.Qty
 
         /// <summary>
         /// 退料数量
         /// </summary>
         [EpplusTableColumn(Header = "退料数量", Order = 8)]
-       public int ReqQty { get; set; }              // t1.Qty  
+       public int ReqQty { get; set; }              // t1.Qty
 
         /// <summary>
         /// 退料单号
@@ -226,28 +244,28 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// 来源订单号
        /// </summary>
        [EpplusTableColumn(Header = "来源订单号", Order = 10)]
-       public string WorkPlanCode { get; set; }     // t4.WorkPlanCode  
+       public string WorkPlanCode { get; set; }     // t4.WorkPlanCode
 
        /// <summary>
        /// 仓库
        /// </summary>
        [EpplusTableColumn(Header = "仓库", Order = 11)]
-       public string Warehouse { get; set; }        // t2.Warehouse  
+       public string Warehouse { get; set; }        // t2.Warehouse
 
        /// <summary>
        /// 申请人
        /// </summary>
        [EpplusTableColumn(Header = "申请人", Order = 12)]
-       public string CreatedBy { get; set; }        // t1.CreatedBy  
+       public string CreatedBy { get; set; }        // t1.CreatedBy
 
        /// <summary>
        /// 领料状态
        /// </summary>
        [EpplusTableColumn(Header = "领料状态", Order = 13)]
-       public WhWarehouseMaterialReturnStatusEnum Status { get; set; }           // t2.Status  
+       public WhWarehouseMaterialReturnStatusEnum Status { get; set; }           // t2.Status
 
     }
-    
+
     /// <summary>
     /// 成品入库
     /// </summary>
