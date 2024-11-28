@@ -832,6 +832,38 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     }
 
     /// <summary>
+    /// 取消成品入库ByScw
+    /// </summary>
+    public record CancelProductReceiptApplyByScwDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 派工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 成品入库单号
+        /// </summary>
+        public string CompletionOrderCode { get; set; }
+
+        /// <summary>
+        /// 唯一码
+        /// </summary>
+        public string UniqueCode { get; set; } = "";
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Quantity { get; set; }
+
+        /// <summary>
+        /// MES明细ID
+        /// </summary>
+        public long SyncId { get; set; }
+
+    }
+
+    /// <summary>
     /// 废成品入库申请
     /// </summary>
     public record WasteProductReceiptRequest

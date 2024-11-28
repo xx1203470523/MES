@@ -145,6 +145,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public record ManuProductReceiptOrderDetailDto : BaseEntityDto
     {
         /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 箱号编码
         /// </summary>
         public string ContaineCode { get; set; }
