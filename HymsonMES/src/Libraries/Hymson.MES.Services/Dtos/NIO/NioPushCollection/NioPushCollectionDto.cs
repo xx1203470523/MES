@@ -654,9 +654,9 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         public decimal CenterValue { get; set; }
 
         /// <summary>
-        /// 工序
+        /// 工序名称
         /// </summary>
-        [EpplusTableColumn(Header = "工序", Order = 10)]
+        [EpplusTableColumn(Header = "工序名称", Order = 10)]
         public string ProcedureName { get; set; }
 
         
