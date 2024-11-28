@@ -2,11 +2,13 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
+using Hymson.MES.CoreServices.Services.SysSetting;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -24,6 +26,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using System.Configuration;
 using System.Text.Json;
 
 namespace Hymson.MES.EquipmentServices.Services.OutBound
@@ -58,6 +61,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         private readonly IManuSfcStepMaterialRepository _manuSfcStepMaterialRepository;
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
+        private readonly ISysSettingService _sysSettingService;
 
         public OutBoundService(AbstractValidator<OutBoundDto> validationOutBoundDtoRules,
             ICurrentEquipment currentEquipment,
@@ -79,7 +83,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             IInteWorkCenterRepository inteWorkCenterRepository,
             IManuSfcStepMaterialRepository manuSfcStepMaterialRepository,
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
-            IManuSfcSummaryRepository manuSfcSummaryRepository)
+            IManuSfcSummaryRepository manuSfcSummaryRepository,
+            ISysSettingService sysSettingService)
         {
             _validationOutBoundDtoRules = validationOutBoundDtoRules;
             _currentEquipment = currentEquipment;
@@ -102,6 +107,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             _manuSfcStepMaterialRepository = manuSfcStepMaterialRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
+            _sysSettingService = sysSettingService;
         }
         #endregion
 
@@ -177,6 +183,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 ResourceId = procResource.Id
             };
 
+            //获取全局配置
+            var settings = await _sysSettingService.GetSettingsAsync();
+
             //根据设备资源获取工序
             //根据资源获取工序
             var procedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new() { ResourceId = procResource.Id, SiteId = _currentEquipment.SiteId })
@@ -223,15 +232,20 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(sfcs);
             //查询已经存在条码的生产信息
             var sfcProduceList = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = sfcs, SiteId = _currentEquipment.SiteId });
+
             //如果有不存在的SFC就提示
             var noIncludeSfcs = sfcs.Where(sfc => sfclist.Select(s => s.SFC).Contains(sfc) == false);
             if (noIncludeSfcs.Any() == true)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", string.Join(',', noIncludeSfcs));
 
             //SFC有条码信息，但已经没有生产信息不允许出站
-            var noProduceSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC).Contains(w.SFC) == false).Select(p => p.SFC);
-            if (noProduceSfcs.Any())
-                throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs));
+            //过站不校验
+            if (outBoundMoreDto.SFCs.Any(a => !a.IsPassingStation))
+            {
+                var noProduceSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC).Contains(w.SFC) == false).Select(p => p.SFC);
+                if (noProduceSfcs.Any())
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs));
+            }
 
             //排队中的条码没进站不允许出站
             if (sfcProduceList.Any())
@@ -257,27 +271,35 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 if (outBoundMoreSfcs.Any())
                     throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
-            //保存条码当前所在工序,出站条码去一个即可
-            var currentProcedureId = sfcProduceList.OrderByDescending(x => x.CreatedOn).First().ProcedureId;
+
+            //保存条码当前所在工序,出站条码去一个即可(如果是没有在制信息，直接根据进站工序创建在制)
+            var current = sfcProduceList.OrderByDescending(x => x.CreatedOn).FirstOrDefault();
+            var currentProcedureId = current?.ProcedureId ?? procedureEntity.Id;
+
 
             //查询已有汇总信息
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
                 SiteId = _currentEquipment.SiteId,
-                EquipmentId = _currentEquipment.Id,
                 //ProcedureIds = new long[] { currentProcedureId },
                 SFCS = sfclist.Select(c => c.SFC).ToArray()
             };
 
+            //Pack下线校验：这些工序信息是必要的
+            var validateCodes = new string[] { "OP26", "OP27", "OP28","OP31" };
+            //var validateIds = procedureEntities.Where(a => validateCodes.Equals(a.Code)).Select(a => a.Id).ToList();
+            var validateIds = new long[] { 20033660099489792, 20033672697081856, 20033684928720896,  22309642103046144 };
+
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
-            var procedureIds = manuSfcSummaryEntities.Select(a => a.ProcedureId).ToArray();
-            var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds);
+            var procedureIds = manuSfcSummaryEntities.Select(a => a.ProcedureId).ToList();
+            procedureIds.AddRange(validateIds);
+            var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds.ToArray());
 
             var equipmentManuSfcSummaryEntities = manuSfcSummaryEntities.Where(a => a.EquipmentId == _currentEquipment.Id && a.SiteId == _currentEquipment.SiteId);
 
             //获取条码绑定信息
             var barcodes = outBoundMoreDto.SFCs.Select(a => a.SFC).ToArray();
-            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new() { CirculationBarCodes = barcodes });
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new() { CirculationBarCodes = barcodes,SiteId = _currentEquipment.SiteId });
 
             //条码流转信息
             List<ManuSfcCirculationEntity> manuSfcCirculationCommand = new List<ManuSfcCirculationEntity>();
@@ -292,10 +314,24 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 var sfcEntity = sfclist.Where(c => c.SFC == outBoundSFCDto.SFC).First();
                 //var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC && c.WorkOrderId == planWorkOrderEntity.Id).FirstOrDefault();
+
+                //过站不生成在制（进站时在创建在制，允许下线后从过站工序进站）
                 var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC).FirstOrDefault();
                 if (sfcProduceEntity == null)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18023)).WithData("SFC", outBoundSFCDto.SFC).WithData("OrderCode", planWorkOrderEntity.OrderCode);
+                    sfcProduceEntity = new()
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentEquipment.SiteId,
+                        ProcedureId = procedureEntity.Id,
+                        ResourceId = procResource.Id,
+                        SFC = sfcEntity.SFC,
+                        WorkOrderId = planWorkOrder.Id,
+                        ProductId = planWorkOrder.ProductId,
+                        ProcessRouteId = planWorkOrder.ProcessRouteId
+                    };
+
+                    //throw new CustomerValidationException(nameof(ErrorCode.MES18023)).WithData("SFC", outBoundSFCDto.SFC).WithData("OrderCode", planWorkOrderEntity.OrderCode);
                 }
                 //汇总信息
                 var manuSfcSummaryEntity = equipmentManuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC).FirstOrDefault();
@@ -330,19 +366,22 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 {
                     #region 严格按照工艺路线生产
 
-                    //过站没有进站动作，也需要校验部分进站逻辑
-                    // 校验设备资源对应的工序和在制工序是否一致
-                    if (procedureEntity.Id != sfcProduceEntity.ProcedureId)
+                    if (settings.StrictProductionFollowingTheProcessRoute)
                     {
-                        var msgSfc = outBoundMoreDto.SFCs.Select(a => a.SFC);
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19161)).WithData("SFC", string.Join(",", msgSfc));
+                        //过站没有进站动作，也需要校验部分进站逻辑
+                        // 校验设备资源对应的工序和在制工序是否一致
+                        if (procedureEntity.Id != sfcProduceEntity.ProcedureId)
+                        {
+                            var msgSfc = outBoundMoreDto.SFCs.Select(a => a.SFC);
+                            throw new CustomerValidationException(nameof(ErrorCode.MES19161)).WithData("SFC", string.Join(",", msgSfc));
+                        }
                     }
 
                     #endregion
 
                     #region Pack下线校验箱码绑定关系，前端是否出现NG，过站信息是否完全
 
-                    if (procedureEntity.Code == "OP29")
+                    if (procedureEntity.Code == "OP29" && settings.PackOfflineValidation)
                     {
                         var validateManuSfcSummaryEntities = manuSfcSummaryEntities.Where(a => a.QualityStatus == 0);
                         //如果下线存在不合格，则提示
@@ -362,20 +401,16 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                         if (bindModuleCount < 2) throw new CustomerDataException(ErrorCode.MES19163);
 
                         //校验Pack段是否有缺少的进出站记录
-                        //先写死，后续考虑做到全局配置中动态校验
-                        var validateCodes = new string[] { "OP26", "OP27", "OP28", "OP29", "OP31" };
-                        var validateIds = procedureEntities.Where(a => validateCodes.Equals(a.Code)).Select(a => a.Id).ToList();
-
                         //校验Pack段生产记录是否完整
-                        var manuSfcSummaryProcedureIds = manuSfcSummaryEntities.Select(a=>a.ProcedureId).ToList();
-                        var manuSfcSummaryValidateIds = validateIds.Where(a =>! manuSfcSummaryProcedureIds.Equals(a));
+                        var manuSfcSummaryProcedureIds = manuSfcSummaryEntities.Select(a => a.ProcedureId).ToList();
+                        var manuSfcSummaryValidateIds = validateIds.Where(a => !manuSfcSummaryProcedureIds.Contains(a));
 
                         if (manuSfcSummaryValidateIds?.Any() == true)
                         {
                             var manuSfcSummaryValidateId = manuSfcSummaryValidateIds.FirstOrDefault();
                             var procedureName = procedureEntities.Where(a => manuSfcSummaryValidateId == a.Id).Select(a => a.Name);
 
-                            throw new CustomerDataException(ErrorCode.MES19164).WithData("SFC",outBoundSFCDto.SFC)
+                            throw new CustomerDataException(ErrorCode.MES19164).WithData("SFC", outBoundSFCDto.SFC)
                                 .WithData("procedureName", procedureName);
                         }
 
@@ -587,10 +622,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 foreach (var entity in manuProductParameterEntities)
                 {
-                    var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == entity.SFC).First();
+                    var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == entity.SFC).FirstOrDefault();
+
                     entity.ProcedureId = currentProcedureId;
-                    entity.ProductId = sfcProduceEntity.ProductId;
-                    entity.WorkOrderId = sfcProduceEntity.WorkOrderId;
+                    entity.ProductId = sfcProduceEntity?.ProductId ?? planWorkOrder.ProductId;
+                    entity.WorkOrderId = sfcProduceEntity?.WorkOrderId ?? planWorkOrder.Id;
                 }
                 rows += await _manuProductParameterRepository.InsertsAsync(manuProductParameterEntities);
             }

@@ -5,6 +5,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Services.SysSetting;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteSFCBox;
@@ -14,6 +15,8 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.SysSetting;
+using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
@@ -57,6 +60,13 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
 
+        private readonly ISysSettingService _sysSettingService;
+
+        /// <summary>
+        /// 系统配置
+        /// </summary>
+        private readonly ISysSettingRepository _sysSettingRepository;
+
         public InBoundService(AbstractValidator<InBoundDto> validationInBoundDtoRules,
             ICurrentEquipment currentEquipment,
             AbstractValidator<InBoundMoreDto> validationInBoundMoreDtoRules,
@@ -75,7 +85,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
             IProcMaterialRepository procMaterialRepository,
-            IInteSFCBoxRepository inteSFCBoxRepository)
+            IInteSFCBoxRepository inteSFCBoxRepository,
+            ISysSettingRepository sysSettingRepository,
+            ISysSettingService sysSettingService)
         {
             _validationInBoundDtoRules = validationInBoundDtoRules;
             _currentEquipment = currentEquipment;
@@ -96,6 +108,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _procMaterialRepository = procMaterialRepository;
             _inteSFCBoxRepository = inteSFCBoxRepository;
+            _sysSettingRepository = sysSettingRepository;
+            _sysSettingService = sysSettingService;
         }
         #endregion
 
@@ -160,6 +174,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
 ;
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = inBoundMoreDto.ResourceCode });
+
+            //获取全局配置
+            var settings = await _sysSettingService.GetSettingsAsync();
 
             //查询资源和设备是否绑定
             var resourceEquipmentBindQuery = new ProcResourceEquipmentBindQuery
@@ -360,7 +377,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     //if (sfcProduceEntity.SFC.Contains("QAM") && procProcedure?.Code == "OP230") isCheck = false;
 
                     // 校验设备资源对应的工序和在制工序是否一直
-                    if (isCheck && procedureEntity.Id != sfcProduceEntity.ProcedureId)
+                    if (settings.StrictProductionFollowingTheProcessRoute && isCheck && procedureEntity.Id != sfcProduceEntity.ProcedureId)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES19161)).WithData("SFC", string.Join(",", inBoundMoreDto.SFCs));
                     }

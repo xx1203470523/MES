@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.SysSetting;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.SysSetting.Query;
+using Hymson.Utils;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.SysSetting
@@ -116,6 +117,8 @@ namespace Hymson.MES.Data.Repositories.SysSetting
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where(" IsDeleted = 0 ");
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<SysSettingEntity>(template.RawSql, query);
         }

@@ -694,6 +694,14 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProductionDetailsReportQueryDto, ProductionDetailsReportQuery>();
             CreateMap<ProductionDetailsReportPageQueryDto, ProductionDetailsReportPageQuery>();
 
+            CreateMap<PackTraceQueryDto, PackTraceQuery>();
+            CreateMap<PackTestQueryDto, PackTestQuery>();
+
+            CreateMap<PackTraceView,PackTraceOutputDto>();
+            CreateMap<PackTestView, PackTestOutputDto>();
+
+            CreateMap<PackTraceView, PackTraceExcelDto>();
+            CreateMap<PackTestView, PackTestExcelDto>();
         }
 
         /// <summary>

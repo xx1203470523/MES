@@ -25,6 +25,7 @@ using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Report;
+using Hymson.MES.Data.Repositories.SysSetting;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Microsoft.Extensions.Configuration;
 
@@ -274,7 +275,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IProductionDetailsReportRepository, ProductionDetailsReportRepository>();
 
+            services.AddSingleton<IPlanWorkOrderPackInfoRepository, PlanWorkOrderPackInfoRepository>();
+
             #endregion
+
+            services.AddSingleton<ISysSettingRepository, SysSettingRepository>();
 
             return services;
         }

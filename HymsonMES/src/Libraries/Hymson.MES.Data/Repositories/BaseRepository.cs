@@ -44,6 +44,11 @@ namespace Hymson.MES.Data.Repositories
             return conn;
         }
 
+        protected IDbConnection GetUserCenterConnection()
+        {
+            var conn = new MySqlConnection(_connectionOptions.UserCenterConnectionString);
+            return conn;
+        }
     }
 
     /// <summary>

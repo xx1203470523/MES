@@ -41,6 +41,7 @@
     <Folder Include="Repositories\Manufacture\ManuFacePlate\View\" />
     <Folder Include="Repositories\Plan\PlanWorkOrderBind\View\" />
     <Folder Include="Repositories\Process\PrintConfig\Command\" />
+    <Folder Include="Repositories\Report\Command\" />
   </ItemGroup>
 
 </Project>

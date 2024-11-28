@@ -61,6 +61,8 @@ using Microsoft.Extensions.Configuration;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Services.Report.PackTraceSfc;
 using Hymson.MES.Data.Repositories.Report;
+using Hymson.MES.Services.Services.Common;
+using Hymson.MES.Data.Repositories.SysSetting;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -95,6 +97,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
+            #region Common
+
+            services.AddSingleton<ICommonService,CommonService>();
+            services.AddSingleton<ISysSettingRepository, SysSettingRepository>();
+
+            #endregion
+
             #region Equipment
             services.AddSingleton<IEquConsumableService, EquConsumableService>();
             services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
@@ -315,6 +324,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProductionDetailsReportService, ProductionDetailsReportService>();
 
             #endregion
+
+            services.AddSingleton<IPlanWorkOrderPackInfoService, PlanWorkOrderPackInfoService>();
 
             #endregion
 

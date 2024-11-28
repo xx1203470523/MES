@@ -1,5 +1,7 @@
 ﻿using Hymson.Localization.Services;
+using Hymson.MES.Core.Domain.SysSetting;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Services.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -17,17 +19,14 @@ namespace Hymson.MES.Api.Controllers
     {
         private readonly IEnumService _enumService;
         private readonly IMemoryCache _memoryCache;
+        private readonly ICommonService _commonService;
 
-       
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="enumService"></param>
-        /// <param name="memoryCache"></param>
-        public CommonController(IEnumService enumService,IMemoryCache memoryCache)
+
+        public CommonController(IEnumService enumService, IMemoryCache memoryCache, ICommonService commonService)
         {
             _enumService = enumService;
             _memoryCache = memoryCache;
+            _commonService = commonService;
         }
 
         /// <summary>
@@ -111,6 +110,29 @@ namespace Hymson.MES.Api.Controllers
             _memoryCache.RemoveCacheRegex("&");
             return Ok();
 
+        }
+
+        /// <summary>
+        /// 获取系统全局配置列表
+        /// </summary>
+        /// <returns></returns>
+        [Route("settings")]
+        [HttpGet]
+        public async Task<IEnumerable<SysSettingEntity>> GetSettingsAsync()
+        {
+            return await _commonService.GetSettingsAsync();
+        }
+
+        /// <summary>
+        /// 保存系统配置
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        [Route("settings/save")]
+        [HttpPost]
+        public async Task SaveSettingsAsync(List<SysSettingDto> settings)
+        {
+            await _commonService.SaveSettingsAsync(settings);
         }
     }
 }

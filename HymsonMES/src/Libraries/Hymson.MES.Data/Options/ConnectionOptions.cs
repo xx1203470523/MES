@@ -15,5 +15,9 @@
         /// </summary>
         public string MESParamterConnectionString { get; set; } = "";
 
+        /// <summary>
+        /// 用户中心连接字符串
+        /// </summary>
+        public string UserCenterConnectionString { get; set; } = "";
     }
 }
