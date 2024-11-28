@@ -6,6 +6,7 @@
  *build datetime: 2023-03-20 10:07:17
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
 using System;
@@ -27,6 +28,20 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="param"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuProductBadRecordReportViewDto>> GetPageListAsync(BadRecordReportDto param);
+
+        /// <summary>
+        /// 根据查询条件导出参数数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<NioPushCollectionExportResultDto> ExprotAsync(BadRecordReportDto param);
+
+        /// <summary>
+        /// 根据查询条件导出参数数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<NioPushCollectionExportResultDto> LogExprotAsync(ManuProductBadRecordLogReportPagedQueryDto param);
 
         /// <summary>
         /// 查询前十的不良记录

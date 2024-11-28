@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Report;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Report
@@ -42,6 +44,19 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _workshopJobControlReportService.GetWorkshopJobControlPageListAsync(param);
         }
+
+        /// 导出信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<NioPushCollectionExportResultDto> ExprotAsync([FromQuery] WorkshopJobControlReportOptimizePagedQueryDto param)
+        {
+            return await _workshopJobControlReportService.ExprotAsync(param);
+        }
+        
 
         /// <summary>
         /// 获取SFC的车间作业控制步骤

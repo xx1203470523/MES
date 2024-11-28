@@ -1,6 +1,9 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Report;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Report
@@ -39,6 +42,32 @@ namespace Hymson.MES.Api.Controllers.Report
         public async Task<PagedInfo<ManuProductBadRecordReportViewDto>> QueryPagedBadRecordReportAsync([FromQuery] BadRecordReportDto parm)
         {
             return await _badRecordReportService.GetPageListAsync(parm);
+        }
+
+        /// <summary>
+        /// 导出信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<NioPushCollectionExportResultDto> ExprotComUsagePageListAsync([FromQuery] BadRecordReportDto param)
+        {
+            return await _badRecordReportService.ExprotAsync(param);
+        }
+
+        /// <summary>
+        /// 导出信息Log
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("exportLog")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<NioPushCollectionExportResultDto> ExprotLogComUsagePageListAsync([FromQuery] ManuProductBadRecordLogReportPagedQueryDto param)
+        {
+            return await _badRecordReportService.LogExprotAsync(param);
         }
 
         /// <summary>

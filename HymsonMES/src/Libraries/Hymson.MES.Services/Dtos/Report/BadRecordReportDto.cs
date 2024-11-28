@@ -1,6 +1,8 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -260,5 +262,128 @@ namespace Hymson.MES.Services.Dtos.Report
         public DateTime CreatedOn { get; set; }
     }
 
+    /// <summary>
+    /// 不合格报告导出
+    /// </summary>
+    public record ManuProductBadRecordReportViewExportDto : BaseExcelDto
+    {
+
+        /// <summary>
+        /// 不合格代码Id
+        /// </summary>
+        [EpplusTableColumn(Header = "不合格代码Id", Order = 1)]
+        public long UnqualifiedId { get; set; }
+
+        /// <summary>
+        /// 汇总数量
+        /// </summary>
+        [EpplusTableColumn(Header = "汇总数量", Order = 2)]
+        public int Num { get; set; }
+
+        /// <summary>
+        /// 百分比
+        /// </summary>
+        [EpplusTableColumn(Header = "百分比", Order = 3)]
+        public decimal Percentage { get; set; }
+
+        /// <summary>
+        /// 描述 :不合格代码 
+        /// 空值 : false  
+        /// </summary>
+        [EpplusTableColumn(Header = "百分比", Order = 4)]
+        public string UnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 描述 :不合格代码名称 
+        /// 空值 : false  
+        /// </summary>
+        [EpplusTableColumn(Header = "不合格代码名称", Order = 5)]
+        public string UnqualifiedCodeName { get; set; }
+
+    }
+
+    /// <summary>
+    /// 不合格日志报告导出
+    /// </summary>
+    public record ManuProductBadRecordLogReportViewExportDto : BaseExcelDto
+    {
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        [EpplusTableColumn(Header = "产品序列码", Order = 1)]
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        [EpplusTableColumn(Header = "产品编码", Order = 2)]
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        [EpplusTableColumn(Header = "产品名称", Order = 3)]
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        [EpplusTableColumn(Header = "工单", Order = 4)]
+        public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 发现工序
+        /// </summary>
+        [EpplusTableColumn(Header = "发现工序", Order = 5)]
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        [EpplusTableColumn(Header = "资源", Order = 6)]
+        public string ResCode { get; set; }
+
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        [EpplusTableColumn(Header = "不合格代码", Order = 7)]
+        public string UnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不合格类型
+        /// </summary>
+        [EpplusTableColumn(Header = "不合格类型", Order = 8)]
+        public QualUnqualifiedCodeTypeEnum UnqualifiedType { get; set; }
+
+        /// <summary>
+        /// 不良状态
+        /// </summary>
+        [EpplusTableColumn(Header = "不合格状态", Order = 9)]
+        public ProductBadRecordStatusEnum BadRecordStatus { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        [EpplusTableColumn(Header = "数量", Order = 10)]
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 录入人
+        /// </summary>
+        [EpplusTableColumn(Header = "操作人", Order = 11)]
+        public string CreatedBy { get; set; }
+
+
+        /// <summary>
+        /// 录入时间
+        /// </summary>
+        [EpplusTableColumn(Header = "操作时间", Order = 12)]
+        public DateTime CreatedOn { get; set; }
+
+
+
+    }
 
 }

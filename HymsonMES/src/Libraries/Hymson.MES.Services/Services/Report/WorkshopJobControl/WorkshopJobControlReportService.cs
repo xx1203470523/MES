@@ -1,6 +1,8 @@
+using CommunityToolkit.HighPerformance;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -18,8 +20,10 @@ using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
+using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Extension;
+using Hymson.Minio;
 using Minio.DataModel;
 using System.Reflection;
 
@@ -67,7 +71,13 @@ namespace Hymson.MES.Services.Services.Report
 
         private readonly IProcParameterRepository _procParameterRepository;
 
-        public WorkshopJobControlReportService(ICurrentUser currentUser, ICurrentSite currentSite, ILocalizationService localizationService, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository, IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository, IProcBomRepository procBomRepository, IManuSfcRepository manuSfcRepository, IProcResourceRepository procResourceRepository, IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository, IManuDowngradingRecordRepository manuDowngradingRecordRepository, IManuProductBadRecordRepository manuProductBadRecordRepository, IManuBarCodeRelationRepository manuBarCodeRelationRepository, IManuFacePlateRepairRepository manuFacePlateRepairRepository, IManuSfcProduceRepository manuSfcProduceRepository, Data.Repositories.Parameter.IManuProductParameterRepository manuProductParameterRepository, IProcParameterRepository procParameterRepository)
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
+
+        public WorkshopJobControlReportService(ICurrentUser currentUser, ICurrentSite currentSite, ILocalizationService localizationService, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository, IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository, IProcBomRepository procBomRepository, IManuSfcRepository manuSfcRepository, IProcResourceRepository procResourceRepository, IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository, IManuDowngradingRecordRepository manuDowngradingRecordRepository, IManuProductBadRecordRepository manuProductBadRecordRepository, IManuBarCodeRelationRepository manuBarCodeRelationRepository, IManuFacePlateRepairRepository manuFacePlateRepairRepository, IManuSfcProduceRepository manuSfcProduceRepository, Data.Repositories.Parameter.IManuProductParameterRepository manuProductParameterRepository
+            , IProcParameterRepository procParameterRepository,
+            IExcelService excelService,
+            IMinioService minioService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -89,6 +99,8 @@ namespace Hymson.MES.Services.Services.Report
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuProductParameterRepository = manuProductParameterRepository;
             _procParameterRepository = procParameterRepository;
+            _excelService = excelService;
+            _minioService = minioService;
         }
 
         ///// <summary>
@@ -168,6 +180,140 @@ namespace Hymson.MES.Services.Services.Report
 
             }
             return new PagedInfo<WorkshopJobControlReportViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 根据查询条件导出参数数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<NioPushCollectionExportResultDto> ExprotAsync(WorkshopJobControlReportOptimizePagedQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<WorkshopJobControlReportOptimizePagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.PageSize = 1000;
+            var pagedInfoList = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportOptimizeAsync(pagedQuery);
+
+            List<WorkshopJobControlReportViewDto> dtos = new();
+            if (pagedInfoList.Data.Any())
+            {
+                // 查询工单
+                var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfoList.Data.Select(x => x.WorkOrderId));
+
+                // 查询bom
+                var procBomsTask = _procBomRepository.GetByIdsAsync(pagedInfoList.Data.Select(x => x.ProductBOMId));
+
+                // 查询物料
+                var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfoList.Data.Select(x => x.ProductId));
+
+                // 查询工序
+                var procProceduresTask = _procProcedureRepository.GetByIdsAsync(pagedInfoList.Data.Select(x => x.ProcedureId));
+
+                var procBoms = await procBomsTask;
+                var materials = await materialsTask;
+                var procProcedures = await procProceduresTask;
+
+                foreach (var item in pagedInfoList.Data)
+                {
+                    var material = materials.FirstOrDefault(x => x.Id == item.ProductId);
+                    var workOrder = workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId);
+                    var procedure = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId);
+                    var bom = procBoms.FirstOrDefault(x => x.Id == item.ProductBOMId);
+
+                    dtos.Add(new WorkshopJobControlReportViewDto
+                    {
+                        SFC = item.SFC,
+                        SFCStatus = item.SFCStatus,
+                        SFCProduceStatus = item.SFCStatus,
+                        Qty = item.Qty,
+                        MaterialCodeVersion = material != null ? material.MaterialCode + "/" + material.Version : "",
+                        MaterialName = material?.MaterialName ?? "",
+                        OrderCode = workOrder?.OrderCode ?? "",
+                        OrderType = workOrder?.Type,
+                        ProcedureCode = procedure?.Code ?? "",
+                        ProcedureName = procedure?.Name ?? "",
+                        BomCodeVersion = bom != null ? bom.BomCode + "/" + bom.Version : "",
+                        BomName = bom != null ? bom.BomName : ""
+                    });
+                }
+
+            }
+
+            //List<ManuProductBadRecordLogReportViewDto> dtos = new List<ManuProductBadRecordLogReportViewDto>();
+            //foreach (var item in pagedInfoList.Data)
+            //{
+            //    dtos.Add(item.ToModel<ManuProductBadRecordLogReportViewDto>());
+            //}
+
+
+            // 实体到DTO转换 装载数据
+            //var dtos = pagedInfo.Data.Select(s => s.ToModel<NioPushCollectionDto>());
+
+            var pagedInfo = new PagedInfo<WorkshopJobControlReportViewDto>(dtos, pagedInfoList.PageIndex, pagedInfoList.PageSize, pagedInfoList.TotalCount);
+
+            //实体到DTO转换 装载数据
+            List<WorkshopJobControlReportViewExportDto> listDto = new();
+
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuProductBadRecordLogReport"), _localizationService.GetResource("ManuProductBadRecordLogReport"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new NioPushCollectionExportResultDto
+                {
+                    FileName = _localizationService.GetResource("ManuProductBadRecordLogReport"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+            {
+                // 查询工单
+                var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfoList.Data.Select(x => x.WorkOrderId));
+
+                // 查询bom
+                var procBomsTask = _procBomRepository.GetByIdsAsync(pagedInfoList.Data.Select(x => x.ProductBOMId));
+
+                // 查询物料
+                var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfoList.Data.Select(x => x.ProductId));
+
+                // 查询工序
+                var procProceduresTask = _procProcedureRepository.GetByIdsAsync(pagedInfoList.Data.Select(x => x.ProcedureId));
+
+                var procBoms = await procBomsTask;
+                var materials = await materialsTask;
+                var procProcedures = await procProceduresTask;
+                //对应的excel数值从这里开始
+                foreach (var item in pagedInfoList.Data)
+                {
+                    var material = materials.FirstOrDefault(x => x.Id == item.ProductId);
+                    var workOrder = workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId);
+                    var procedure = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId);
+                    var bom = procBoms.FirstOrDefault(x => x.Id == item.ProductBOMId);
+                    listDto.Add(new WorkshopJobControlReportViewExportDto()
+                    {
+                        SFC = item.SFC,
+                        SFCStatus = item.SFCStatus,
+                        Qty = item.Qty,
+                        MaterialCodeVersion = material != null ? material.MaterialCode + "/" + material.Version : "",
+                        MaterialName = material?.MaterialName ?? "",
+                        OrderCode = workOrder?.OrderCode ?? "",
+                        OrderType = workOrder?.Type,
+                        ProcedureCode = procedure?.Code ?? "",
+                        ProcedureName = procedure?.Name ?? "",
+                        BomCodeVersion = bom != null ? bom.BomCode + "/" + bom.Version : "",
+                        BomName = bom != null ? bom.BomName : ""
+                    });
+                }
+            }
+           
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuProductBadRecordLogReport"), _localizationService.GetResource("ManuProductBadRecordLogReport"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new NioPushCollectionExportResultDto
+            {
+                FileName = _localizationService.GetResource("ManuProductBadRecordLogReport"),
+                Path = uploadResult.AbsoluteUrl,
+            };
+
         }
 
         /// <summary>

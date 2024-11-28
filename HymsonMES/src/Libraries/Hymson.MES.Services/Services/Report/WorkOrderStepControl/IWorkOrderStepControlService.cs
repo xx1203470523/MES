@@ -6,6 +6,7 @@
  *build datetime: 2023-03-20 10:07:17
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
 using System;
@@ -29,5 +30,13 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="param"></param>
         /// <returns></returns>
         Task<PagedInfo<WorkOrderStepControlViewDto>> GetWorkOrderStepControlPageListAsync(WorkOrderStepControlOptimizePagedQueryDto param);
+
+        /// <summary>
+        /// 根据查询条件导出参数数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<NioPushCollectionExportResultDto> ExprotAsync(WorkOrderStepControlOptimizePagedQueryDto param);
+
     }
 }

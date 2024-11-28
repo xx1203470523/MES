@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Report;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Report
@@ -38,5 +40,18 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _workOrderStepControlService.GetWorkOrderStepControlPageListAsync(param);
         }
+
+        /// 导出信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<NioPushCollectionExportResultDto> ExprotComUsagePageListAsync([FromQuery] WorkOrderStepControlOptimizePagedQueryDto param)
+        {
+            return await _workOrderStepControlService.ExprotAsync(param);
+        }
+
     }
 }
