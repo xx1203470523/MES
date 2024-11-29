@@ -46,6 +46,13 @@ namespace Hymson.MES.HttpClients
         Task<BaseResponse?> CancelEntryAsync(CancelEntryDto requestBody);
 
         /// <summary>
+        /// 取消入库申请ByScw
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<BaseResponse?> CancelEntryByScwAsync(CancelEntryByScwDto requestBody);
+
+        /// <summary>
         /// 取消出库申请
         /// </summary>
         /// <param name="requestDto"></param>

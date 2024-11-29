@@ -292,6 +292,17 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         }
 
         /// <summary>
+        /// 取消入库ByScw
+        /// </summary>
+        /// <param name="request"></param>
+        [HttpPost("ProductReceiptCancelByScw")]
+        [LogDescription("取消入库ByScw", BusinessType.INSERT)]
+        public async Task<int> ProductReceiptCancelAsync([FromBody] CancelProductReceiptApplyByScwDto request)
+        {
+            return await _whMaterialInventoryService.CancelProductReceiptApplyByScwAsync(request);
+        }
+
+        /// <summary>
         /// 根据工单查询工单的领料列表
         /// </summary>
         /// <param name="id"></param>

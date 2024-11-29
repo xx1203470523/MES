@@ -1538,19 +1538,6 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
             foreach (var item in request.Items)
             {
-
-                HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
-                {
-                    ProductionOrderNumber = erpOrder,
-                    ProductionOrderDetailID = erpInfo.ErpProductId,
-                    BoxCode = item.BoxCode ?? "",
-                    LotCode = item.Batch,
-                    MaterialCode = request.MaterialCode,
-                    Quantity = item.Qty.ToString(),
-                    BRelated = TrueOrFalseEnum.No,
-                    UnitCode = item.Unit,
-                    UniqueCode = item.Sfc ?? ""
-                };
                 ManuProductReceiptOrderDetailEntity manuProductReceiptOrderDetailEntity = new ManuProductReceiptOrderDetailEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -1567,6 +1554,20 @@ namespace Hymson.MES.Services.Services.Warehouse
                     Unit = item.Unit,
                     CreatedBy = _currentSystem.Name,
                     UpdatedBy = _currentSystem.Name,
+                };
+
+                HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
+                {
+                    ProductionOrderNumber = erpOrder,
+                    ProductionOrderDetailID = erpInfo.ErpProductId,
+                    BoxCode = item.BoxCode ?? "",
+                    LotCode = item.Batch,
+                    MaterialCode = request.MaterialCode,
+                    Quantity = item.Qty.ToString(),
+                    BRelated = TrueOrFalseEnum.No,
+                    UnitCode = item.Unit,
+                    UniqueCode = item.Sfc ?? "",
+                    SyncId = manuProductReceiptOrderDetailEntity.Id
                 };
                 manuProductReceiptOrderDetails.Add(manuProductReceiptOrderDetailEntity);
                 returnMaterialDtos.Add(returnMaterialDto);
@@ -1800,6 +1801,65 @@ namespace Hymson.MES.Services.Services.Warehouse
             var response = await _wmsRequest.CancelEntryAsync(new CancelEntryDto
             {
                 SyncCode = entryOrderEntity.CompletionOrderCode,
+                UpdatedBy = _currentUser.UserName,
+            });
+            if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "结果返回异常，请检查！");
+            if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
+
+            // 修改退料单状态
+            entryOrderEntity.Status = ProductReceiptStatusEnum.CancelApply;
+            entryOrderEntity.UpdatedBy = _currentUser.UserName;
+            entryOrderEntity.UpdatedOn = HymsonClock.Now();
+
+            return await _manuProductReceiptOrderRepository.UpdateAsync(entryOrderEntity);
+        }
+
+
+
+        /// <summary>
+        /// 取消成品入库ByScw
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> CancelProductReceiptApplyByScwAsync(CancelProductReceiptApplyByScwDto requestDto)
+        {
+            var siteId = _currentSite.SiteId ?? 0;
+
+            // 读取工单
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.WorkOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16000));
+
+            // 读取成品入库单
+            var entryOrderEntities = await _manuProductReceiptOrderRepository.GetEntitiesAsync(new ManuProductReceiptOrderQuery
+            {
+                SiteId = siteId,
+                WorkOrderId = workOrderEntity.Id,
+                CompletionOrderCode = requestDto.CompletionOrderCode,
+
+            });
+            if (entryOrderEntities == null || !entryOrderEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16065)).WithData("Code", workOrderEntity.OrderCode);
+            }
+
+            // 判断成品入库单状态是否允许取消
+            if (entryOrderEntities.Any(a => a.Status != ProductReceiptStatusEnum.Approvaling))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16067))
+                    .WithData("Status", ProductReceiptStatusEnum.Approvaling.GetDescription());
+            }
+
+            // 如果存在多个，就表示数据已经有问题
+            var entryOrderEntity = entryOrderEntities.FirstOrDefault();
+            if (entryOrderEntity == null) return 0;
+
+            // 通知WMS取消成品入库申请
+            var response = await _wmsRequest.CancelEntryByScwAsync(new CancelEntryByScwDto
+            {
+                SyncCode = entryOrderEntity.CompletionOrderCode,
+                UniqueCode = requestDto.UniqueCode,
+                Quantity = requestDto.Quantity,
+                SyncId = requestDto.SyncId,
                 UpdatedBy = _currentUser.UserName,
             });
             if (response == null) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", "结果返回异常，请检查！");

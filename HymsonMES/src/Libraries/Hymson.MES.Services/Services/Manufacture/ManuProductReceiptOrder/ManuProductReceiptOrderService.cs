@@ -158,6 +158,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var manuProductReceiptOrder = manuProductReceiptOrderLists.FirstOrDefault(x => x.Id == entity.ProductReceiptId);
                     var manuProductReceipt = new ManuProductReceiptOrderDetailDto
                     {
+                        Id = entity.Id,
                         CompletionOrderCode = manuProductReceiptOrder?.CompletionOrderCode ?? "",
                         StorageStatus = manuProductReceiptOrder?.Status ?? ProductReceiptStatusEnum.Approvaling,
                         Batch = entity.Batch,
