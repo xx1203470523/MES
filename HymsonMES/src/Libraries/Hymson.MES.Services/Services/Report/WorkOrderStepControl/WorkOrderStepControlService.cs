@@ -233,7 +233,7 @@ namespace Hymson.MES.Services.Services.Report
             // 判断是否有获取到站点码 
             if (string.IsNullOrWhiteSpace(param.OrderCode))
             {
-                return null;
+                //return null;
             }
             //查询工单表信息
             var pagedInfoList = await _planWorkOrderRepository.GetPagedInfoAsyncCode(pagedQuery);
