@@ -1538,19 +1538,6 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
             foreach (var item in request.Items)
             {
-
-                HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
-                {
-                    ProductionOrderNumber = erpOrder,
-                    ProductionOrderDetailID = erpInfo.ErpProductId,
-                    BoxCode = item.BoxCode ?? "",
-                    LotCode = item.Batch,
-                    MaterialCode = request.MaterialCode,
-                    Quantity = item.Qty.ToString(),
-                    BRelated = TrueOrFalseEnum.No,
-                    UnitCode = item.Unit,
-                    UniqueCode = item.Sfc ?? ""
-                };
                 ManuProductReceiptOrderDetailEntity manuProductReceiptOrderDetailEntity = new ManuProductReceiptOrderDetailEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -1567,6 +1554,20 @@ namespace Hymson.MES.Services.Services.Warehouse
                     Unit = item.Unit,
                     CreatedBy = _currentSystem.Name,
                     UpdatedBy = _currentSystem.Name,
+                };
+
+                HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
+                {
+                    ProductionOrderNumber = erpOrder,
+                    ProductionOrderDetailID = erpInfo.ErpProductId,
+                    BoxCode = item.BoxCode ?? "",
+                    LotCode = item.Batch,
+                    MaterialCode = request.MaterialCode,
+                    Quantity = item.Qty.ToString(),
+                    BRelated = TrueOrFalseEnum.No,
+                    UnitCode = item.Unit,
+                    UniqueCode = item.Sfc ?? "",
+                    SyncId = manuProductReceiptOrderDetailEntity.Id
                 };
                 manuProductReceiptOrderDetails.Add(manuProductReceiptOrderDetailEntity);
                 returnMaterialDtos.Add(returnMaterialDto);

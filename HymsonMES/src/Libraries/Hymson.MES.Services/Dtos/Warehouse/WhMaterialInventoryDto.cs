@@ -752,6 +752,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     public record ProductReceiptDetailRequest
     {
         /// <summary>
+        /// MES明细Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 条码
         /// </summary>
         public string Sfc { get; set; }
