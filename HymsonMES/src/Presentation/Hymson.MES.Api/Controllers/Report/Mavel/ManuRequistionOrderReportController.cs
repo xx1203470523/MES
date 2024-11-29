@@ -81,7 +81,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpGet]
         [Route("export")]
-        [PermissionDescription("proc:parameter:export")]
+        [PermissionDescription("proc:manuRequistionOrderReport:export")]
         public async Task<NioPushCollectionExportResultDto> ExprotComUsagePageListAsync([FromQuery] ReportRequistionOrderQueryDto param)
         {
             return await _manuRequistionOrderReportService.ExprotAsync(param);

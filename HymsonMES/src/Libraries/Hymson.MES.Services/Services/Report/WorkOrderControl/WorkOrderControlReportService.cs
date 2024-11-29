@@ -195,12 +195,12 @@ namespace Hymson.MES.Services.Services.Report
 
             if (pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuBoxReport"), _localizationService.GetResource("ManuBoxReport"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkOrderControlReportView"), _localizationService.GetResource("WorkOrderControlReportView"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new NioPushCollectionExportResultDto
                 {
-                    FileName = _localizationService.GetResource("ManuBoxReport"),
+                    FileName = _localizationService.GetResource("WorkOrderControlReportView"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -239,12 +239,12 @@ namespace Hymson.MES.Services.Services.Report
             }
             
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuBoxReport"), _localizationService.GetResource("ManuBoxReport"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkOrderControlReportView"), _localizationService.GetResource("WorkOrderControlReportView"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new NioPushCollectionExportResultDto
             {
-                FileName = _localizationService.GetResource("ManuBoxReport"),
+                FileName = _localizationService.GetResource("WorkOrderControlReportView"),
                 Path = uploadResult.AbsoluteUrl,
             };
 
