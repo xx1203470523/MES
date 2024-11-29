@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("export")]
-        [PermissionDescription("proc:parameter:export")]
+        [PermissionDescription("proc:workOrderStepReport:export")]
         public async Task<NioPushCollectionExportResultDto> ExprotComUsagePageListAsync([FromQuery] WorkOrderStepControlOptimizePagedQueryDto param)
         {
             return await _workOrderStepControlService.ExprotAsync(param);
