@@ -1,4 +1,5 @@
 using CommunityToolkit.HighPerformance;
+using Elastic.Transport.Extensions;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -20,11 +21,13 @@ using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Extension;
 using Hymson.Minio;
 using Minio.DataModel;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Hymson.MES.Services.Services.Report
@@ -288,6 +291,8 @@ namespace Hymson.MES.Services.Services.Report
                     var workOrder = workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId);
                     var procedure = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId);
                     var bom = procBoms.FirstOrDefault(x => x.Id == item.ProductBOMId);
+                    int type_int = (int)((PlanWorkOrderTypeEnum)workOrder?.Type);
+                    PlanWorkOrderTypeEnum t2 = (PlanWorkOrderTypeEnum)type_int;
                     listDto.Add(new WorkshopJobControlReportViewExportDto()
                     {
                         SFC = item.SFC,
@@ -296,12 +301,12 @@ namespace Hymson.MES.Services.Services.Report
                         MaterialCodeVersion = material != null ? material.MaterialCode + "/" + material.Version : "",
                         MaterialName = material?.MaterialName ?? "",
                         OrderCode = workOrder?.OrderCode ?? "",
-                        OrderType = workOrder?.Type,
+                        OrderType = workOrder?.Type.GetEnumDescription(),//workOrder?.Type ?? 
                         ProcedureCode = procedure?.Code ?? "",
                         ProcedureName = procedure?.Name ?? "",
                         BomCodeVersion = bom != null ? bom.BomCode + "/" + bom.Version : "",
                         BomName = bom != null ? bom.BomName : ""
-                    });
+                    }); ;
                 }
             }
            
