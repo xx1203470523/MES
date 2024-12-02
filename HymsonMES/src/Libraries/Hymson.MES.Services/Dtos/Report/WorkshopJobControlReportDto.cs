@@ -325,7 +325,8 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 工单类型
         /// </summary>
         [EpplusTableColumn(Header = "工单类型", Order = 6)]
-        public PlanWorkOrderTypeEnum? OrderType { get; set; }
+        public string? OrderType { get; set; }
+        //public PlanWorkOrderTypeEnum? OrderType { get; set; }
 
         /// <summary>
         /// 工序编码
