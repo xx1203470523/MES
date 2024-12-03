@@ -161,6 +161,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据IDs获取数据（批量）ByScw
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetByProductReceiptIdsByScwAsync(long[] ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuProductReceiptOrderDetailEntity>(GetByProductReceiptIdsByScwSql, new { Ids = ids });
+        }
+
+        /// <summary>
         /// 数据集查询
         /// </summary>
         /// <param name="query"></param>
@@ -319,6 +330,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT * FROM manu_product_receipt_order_detail WHERE Id IN @Ids ";
 
         const string GetByProductReceiptIdsSql = @"SELECT * FROM manu_product_receipt_order_detail WHERE ProductReceiptId IN @Ids order by CreatedOn desc ";
+
+        const string GetByProductReceiptIdsByScwSql = @"SELECT d.id,d.ProductReceiptId,t.Status FROM manu_product_receipt_order_detail d, manu_product_receipt_order t WHERE t.id = d.ProductReceiptId and t.Status != 7 and d.ProductReceiptId IN @Ids ";
 
         /// <summary>
         /// 获取配方列表
