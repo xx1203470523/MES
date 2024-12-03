@@ -532,7 +532,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         }
 
         /// <summary>
-        /// 根据查询条件获取分页数据
+        /// 根据查询条件获取分页数据：生产工单，列表查询，所调接口
         /// </summary>
         /// <param name="planWorkOrderPagedQueryDto"></param>
         /// <returns></returns>
