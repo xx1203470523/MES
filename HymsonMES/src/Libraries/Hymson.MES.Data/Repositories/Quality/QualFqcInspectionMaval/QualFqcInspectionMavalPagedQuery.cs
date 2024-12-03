@@ -23,6 +23,16 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// 不合格原因
         /// </summary>
         public string? Remark { get; set; }
+        
+        /// <summary>
+        /// 工序Code
+        /// </summary>
+        public string? Code { get; set; }
+        
+        /// <summary>
+        /// 资源Code
+        /// </summary>
+        public string? ResCode { get; set; }
 
     }
 }

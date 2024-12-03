@@ -33,11 +33,21 @@ namespace Hymson.MES.Services.Dtos.QualFqcInspectionMaval
         /// 工序Id
         /// </summary>
         public long ProcedureId { get; set; }
+        
+        /// <summary>
+        /// 工序Code
+        /// </summary>
+        public string ProcedureCode { get; set; }
 
         /// <summary>
         /// 资源Id
         /// </summary>
         public long ResourceId { get; set; }
+        
+        /// <summary>
+        /// 资源Code
+        /// </summary>
+        public string ResourceCode { get; set; }
 
         /// <summary>
         /// 条码
