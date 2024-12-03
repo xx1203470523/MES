@@ -612,7 +612,11 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                     //var qty = requistiongroup.FirstOrDefault(r => r.Key == d.Id)?.Count() ?? 0;
                     d.PickStatus = requistionOrderEntities.Any(x => x.Status != WhMaterialPickingStatusEnum.CancelMaterialReturn && x.WorkOrderId == d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked;
                     d.PassDownQuantity = d.Qty;
-                    d.FinishProductQuantity = await _manuProductReceiptOrderService.QueryByWorkIdByScwAsync(d.Id);
+                    var result = await _manuProductReceiptOrderService.QueryByWorkIdByScwAsync(d.Id);
+                    if (result != null)
+                    {
+                        d.FinishProductQuantity = result.SumQty;
+                    }
                 });
                 return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtolist, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
             }
@@ -691,6 +695,16 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 if (workCenter != null)
                 {
                     planWorkOrderDetailView.WorkCenterCode = workCenter.Code;
+                }
+
+                //计算汇总数量和入库数量
+                var result = await _manuProductReceiptOrderService.QueryByWorkIdByScwAsync(id);
+                if (result != null)
+                {
+                    planWorkOrderDetailView.SumQty = result.SumQty;
+                    planWorkOrderDetailView.ToBeTestQty = result.ToBeTestQty;
+                    planWorkOrderDetailView.FinishQty = result.FinishQty;
+                    planWorkOrderDetailView.BadQty = result.BadQty;
                 }
 
                 return planWorkOrderDetailView;
