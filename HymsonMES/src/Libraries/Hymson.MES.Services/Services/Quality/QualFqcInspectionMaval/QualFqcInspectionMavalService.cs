@@ -164,7 +164,16 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
         /// <returns></returns>
         public async Task<PagedInfo<QualFqcInspectionMavalDto>> GetPagedListAsync(QualFqcInspectionMavalPagedQueryDto qualFqcInspectionMavalPagedQueryDto)
         {
+            var procedure = await _procProcedureRepository.GetByCodeAsync(new EntityByCodeQuery
+                { Code = qualFqcInspectionMavalPagedQueryDto.ProcedureCode,Site = _currentSite.SiteId ?? 0 });
+
+            var resoure = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
+                { Code = qualFqcInspectionMavalPagedQueryDto.ResourceCode ,Site = _currentSite.SiteId ?? 0});
+
             var qualFqcInspectionMavalPagedQuery = qualFqcInspectionMavalPagedQueryDto.ToQuery<QualFqcInspectionMavalPagedQuery>();
+            qualFqcInspectionMavalPagedQuery.ProcedureId = procedure?.Id;
+            qualFqcInspectionMavalPagedQuery.ResourceId = resoure?.Id;
+            
             qualFqcInspectionMavalPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _qualFqcInspectionMavalRepository.GetPagedInfoAsync(qualFqcInspectionMavalPagedQuery);
             

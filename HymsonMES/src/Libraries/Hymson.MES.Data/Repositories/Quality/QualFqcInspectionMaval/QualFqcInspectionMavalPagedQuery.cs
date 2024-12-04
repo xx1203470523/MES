@@ -27,12 +27,12 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// <summary>
         /// 工序Code
         /// </summary>
-        public string? Code { get; set; }
+        public long? ProcedureId {  get; set; }
         
         /// <summary>
         /// 资源Code
         /// </summary>
-        public string? ResCode { get; set; }
+        public long? ResourceId {  get; set; }
 
     }
 }

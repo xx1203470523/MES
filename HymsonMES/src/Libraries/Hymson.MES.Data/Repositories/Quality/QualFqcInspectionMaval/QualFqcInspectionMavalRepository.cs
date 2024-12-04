@@ -105,10 +105,15 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
             sqlBuilder.Select("*");
             sqlBuilder.OrderBy("CreatedOn DESC");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            if (qualFqcInspectionMavalPagedQuery.ProcedureId != null)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
+            }
+            
+            if (qualFqcInspectionMavalPagedQuery.ResourceId != null)
+            {
+                sqlBuilder.Where("ResourceId=@ResourceId");
+            }
 
             var offSet = (qualFqcInspectionMavalPagedQuery.PageIndex - 1) * qualFqcInspectionMavalPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

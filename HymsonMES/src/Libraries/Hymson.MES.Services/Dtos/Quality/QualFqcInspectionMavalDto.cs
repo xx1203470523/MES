@@ -218,6 +218,16 @@ namespace Hymson.MES.Services.Dtos.QualFqcInspectionMaval
         /// 不合格原因
         /// </summary>
         public string? Remark {  get; set; }
+        
+        /// <summary>
+        /// 工序Code
+        /// </summary>
+        public string? ProcedureCode {  get; set; }
+        
+        /// <summary>
+        /// 资源Code
+        /// </summary>
+        public string? ResourceCode {  get; set; }
 
     }
 
