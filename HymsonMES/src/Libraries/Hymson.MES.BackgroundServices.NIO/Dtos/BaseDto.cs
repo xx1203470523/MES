@@ -171,6 +171,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Dtos
         public string BottleneckProcess { get; set; } = "暂无";
 
         /// <summary>
+        ///  成品实际入库数量
+        /// </summary>
+        public decimal ProductInNum { get; set; }
+
+        /// <summary>  
+        /// 下线合格数量  
+        /// </summary>  
+        public decimal DownlineNum { get; set; }
+
+        /// <summary>
         /// 计划产量
         /// </summary>
         public decimal PlanOutput { get; set; } = 105;
