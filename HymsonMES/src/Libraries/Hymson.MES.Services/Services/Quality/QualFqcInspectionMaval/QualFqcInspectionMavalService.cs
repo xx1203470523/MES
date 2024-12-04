@@ -95,7 +95,7 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
              ?? throw new CustomerValidationException(nameof(ErrorCode.MES11751)).WithData("Code", qualFqcInspectionMavalCreateDto.ResourceCode);
 
             var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery { SFC = qualFqcInspectionMavalCreateDto.SFC, SiteId = siteId }) 
-                                ?? throw new CustomerValidationException(nameof(ErrorCode.MES11753)).WithData("SFC", qualFqcInspectionMavalCreateDto.SFC);
+                                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15320)).WithData("sfcs", qualFqcInspectionMavalCreateDto.SFC);
 
             var qualFqcInspectionMaval = await _qualFqcInspectionMavalRepository.GetBySFCAsync(new QualFqcInspectionMavalQuery { SFC = qualFqcInspectionMavalCreateDto.SFC, SiteId = siteId });
             if (qualFqcInspectionMaval != null)
