@@ -164,8 +164,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
             //1. 取配置中的两个生产物料
             List<NIOConfigBaseDto> configList = new List<NIOConfigBaseDto>();
             List<string> matCodeList = new List<string>();
-            var baseConfigList = await GetBaseConfigAsync();
-            foreach(var item in baseConfigList)
+            var baseConfigList = await GetBaseConfigAsync();//组装NIO合作伙伴精益与库存信息，获取转子线NioRotorConfig，和定子线NioStatorConfig基础配置数据【scw】
+            foreach (var item in baseConfigList)
             {
                 NIOConfigBaseDto curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(item.Value);
                 configList.Add(curConfig);
@@ -249,6 +249,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
                 //数量配置：StockRejection是成品库存不合格量，StockUndetermined是成品库存待判定，ProductInNum是成品实际入库数量，DownlineNum是下线合格数量。
                 //格式： StockRejection=数量&StockUndetermined=数量&ProductInNum=数量&DownlineNum=数量，
                 //数量为-1时，取的是实际的值；数量不为-1的时候，取的是配置的值。
+                //2024.11.29号，以上三行注释需要重新做，改成从配置里面动态获取数据：获取转子线NioRotorConfig，和定子线NioStatorConfig基础配置数据
 
                 //成品库存不合格量(需要可以手动修改)
                 dto.ProductStockRejection = item.ProductStockRejection;
@@ -268,17 +269,25 @@ namespace Hymson.MES.BackgroundServices.NIO.Services.ERP
 
                 //成品实际入库数量(需要可以手动输入修改)
                 dto.ProductInNum = item.ProductInNum;
-                decimal configProductInNum = ConfigConvertToNum(sysConfigEntity, "ProductInNum");
-                if (configProductInNum != NO_CONFIG_NUM)
+                //decimal configProductInNum = ConfigConvertToNum(sysConfigEntity, "ProductInNum");
+                //if (configProductInNum != NO_CONFIG_NUM)
+                //{
+                //    dto.ProductInNum = configProductInNum;
+                //}
+                if (curBaseConfig.ProductInNum != null)
                 {
-                    dto.ProductInNum = configProductInNum;
+                    dto.ProductInNum = curBaseConfig.ProductInNum;
                 }
 
                 //下线合格数量(需要可以手动输入修改)
-                decimal configDownlineNum = ConfigConvertToNum(sysConfigEntity, "DownlineNum");
-                if (configDownlineNum != NO_CONFIG_NUM)
+                //decimal configDownlineNum = ConfigConvertToNum(sysConfigEntity, "DownlineNum");
+                //if (configDownlineNum != NO_CONFIG_NUM)
+                //{
+                //    dto.DownlineNum = configDownlineNum;
+                //}
+                if (curBaseConfig.DownlineNum != null)
                 {
-                    dto.DownlineNum = configDownlineNum;
+                    dto.DownlineNum = curBaseConfig.DownlineNum;
                 }
                 else
                 {

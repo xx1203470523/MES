@@ -182,21 +182,26 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="workOrderId"></param>
         /// <returns></returns>
-        public async Task<decimal> QueryByWorkIdByScwAsync(long workOrderId)
+        public async Task<ManuProductReceiptOrderByScwDto?> QueryByWorkIdByScwAsync(long workOrderId)
         {
-            var manuProductReceiptOrders = new List<ManuProductReceiptOrderDetailDto>();
+            var result = new ManuProductReceiptOrderByScwDto();
             var manuProductReceiptOrderLists = await _manuProductReceiptOrderRepository.GetByWorkOrderIdsSqlAsync(workOrderId);
             if (manuProductReceiptOrderLists.Any() == false)
             {
-                return 0;
+                return result;
             }
             var manuProductReceiptOrderIds = manuProductReceiptOrderLists.Select(x => x.Id).ToArray();
             var productReceiptOrderDetailEntities = await _manuProductReceiptOrderDetailRepository.GetByProductReceiptIdsByScwAsync(manuProductReceiptOrderIds);
             if (productReceiptOrderDetailEntities.Any())
             {
-                return productReceiptOrderDetailEntities.Count();
+                result.SumQty = productReceiptOrderDetailEntities.Count();
+                var warehouseCount = productReceiptOrderDetailEntities.GroupBy(a => a.WarehouseCode).Select(b => new { b.Key,Qty = b.Count() });
+                result.ToBeTestQty = warehouseCount.FirstOrDefault(a => a.Key.Equals("待检验仓"))?.Qty ?? 0;
+                result.FinishQty = warehouseCount.FirstOrDefault(a => a.Key.Equals("成品仓"))?.Qty ?? 0;
+                result.BadQty = warehouseCount.FirstOrDefault(a => a.Key.Equals("不良品仓"))?.Qty ?? 0;
+                return result;
             }
-            return 0;
+            return result;
         }
 
         /// <summary>

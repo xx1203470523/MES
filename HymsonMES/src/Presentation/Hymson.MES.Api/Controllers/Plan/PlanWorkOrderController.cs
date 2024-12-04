@@ -34,7 +34,7 @@ namespace Hymson.MES.Api.Controllers.Plan
 
 
         /// <summary>
-        /// 分页查询列表（工单信息表）
+        /// 分页查询列表（工单信息表）：生产工单，列表查询，所调接口
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>

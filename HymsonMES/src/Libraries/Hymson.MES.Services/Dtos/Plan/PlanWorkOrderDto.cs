@@ -375,7 +375,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         public PlanWorkOrderTypeEnum Type { get; set; }
 
         /// <summary>
-        /// 数量
+        /// 派工单数量
         /// </summary>
         public decimal Qty { get; set; }
 
@@ -473,6 +473,26 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工作中心代码
         /// </summary>
         public string WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 汇总数量：按照所有仓库汇总所有入库状态下数量
+        /// </summary>
+        public decimal SumQty { get; set; }
+
+        /// <summary>
+        /// 入库数量：按照入库的仓库分别计算该仓库的数量，入库状态排除：取消申请的【待检验仓入库数量】
+        /// </summary>
+        public decimal ToBeTestQty { get; set; }
+
+        /// <summary>
+        /// 入库数量：按照入库的仓库分别计算该仓库的数量，入库状态排除：取消申请的【成品仓入库数量】
+        /// </summary>
+        public decimal FinishQty { get; set; }
+
+        /// <summary>
+        /// 入库数量：按照入库的仓库分别计算该仓库的数量，入库状态排除：取消申请的【不良品仓入库数量】
+        /// </summary>
+        public decimal BadQty { get; set; }
     }
 
     /// <summary>
