@@ -648,63 +648,71 @@ namespace Hymson.MES.SystemServices.Services
             }
             //根据完工单号获取数据
             var CompletionOrderCode = productionPickDto.RequistionId;
-            var returnOrderEntity = await _manuProductReceiptOrderRepository.GetByCompletionOrderCodeSqlAsync(CompletionOrderCode);
-            if (returnOrderEntity == null)
+            //var returnOrderEntity = await _manuProductReceiptOrderRepository.GetByCompletionOrderCodeSqlAsync(CompletionOrderCode);
+            var returnOrderEntitys = await _manuProductReceiptOrderRepository.GetByCompletionOrderCodeSqlByScwAsync(CompletionOrderCode);
+            if (returnOrderEntitys.Any() == false)
             {
+                //领料单未找到，发送的请求标识为：【{orderId}】。
                 throw new CustomerValidationException(nameof(ErrorCode.MES16050)).WithData("orderId", productionPickDto.RequistionId);
             }
-            switch (productionPickDto.State)
-            {
-                case ManuMaterialFormResponseEnum.Created:
-                    returnOrderEntity.Status = ProductReceiptStatusEnum.Created;
-                    break;
-                case ManuMaterialFormResponseEnum.Failed:
-                    returnOrderEntity.Status = ProductReceiptStatusEnum.Failed;
-                    break;
-                case ManuMaterialFormResponseEnum.ApprovalingSuccess:
-                    returnOrderEntity.Status = ProductReceiptStatusEnum.ApprovalingSuccess;
-                    break;
-                case ManuMaterialFormResponseEnum.ApprovalingFailed:
-                    returnOrderEntity.Status = ProductReceiptStatusEnum.ApprovalingFailed;
-                    break;
-                case ManuMaterialFormResponseEnum.CancelFailed:
-                    break;
-                case ManuMaterialFormResponseEnum.CancelSuccess:
-                    returnOrderEntity.Status = ProductReceiptStatusEnum.Cancel;
-                    break;
-                default:
-                    break;
-            }
-            var rows = 0;
-            if (returnOrderEntity.Status == ProductReceiptStatusEnum.ApprovalingSuccess)
-            {
-                long[] array = new long[] { returnOrderEntity.Id };
-                //string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
-                var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(returnOrderEntity.WorkOrderCode);
-                if (planWorkOrderEntity == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16301)).WithData("orderCode", returnOrderEntity.WorkOrderCode);
-                }
-                var productReceiptOrderDetailEntities = await _manuProductReceiptOrderDetailRepository.GetByProductReceiptIdsAsync(array);
-                returnOrderEntity.Status = ProductReceiptStatusEnum.Receipt;
 
-                using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            var rows = 0;
+            foreach (var returnOrderEntity in returnOrderEntitys)
+            {
+                switch (productionPickDto.State)
                 {
-                    // 更新完工数量
-                    rows += await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
+                    case ManuMaterialFormResponseEnum.Created:
+                        returnOrderEntity.Status = ProductReceiptStatusEnum.Created;
+                        break;
+                    case ManuMaterialFormResponseEnum.Failed:
+                        returnOrderEntity.Status = ProductReceiptStatusEnum.Failed;
+                        break;
+                    case ManuMaterialFormResponseEnum.ApprovalingSuccess:
+                        returnOrderEntity.Status = ProductReceiptStatusEnum.ApprovalingSuccess;
+                        break;
+                    case ManuMaterialFormResponseEnum.ApprovalingFailed:
+                        returnOrderEntity.Status = ProductReceiptStatusEnum.ApprovalingFailed;
+                        break;
+                    case ManuMaterialFormResponseEnum.CancelFailed:
+                        break;
+                    case ManuMaterialFormResponseEnum.CancelSuccess:
+                        returnOrderEntity.Status = ProductReceiptStatusEnum.Cancel;
+                        break;
+                    default:
+                        break;
+                }
+                if (returnOrderEntity.Status == ProductReceiptStatusEnum.ApprovalingSuccess)
+                {
+                    long[] array = new long[] { returnOrderEntity.Id };
+                    //string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
+                    var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(returnOrderEntity.WorkOrderCode);
+                    if (planWorkOrderEntity == null)
                     {
-                        UpdatedOn = DateTime.UtcNow,
-                        WorkOrderId = planWorkOrderEntity.Id,
-                        Qty = productReceiptOrderDetailEntities.Count(),
-                    });
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16301)).WithData("orderCode", returnOrderEntity.WorkOrderCode);
+                    }
+                    var productReceiptOrderDetailEntities = await _manuProductReceiptOrderDetailRepository.GetByProductReceiptIdsAsync(array);
+                    returnOrderEntity.Status = ProductReceiptStatusEnum.Receipt;
+
+                    using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+                    {
+                        // 更新完工数量
+                        rows += await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
+                        {
+                            UpdatedOn = DateTime.UtcNow,
+                            WorkOrderId = planWorkOrderEntity.Id,
+                            Qty = productReceiptOrderDetailEntities.Count(),
+                        });
+                        rows += await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
+                        ts.Complete();
+                    }
+                }
+                else
+                {
                     rows += await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
-                    ts.Complete();
                 }
             }
-            else
-            {
-                rows += await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
-            }
+
+
             ResponseOutputDto responseOutputDto = new ResponseOutputDto();
             if (rows > 0)
             {

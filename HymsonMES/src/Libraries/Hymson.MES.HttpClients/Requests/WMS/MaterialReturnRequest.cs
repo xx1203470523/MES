@@ -239,6 +239,12 @@ namespace Hymson.MES.HttpClients.Requests
         public long? ProductionOrderDetailID { get; set; }
 
         /// <summary>
+        /// MES明细ID
+        /// </summary>
+        public long? SyncId { get; set; }
+        
+
+        /// <summary>
         /// 生产订单子件ID
         /// </summary>
         //public long? ProductionOrderComponentID { get; set; }

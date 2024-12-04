@@ -21,6 +21,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.MES.Services.Services.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -53,6 +54,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
 
         private readonly AbstractValidator<PlanWorkOrderChangeStatusDto> _validationChangeStatusRules;
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
+        private readonly IManuProductReceiptOrderService _manuProductReceiptOrderService; 
         private readonly IManuRequistionOrderDetailRepository _manuRequistionOrderDetailRepository;
         private readonly Data.Repositories.Manufacture.IManuReturnOrderRepository _manuReturnOrderRepository;
         /// <summary>
@@ -95,7 +97,8 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             IManuRequistionOrderDetailRepository manuRequistionOrderDetailRepository,
             Data.Repositories.Manufacture.IManuReturnOrderRepository manuReturnOrderRepository,
             AbstractValidator<PlanWorkOrderChangeStatusDto> validationChangeStatusRules,
-            IPlanWorkPlanProductRepository planWorkPlanProductRepository)
+            IPlanWorkPlanProductRepository planWorkPlanProductRepository,
+            IManuProductReceiptOrderService manuProductReceiptOrderService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -115,6 +118,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             _manuRequistionOrderDetailRepository = manuRequistionOrderDetailRepository;
             _manuReturnOrderRepository = manuReturnOrderRepository;
             _planWorkPlanProductRepository = planWorkPlanProductRepository;
+            _manuProductReceiptOrderService = manuProductReceiptOrderService;
         }
 
 
@@ -528,7 +532,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         }
 
         /// <summary>
-        /// 根据查询条件获取分页数据
+        /// 根据查询条件获取分页数据：生产工单，列表查询，所调接口
         /// </summary>
         /// <param name="planWorkOrderPagedQueryDto"></param>
         /// <returns></returns>
@@ -602,12 +606,17 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
 
                 List<PlanWorkOrderListDetailViewDto> dtolist = dtos.ToList();
                 // TODO: 由于工单没有领料状态字段，所以根据领料记录判断工单领料状态。。。
-                dtolist.ForEach(d =>
+                dtolist.ForEach(async d =>
                 {
                     // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
                     //var qty = requistiongroup.FirstOrDefault(r => r.Key == d.Id)?.Count() ?? 0;
                     d.PickStatus = requistionOrderEntities.Any(x => x.Status != WhMaterialPickingStatusEnum.CancelMaterialReturn && x.WorkOrderId == d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked;
                     d.PassDownQuantity = d.Qty;
+                    var result = await _manuProductReceiptOrderService.QueryByWorkIdByScwAsync(d.Id);
+                    if (result != null)
+                    {
+                        d.FinishProductQuantity = result.SumQty;
+                    }
                 });
                 return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtolist, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
             }
@@ -686,6 +695,16 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 if (workCenter != null)
                 {
                     planWorkOrderDetailView.WorkCenterCode = workCenter.Code;
+                }
+
+                //计算汇总数量和入库数量
+                var result = await _manuProductReceiptOrderService.QueryByWorkIdByScwAsync(id);
+                if (result != null)
+                {
+                    planWorkOrderDetailView.SumQty = result.SumQty;
+                    planWorkOrderDetailView.ToBeTestQty = result.ToBeTestQty;
+                    planWorkOrderDetailView.FinishQty = result.FinishQty;
+                    planWorkOrderDetailView.BadQty = result.BadQty;
                 }
 
                 return planWorkOrderDetailView;

@@ -75,6 +75,34 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// <summary>
     /// 工单完工入库Dto
     /// </summary>
+    public record ManuProductReceiptOrderByScwDto
+    {
+
+        /// <summary>
+        /// 汇总数量：按照所有仓库汇总所有入库状态下数量
+        /// </summary>
+        public decimal SumQty { get; set; } = 0;
+
+        /// <summary>
+        /// 入库数量：按照入库的仓库分别计算该仓库的数量，入库状态排除：取消申请的【待检验仓入库数量】
+        /// </summary>
+        public decimal ToBeTestQty { get; set; } = 0;
+
+        /// <summary>
+        /// 入库数量：按照入库的仓库分别计算该仓库的数量，入库状态排除：取消申请的【成品仓入库数量】
+        /// </summary>
+        public decimal FinishQty { get; set; } = 0;
+
+        /// <summary>
+        /// 入库数量：按照入库的仓库分别计算该仓库的数量，入库状态排除：取消申请的【不良品仓入库数量】
+        /// </summary>
+        public decimal BadQty { get; set; } = 0;
+
+    }
+
+    /// <summary>
+    /// 工单完工入库Dto
+    /// </summary>
     public record ManuProductReceiptOrderDto : BaseEntityDto
     {
         /// <summary>
@@ -144,6 +172,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public record ManuProductReceiptOrderDetailDto : BaseEntityDto
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 箱号编码
         /// </summary>

@@ -847,7 +847,8 @@ namespace Hymson.MES.Services.Services.Process
                     WaitPickingQty = waitPickingQty,
                     HavePickingQty = havePickingQty,
                     BomId = planMaterial?.BomId ?? 0,
-                    Batch = procMaterialEntity.Batch ?? 0
+                    //Batch = procMaterialEntity.Batch ?? 0,
+                    Batch = procMaterialEntity.MinPackageQty ?? procMaterialEntity.Batch ?? 0
                 });
             }
 

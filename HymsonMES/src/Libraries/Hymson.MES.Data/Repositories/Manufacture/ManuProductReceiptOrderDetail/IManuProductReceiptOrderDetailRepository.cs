@@ -89,6 +89,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetByProductReceiptIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据主表id入库明细单查询ByScw
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetByProductReceiptIdsByScwAsync(long[] ids);
+
+        /// <summary>
         /// 数据集查询
         /// </summary>
         /// <param name="query"></param>

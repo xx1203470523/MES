@@ -93,5 +93,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="CompletionOrderCode"></param>
         /// <returns></returns>
         Task<ManuProductReceiptOrderEntity> GetByCompletionOrderCodeSqlAsync(string CompletionOrderCode);
+
+        /// <summary>
+        /// 根据完工单号获取数据ByScw
+        /// </summary>
+        /// <param name="CompletionOrderCode"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductReceiptOrderEntity>> GetByCompletionOrderCodeSqlByScwAsync(string CompletionOrderCode);
     }
 }

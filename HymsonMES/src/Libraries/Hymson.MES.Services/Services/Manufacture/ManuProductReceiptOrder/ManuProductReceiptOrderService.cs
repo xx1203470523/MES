@@ -158,6 +158,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var manuProductReceiptOrder = manuProductReceiptOrderLists.FirstOrDefault(x => x.Id == entity.ProductReceiptId);
                     var manuProductReceipt = new ManuProductReceiptOrderDetailDto
                     {
+                        Id = entity.Id,
                         CompletionOrderCode = manuProductReceiptOrder?.CompletionOrderCode ?? "",
                         StorageStatus = manuProductReceiptOrder?.Status ?? ProductReceiptStatusEnum.Approvaling,
                         Batch = entity.Batch,
@@ -174,6 +175,33 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             }
             return manuProductReceiptOrders;
+        }
+
+        /// <summary>
+        /// 根据工单查询入库记录ByScw
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        public async Task<ManuProductReceiptOrderByScwDto?> QueryByWorkIdByScwAsync(long workOrderId)
+        {
+            var result = new ManuProductReceiptOrderByScwDto();
+            var manuProductReceiptOrderLists = await _manuProductReceiptOrderRepository.GetByWorkOrderIdsSqlAsync(workOrderId);
+            if (manuProductReceiptOrderLists.Any() == false)
+            {
+                return result;
+            }
+            var manuProductReceiptOrderIds = manuProductReceiptOrderLists.Select(x => x.Id).ToArray();
+            var productReceiptOrderDetailEntities = await _manuProductReceiptOrderDetailRepository.GetByProductReceiptIdsByScwAsync(manuProductReceiptOrderIds);
+            if (productReceiptOrderDetailEntities.Any())
+            {
+                result.SumQty = productReceiptOrderDetailEntities.Count();
+                var warehouseCount = productReceiptOrderDetailEntities.GroupBy(a => a.WarehouseCode).Select(b => new { b.Key,Qty = b.Count() });
+                result.ToBeTestQty = warehouseCount.FirstOrDefault(a => a.Key.Equals("待检验仓"))?.Qty ?? 0;
+                result.FinishQty = warehouseCount.FirstOrDefault(a => a.Key.Equals("成品仓"))?.Qty ?? 0;
+                result.BadQty = warehouseCount.FirstOrDefault(a => a.Key.Equals("不良品仓"))?.Qty ?? 0;
+                return result;
+            }
+            return result;
         }
 
         /// <summary>

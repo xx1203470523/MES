@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Services.Dtos.Warehouse;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -173,6 +174,13 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="request"></param>
         /// <returns></returns>
         Task<int> CancelProductReceiptApplyAsync(CancelProductReceiptApplyDto request);
+
+        /// <summary>
+        /// 取消入库ByScw
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<int> CancelProductReceiptApplyByScwAsync(CancelProductReceiptApplyByScwDto request);
 
         /// <summary>
         /// 根据工单查询工单的领料列表

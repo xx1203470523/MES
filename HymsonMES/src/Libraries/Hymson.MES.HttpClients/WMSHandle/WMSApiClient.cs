@@ -179,6 +179,24 @@ namespace Hymson.MES.HttpClients
         }
 
         /// <summary>
+        /// 取消入库申请ByScw
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<BaseResponse?> CancelEntryByScwAsync(CancelEntryByScwDto requestBody)
+        {
+            _logger.LogDebug($"取消入库申请ByScw -> Request: {requestBody.ToSerialize()}");
+
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.ReceiptCancelByScw.Route, requestBody);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"取消入库申请ByScw -> Response: {jsonResponse}");
+
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse?>();
+        }
+
+        /// <summary>
         /// 取消出库申请
         /// </summary>
         /// <param name="requestDto"></param>
