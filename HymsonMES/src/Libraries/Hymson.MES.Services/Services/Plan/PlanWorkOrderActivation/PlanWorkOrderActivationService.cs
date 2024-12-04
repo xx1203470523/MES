@@ -24,6 +24,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Transactions;
 
@@ -34,6 +35,7 @@ namespace Hymson.MES.Services.Services.Plan;
 /// </summary>
 public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
 {
+    private readonly ILogger<PlanWorkOrderActivationService> _logger;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentSite _currentSite;
 
@@ -81,6 +83,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
     /// <param name="rotorApiClient"></param>
     /// <param name="sysConfigRepository"></param>
     public PlanWorkOrderActivationService(
+        ILogger<PlanWorkOrderActivationService> logger,
         ICurrentUser currentUser,
         ICurrentSite currentSite,
         AbstractValidator<PlanWorkOrderActivationCreateDto> validationCreateRules,
@@ -100,6 +103,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         IRotorApiClient rotorApiClient,
         ISysConfigRepository sysConfigRepository)
     {
+        _logger = logger;
         _currentUser = currentUser;
         _currentSite = currentSite;
 
@@ -574,10 +578,19 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
                 {
                     PlanWorkOrderMavelView order = await _planWorkOrderRepository.GetByIdMavelAsync(activationWorkOrderDto.Id);
                     RotorWorkOrderRequest lmsOrder = LmsOrderChange(order);
+
+                    _logger.LogInformation($"MES调用rotorApiClient -> 调用前，入参lmsOrder = {lmsOrder.ToSerialize()}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
+
                     var lmsResult = await _rotorApiClient.WorkOrderAsync(lmsOrder);
+
+
+                    _logger.LogInformation($"MES调用rotorApiClient -> 调用后，返回值lmsResult = {lmsResult.ToSerialize()}；返回值的状态status = {lmsResult.IsSuccess}；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
                     if (lmsResult.IsSuccess == false)
                     {
                         ts.Dispose();
+                        //工单下发至LMS失败！错误信息:{msg}
                         throw new CustomerValidationException(nameof(ErrorCode.MES16418)).WithData("msg", lmsResult.Message);
                     }
                 }

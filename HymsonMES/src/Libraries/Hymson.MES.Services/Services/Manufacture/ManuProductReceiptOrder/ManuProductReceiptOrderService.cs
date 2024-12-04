@@ -178,6 +178,28 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
+        /// 根据工单查询入库记录ByScw
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        public async Task<decimal> QueryByWorkIdByScwAsync(long workOrderId)
+        {
+            var manuProductReceiptOrders = new List<ManuProductReceiptOrderDetailDto>();
+            var manuProductReceiptOrderLists = await _manuProductReceiptOrderRepository.GetByWorkOrderIdsSqlAsync(workOrderId);
+            if (manuProductReceiptOrderLists.Any() == false)
+            {
+                return 0;
+            }
+            var manuProductReceiptOrderIds = manuProductReceiptOrderLists.Select(x => x.Id).ToArray();
+            var productReceiptOrderDetailEntities = await _manuProductReceiptOrderDetailRepository.GetByProductReceiptIdsByScwAsync(manuProductReceiptOrderIds);
+            if (productReceiptOrderDetailEntities.Any())
+            {
+                return productReceiptOrderDetailEntities.Count();
+            }
+            return 0;
+        }
+
+        /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>
