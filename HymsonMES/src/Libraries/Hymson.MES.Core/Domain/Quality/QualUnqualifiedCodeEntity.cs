@@ -41,6 +41,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// </summary>
         public QualUnqualifiedCodeTypeEnum Type { get; set; }
 
+
         /// <summary>
         /// 描述 :等级 
         /// 空值 : true  

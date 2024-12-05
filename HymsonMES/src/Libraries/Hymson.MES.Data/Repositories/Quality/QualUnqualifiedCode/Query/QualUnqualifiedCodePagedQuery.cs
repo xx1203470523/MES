@@ -37,6 +37,8 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         public QualUnqualifiedCodeTypeEnum? Type { get; set; }
 
+
+
         /// <summary>
         /// 等级
         /// </summary>
