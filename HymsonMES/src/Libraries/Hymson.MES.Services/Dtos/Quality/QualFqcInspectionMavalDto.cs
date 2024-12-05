@@ -134,10 +134,7 @@ namespace Hymson.MES.Services.Dtos.QualFqcInspectionMaval
         /// </summary>
         public string ?Remark { get; set; }
 
-        /// <summary>
-        /// 检验类型
-        /// </summary>
-        public string? TestType { get; set; }
+ 
 
     }
 
@@ -206,10 +203,7 @@ namespace Hymson.MES.Services.Dtos.QualFqcInspectionMaval
         /// </summary>
         public long IsDeleted { get; set; }
 
-        /// <summary>
-        /// 检验类型
-        /// </summary>
-        public string? TestType { get; set; }
+
 
     }
 

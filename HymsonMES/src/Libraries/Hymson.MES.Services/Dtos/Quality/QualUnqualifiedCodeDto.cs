@@ -277,6 +277,8 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public QualUnqualifiedCodeTypeEnum? Type { get; set; }
 
+
+
         /// <summary>
         /// 等级
         /// </summary>

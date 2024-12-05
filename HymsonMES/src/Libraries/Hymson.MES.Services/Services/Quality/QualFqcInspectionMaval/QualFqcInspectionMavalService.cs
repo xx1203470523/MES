@@ -106,7 +106,6 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
                 qualFqcInspectionMaval.UpdatedBy = _currentUser.UserName;
                 qualFqcInspectionMaval.UpdatedOn = HymsonClock.Now();
                 qualFqcInspectionMaval.Remark = qualFqcInspectionMavalCreateDto.Remark;
-                qualFqcInspectionMaval.TestType = qualFqcInspectionMavalCreateDto.TestType;
                 await _qualFqcInspectionMavalRepository.UpdateAsync(qualFqcInspectionMaval);
                 //var row = await _qualFqcInspectionMavalRepository.DeleteAsync(qualFqcInspectionMaval.Id);
                 //if (row <= 0)
@@ -125,7 +124,6 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
                 qualFqcInspectionMavalEntity.Qty = qualFqcInspectionMavalCreateDto.Qty;
                 qualFqcInspectionMavalEntity.JudgmentResults = qualFqcInspectionMavalCreateDto.JudgmentResults;
                 qualFqcInspectionMavalEntity.Remark = qualFqcInspectionMavalCreateDto.Remark;
-                qualFqcInspectionMavalEntity.TestType = qualFqcInspectionMavalCreateDto.TestType;
 
                 qualFqcInspectionMavalEntity.Id = qualFqcInspectionMavalCreateDto.Id != 0 ? qualFqcInspectionMavalCreateDto.Id : IdGenProvider.Instance.CreateId();
                 qualFqcInspectionMavalEntity.CreatedBy = _currentUser.UserName;
