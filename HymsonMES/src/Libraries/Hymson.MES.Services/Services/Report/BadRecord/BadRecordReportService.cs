@@ -112,7 +112,7 @@ namespace Hymson.MES.Services.Services.Report
         {
             var pagedQuery = param.ToQuery<ManuProductBadRecordReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            pagedQuery.PageSize = 1000;
+            pagedQuery.PageSize = 100000;
             var pagedInfoList = await _manuProductBadRecordRepository.GetPagedInfoReportAsync(pagedQuery);
 
             var unqualifiedIds = pagedInfoList.Data.Select(x => x.UnqualifiedId).ToArray();
@@ -158,7 +158,7 @@ namespace Hymson.MES.Services.Services.Report
                 var unqualifiedCodeEntitie = unqualifiedCodeEntities.FirstOrDefault(y => y.Id == a.UnqualifiedId);
                 listDto.Add(new ManuProductBadRecordReportViewExportDto()
                 {
-                    UnqualifiedId = a.UnqualifiedId,
+                    //UnqualifiedId = a.UnqualifiedId,
                     Num = a.Num,
                     UnqualifiedCode = unqualifiedCodeEntitie?.UnqualifiedCode ?? "",
                     UnqualifiedCodeName = unqualifiedCodeEntitie?.UnqualifiedCodeName ?? ""
@@ -244,7 +244,7 @@ namespace Hymson.MES.Services.Services.Report
         {
             var pagedQuery = param.ToQuery<ManuProductBadRecordLogReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            pagedQuery.PageSize = 1000;
+            pagedQuery.PageSize = 100000;
             var pagedInfoList = await _manuProductBadRecordRepository.GetPagedInfoLogReportAsync(pagedQuery);
 
             List<ManuProductBadRecordLogReportViewDto> dtos = new List<ManuProductBadRecordLogReportViewDto>();

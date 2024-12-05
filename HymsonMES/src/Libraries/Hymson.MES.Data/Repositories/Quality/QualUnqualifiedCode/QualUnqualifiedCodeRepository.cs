@@ -173,6 +173,8 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("Type=@Type");
             }
 
+
+
             if (parm.Ids != null && parm.Ids.Any())
             {
                 sqlBuilder.Where("Id IN @Ids");

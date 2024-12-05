@@ -228,12 +228,12 @@ namespace Hymson.MES.Services.Services.Report
         {
             var siteId = _currentSite.SiteId ?? 0;
             var pagedQuery = param.ToQuery<PlanWorkOrderPagedQuery>();
-            pagedQuery.PageSize = 1000;
+            pagedQuery.PageSize = 100000;
             pagedQuery.SiteId = siteId;
             // 判断是否有获取到站点码 
             if (string.IsNullOrWhiteSpace(param.OrderCode))
             {
-                return null;
+                //return null;
             }
             //查询工单表信息
             var pagedInfoList = await _planWorkOrderRepository.GetPagedInfoAsyncCode(pagedQuery);

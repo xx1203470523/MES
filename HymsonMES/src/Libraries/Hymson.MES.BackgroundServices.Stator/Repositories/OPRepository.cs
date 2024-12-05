@@ -14,7 +14,7 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// </summary>
         //const string QuerySql = @"SELECT * FROM `{0}` WHERE RDate >= '2024-08-11 08:30:00' AND `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
         const string QuerySql = @"SELECT * FROM `{0}` WHERE `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
-        const string QueryByIdSql = @"SELECT * FROM `{0}` WHERE `ID` IN @Ids ORDER BY `index` ASC";
+        const string QueryByIdSql = @"SELECT * FROM `{0}` WHERE `ID` IN @Ids ORDER BY `index` ASC  LIMIT @Rows";
 
         /// <summary>
         /// 构造函数
@@ -31,7 +31,9 @@ namespace Hymson.MES.BackgroundServices.Stator
         public async Task<IEnumerable<TEntity>> GetListByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetStatorDbConnection();
-            return await conn.QueryAsync<TEntity>(string.Format(QueryByIdSql, typeof(TEntity).Name), new { Ids = ids });
+
+            int rows = 200;
+            return await conn.QueryAsync<TEntity>(string.Format(QueryByIdSql, typeof(TEntity).Name), new { Ids = ids, Rows = rows });
         }
 
         /// <summary>

@@ -52,5 +52,6 @@ namespace Hymson.MES.Core.Domain.QualFqcInspectionMaval
         /// 不合格原因
         /// </summary>
         public string? Remark { get; set; }
+
     }
 }

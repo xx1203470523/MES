@@ -21,12 +21,12 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
     /// </summary>
     public partial class QualFqcInspectionMavalRepository : BaseRepository, IQualFqcInspectionMavalRepository
     {
-
         public QualFqcInspectionMavalRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
         #region 方法
+
         /// <summary>
         /// 删除（软删除）
         /// </summary>
@@ -61,7 +61,6 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         }
 
 
-
         /// <summary>
         /// 根据SFC获取数据
         /// </summary>
@@ -90,7 +89,8 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// </summary>
         /// <param name="qualFqcInspectionMavalPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualFqcInspectionMavalEntity>> GetPagedInfoAsync(QualFqcInspectionMavalPagedQuery qualFqcInspectionMavalPagedQuery)
+        public async Task<PagedInfo<QualFqcInspectionMavalEntity>> GetPagedInfoAsync(
+            QualFqcInspectionMavalPagedQuery qualFqcInspectionMavalPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -101,13 +101,19 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
                 qualFqcInspectionMavalPagedQuery.Remark = $"%{qualFqcInspectionMavalPagedQuery.Remark}%";
                 sqlBuilder.Where("Remark LIKE @Remark");
             }
+
             sqlBuilder.Select("*");
             sqlBuilder.OrderBy("CreatedOn DESC");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            if (qualFqcInspectionMavalPagedQuery.ProcedureId != null)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
+            }
+            
+            if (qualFqcInspectionMavalPagedQuery.ResourceId != null)
+            {
+                sqlBuilder.Where("ResourceId=@ResourceId");
+            }
 
             var offSet = (qualFqcInspectionMavalPagedQuery.PageIndex - 1) * qualFqcInspectionMavalPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -115,11 +121,13 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
             sqlBuilder.AddParameters(qualFqcInspectionMavalPagedQuery);
 
             using var conn = GetMESDbConnection();
-            var qualFqcInspectionMavalEntitiesTask = conn.QueryAsync<QualFqcInspectionMavalEntity>(templateData.RawSql, templateData.Parameters);
+            var qualFqcInspectionMavalEntitiesTask =
+                conn.QueryAsync<QualFqcInspectionMavalEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var qualFqcInspectionMavalEntities = await qualFqcInspectionMavalEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<QualFqcInspectionMavalEntity>(qualFqcInspectionMavalEntities, qualFqcInspectionMavalPagedQuery.PageIndex, qualFqcInspectionMavalPagedQuery.PageSize, totalCount);
+            return new PagedInfo<QualFqcInspectionMavalEntity>(qualFqcInspectionMavalEntities,
+                qualFqcInspectionMavalPagedQuery.PageIndex, qualFqcInspectionMavalPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -127,7 +135,8 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFqcInspectionMavalEntity>> GetQualFqcInspectionMavalEntitiesAsync(QualFqcInspectionMavalQuery query)
+        public async Task<IEnumerable<QualFqcInspectionMavalEntity>> GetQualFqcInspectionMavalEntitiesAsync(
+            QualFqcInspectionMavalQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetQualFqcInspectionMavalEntitiesSqlTemplate);
@@ -143,7 +152,8 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
 
             sqlBuilder.AddParameters(query);
             using var conn = GetMESDbConnection();
-            var qualFqcInspectionMavalEntities = await conn.QueryAsync<QualFqcInspectionMavalEntity>(template.RawSql, query);
+            var qualFqcInspectionMavalEntities =
+                await conn.QueryAsync<QualFqcInspectionMavalEntity>(template.RawSql, query);
             return qualFqcInspectionMavalEntities;
         }
 
@@ -190,31 +200,43 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, qualFqcInspectionMavalEntitys);
         }
-        #endregion
 
+        #endregion
     }
 
     public partial class QualFqcInspectionMavalRepository
     {
-        #region 
+        #region
+
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_fqc_inspection_maval` /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
+        
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `qual_fqc_inspection_maval` /**where**/ ";
+
         const string GetQualFqcInspectionMavalEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `qual_fqc_inspection_maval` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `qual_fqc_inspection_maval`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `SFC`, `Qty`, `JudgmentResults`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`) VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @SFC, @Qty, @JudgmentResults, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark )  ";
-        const string InsertsSql = "INSERT INTO `qual_fqc_inspection_maval`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `SFC`, `Qty`, `JudgmentResults`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`) VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @SFC, @Qty, @JudgmentResults, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark )  ";
+        const string InsertSql =
+            "INSERT INTO `qual_fqc_inspection_maval`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `SFC`, `Qty`, `JudgmentResults`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`) VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @SFC, @Qty, @JudgmentResults, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark )  ";
 
-        const string UpdateSql = "UPDATE `qual_fqc_inspection_maval` SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, SFC = @SFC, Qty = @Qty, JudgmentResults = @JudgmentResults, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `qual_fqc_inspection_maval` SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, SFC = @SFC, Qty = @Qty, JudgmentResults = @JudgmentResults, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark  WHERE Id = @Id ";
+        const string InsertsSql =
+            "INSERT INTO `qual_fqc_inspection_maval`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `SFC`, `Qty`, `JudgmentResults`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`) VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @SFC, @Qty, @JudgmentResults, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark )  ";
+
+        const string UpdateSql =
+            "UPDATE `qual_fqc_inspection_maval` SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, SFC = @SFC, Qty = @Qty, JudgmentResults = @JudgmentResults, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark  WHERE Id = @Id ";
+
+        const string UpdatesSql =
+            "UPDATE `qual_fqc_inspection_maval` SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, SFC = @SFC, Qty = @Qty, JudgmentResults = @JudgmentResults, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `qual_fqc_inspection_maval` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `qual_fqc_inspection_maval` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+
+        const string DeletesSql =
+            "UPDATE `qual_fqc_inspection_maval` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `SFC`, `Qty`, `JudgmentResults`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `qual_fqc_inspection_maval`  WHERE Id = @Id ";
+
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `SFC`, `Qty`, `JudgmentResults`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `qual_fqc_inspection_maval`  WHERE Id IN @Ids ";
@@ -222,6 +244,7 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         const string GetBySFCSql = @"SELECT  
                                `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `SFC`, `Qty`, `JudgmentResults`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `qual_fqc_inspection_maval`  WHERE SFC = @SFC AND SiteId=@SiteId";
+
         #endregion
     }
 }

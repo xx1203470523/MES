@@ -51,7 +51,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("export")]
-        [PermissionDescription("proc:parameter:export")]
+        [PermissionDescription("report:badRecordReport:export")]
         public async Task<NioPushCollectionExportResultDto> ExprotComUsagePageListAsync([FromQuery] BadRecordReportDto param)
         {
             return await _badRecordReportService.ExprotAsync(param);
@@ -64,7 +64,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("exportLog")]
-        [PermissionDescription("proc:parameter:export")]
+        [PermissionDescription("report:badRecordLogReport:export")]
         public async Task<NioPushCollectionExportResultDto> ExprotLogComUsagePageListAsync([FromQuery] ManuProductBadRecordLogReportPagedQueryDto param)
         {
             return await _badRecordReportService.LogExprotAsync(param);

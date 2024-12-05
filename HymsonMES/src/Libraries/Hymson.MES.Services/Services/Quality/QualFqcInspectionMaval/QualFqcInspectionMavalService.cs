@@ -19,10 +19,12 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.QualFqcInspectionMavalAttachment;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.QualFqcInspectionMaval;
 using Hymson.MES.Services.Dtos.QualFqcInspectionMaval;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Services.Manufacture.ManuSfc;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -45,11 +47,15 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IQualFqcInspectionMavalAttachmentRepository _qualFqcInspectionMavalAttachmentRepository;
+        private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IInteAttachmentRepository _inteAttachmentRepository;
         private readonly AbstractValidator<QualFqcInspectionMavalCreateDto> _validationCreateRules;
         private readonly AbstractValidator<QualFqcInspectionMavalModifyDto> _validationModifyRules;
 
-        public QualFqcInspectionMavalService(ICurrentUser currentUser, ICurrentSite currentSite, IQualFqcInspectionMavalRepository qualFqcInspectionMavalRepository, AbstractValidator<QualFqcInspectionMavalCreateDto> validationCreateRules, AbstractValidator<QualFqcInspectionMavalModifyDto> validationModifyRules, IProcResourceRepository procResourceRepository, IProcProcedureRepository procProcedureRepository, IQualFqcInspectionMavalAttachmentRepository qualFqcInspectionMavalAttachmentRepository, IInteAttachmentRepository inteAttachmentRepository)
+        public QualFqcInspectionMavalService(ICurrentUser currentUser, ICurrentSite currentSite, IQualFqcInspectionMavalRepository qualFqcInspectionMavalRepository,
+            AbstractValidator<QualFqcInspectionMavalCreateDto> validationCreateRules, AbstractValidator<QualFqcInspectionMavalModifyDto> validationModifyRules, 
+            IProcResourceRepository procResourceRepository, IProcProcedureRepository procProcedureRepository, IQualFqcInspectionMavalAttachmentRepository qualFqcInspectionMavalAttachmentRepository, 
+            IInteAttachmentRepository inteAttachmentRepository,IManuSfcRepository manuSfcRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -60,6 +66,7 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
             _procProcedureRepository = procProcedureRepository;
             _qualFqcInspectionMavalAttachmentRepository = qualFqcInspectionMavalAttachmentRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
+            _manuSfcRepository = manuSfcRepository;
         }
 
         /// <summary>
@@ -85,7 +92,10 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
             var procProcedure = await _procProcedureRepository.GetByCodeAsync(new EntityByCodeQuery { Code = qualFqcInspectionMavalCreateDto.ProcedureCode, Site = siteId })
              ?? throw new CustomerValidationException(nameof(ErrorCode.MES11750)).WithData("Code", qualFqcInspectionMavalCreateDto.ProcedureCode);
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Code = qualFqcInspectionMavalCreateDto.ResourceCode, Site = siteId })
-             ?? throw new CustomerValidationException(nameof(ErrorCode.MES11751)).WithData("Code", qualFqcInspectionMavalCreateDto.ProcedureCode);
+             ?? throw new CustomerValidationException(nameof(ErrorCode.MES11751)).WithData("Code", qualFqcInspectionMavalCreateDto.ResourceCode);
+
+            var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery { SFC = qualFqcInspectionMavalCreateDto.SFC, SiteId = siteId }) 
+                                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15320)).WithData("sfcs", qualFqcInspectionMavalCreateDto.SFC);
 
             var qualFqcInspectionMaval = await _qualFqcInspectionMavalRepository.GetBySFCAsync(new QualFqcInspectionMavalQuery { SFC = qualFqcInspectionMavalCreateDto.SFC, SiteId = siteId });
             if (qualFqcInspectionMaval != null)
@@ -154,12 +164,43 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
         /// <returns></returns>
         public async Task<PagedInfo<QualFqcInspectionMavalDto>> GetPagedListAsync(QualFqcInspectionMavalPagedQueryDto qualFqcInspectionMavalPagedQueryDto)
         {
+            var procedure = await _procProcedureRepository.GetByCodeAsync(new EntityByCodeQuery
+                { Code = qualFqcInspectionMavalPagedQueryDto.ProcedureCode,Site = _currentSite.SiteId ?? 0 });
+
+            var resoure = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
+                { Code = qualFqcInspectionMavalPagedQueryDto.ResourceCode ,Site = _currentSite.SiteId ?? 0});
+
             var qualFqcInspectionMavalPagedQuery = qualFqcInspectionMavalPagedQueryDto.ToQuery<QualFqcInspectionMavalPagedQuery>();
+            qualFqcInspectionMavalPagedQuery.ProcedureId = procedure?.Id;
+            qualFqcInspectionMavalPagedQuery.ResourceId = resoure?.Id;
+            
             qualFqcInspectionMavalPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _qualFqcInspectionMavalRepository.GetPagedInfoAsync(qualFqcInspectionMavalPagedQuery);
+            
+            // 查询工序
+            var procProcedureEntities = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(s => s.ProcedureId));
+            
+            // 查询资源
+            var resourceEntities = await _procResourceRepository.GetListByIdsAsync(pagedInfo.Data.Select(s => s.ResourceId));
+            
 
             //实体到DTO转换 装载数据
-            List<QualFqcInspectionMavalDto> qualFqcInspectionMavalDtos = PrepareQualFqcInspectionMavalDtos(pagedInfo);
+            // List<QualFqcInspectionMavalDto> qualFqcInspectionMavalDtos = PrepareQualFqcInspectionMavalDtos(pagedInfo);
+            
+            var qualFqcInspectionMavalDtos = new List<QualFqcInspectionMavalDto>();
+            foreach (var qualFqcInspectionMavalEntity in pagedInfo.Data)
+            {
+                var qualFqcInspectionMavalDto = qualFqcInspectionMavalEntity.ToModel<QualFqcInspectionMavalDto>();
+                if (qualFqcInspectionMavalDto == null) continue;
+                qualFqcInspectionMavalDto.ProcedureCode = procProcedureEntities
+                    .FirstOrDefault(s => s.Id == qualFqcInspectionMavalEntity.ProcedureId)?.Code;
+                qualFqcInspectionMavalDto.ResourceCode = resourceEntities
+                    .FirstOrDefault(s => s.Id == qualFqcInspectionMavalEntity.ResourceId)?.ResCode;
+                qualFqcInspectionMavalDtos.Add(qualFqcInspectionMavalDto);
+            }
+            
+            
+            
             return new PagedInfo<QualFqcInspectionMavalDto>(qualFqcInspectionMavalDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 

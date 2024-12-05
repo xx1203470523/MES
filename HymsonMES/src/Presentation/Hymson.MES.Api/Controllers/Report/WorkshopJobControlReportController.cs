@@ -51,7 +51,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("export")]
-        [PermissionDescription("proc:parameter:export")]
+        [PermissionDescription("report:workshopJobControlReport:export")]
         public async Task<NioPushCollectionExportResultDto> ExprotAsync([FromQuery] WorkshopJobControlReportOptimizePagedQueryDto param)
         {
             return await _workshopJobControlReportService.ExprotAsync(param);

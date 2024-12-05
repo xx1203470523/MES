@@ -97,13 +97,15 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 工单类型
         /// </summary>
         [EpplusTableColumn(Header = "工单类型", Order = 4)]
-        public PlanWorkOrderTypeEnum? Type { get; set; }
+        public string Type { get; set; }
+        //public PlanWorkOrderTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 工单类型
         /// </summary>
-        [EpplusTableColumn(Header = "工单类型", Order = 5)]
-        public PlanWorkOrderStatusEnum? Status { get; set; }
+        [EpplusTableColumn(Header = "工单状态", Order = 5)]
+        public string? Status { get; set; }
+        //public PlanWorkOrderStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 条码下达数量

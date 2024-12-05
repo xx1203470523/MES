@@ -18,6 +18,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Dtos.Report;
@@ -144,7 +145,7 @@ namespace Hymson.MES.Services.Services.Report
         {
             var pagedQuery = pagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            pagedQuery.PageSize = 1000;
+            pagedQuery.PageSize = 100000;
             var pagedInfoList = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
 
             List<WorkOrderControlReportViewDto> dtos = new();
@@ -195,12 +196,12 @@ namespace Hymson.MES.Services.Services.Report
 
             if (pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuBoxReport"), _localizationService.GetResource("ManuBoxReport"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkOrderControlReportView"), _localizationService.GetResource("WorkOrderControlReportView"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new NioPushCollectionExportResultDto
                 {
-                    FileName = _localizationService.GetResource("ManuBoxReport"),
+                    FileName = _localizationService.GetResource("WorkOrderControlReportView"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -224,11 +225,12 @@ namespace Hymson.MES.Services.Services.Report
                     var material = materials.FirstOrDefault(x => x.Id == item.ProductId);
                     listDto.Add(new WorkOrderControlReportViewExportDto()
                     {
-                        Status = item.Status,
+                        WorkCenterId = item.WorkCenterCode,
+                        Status = item.Status.GetEnumDescription(),
                         Qty = item.Qty,
                         MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
                         OrderCode = item?.OrderCode ?? "",
-                        Type = item?.Type,
+                        Type = item?.Type.GetEnumDescription(),
                         PassDownQuantity = item?.PassDownQuantity ?? 0,
                         ProcessDownQuantity = item?.PassDownQuantity ?? 0 - item?.UnQualifiedQuantity ?? 0 - item?.FinishProductQuantity ?? 0,
                         UnQualifiedQuantity = item?.UnQualifiedQuantity ?? 0,
@@ -239,12 +241,12 @@ namespace Hymson.MES.Services.Services.Report
             }
             
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuBoxReport"), _localizationService.GetResource("ManuBoxReport"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkOrderControlReportView"), _localizationService.GetResource("WorkOrderControlReportView"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new NioPushCollectionExportResultDto
             {
-                FileName = _localizationService.GetResource("ManuBoxReport"),
+                FileName = _localizationService.GetResource("WorkOrderControlReportView"),
                 Path = uploadResult.AbsoluteUrl,
             };
 

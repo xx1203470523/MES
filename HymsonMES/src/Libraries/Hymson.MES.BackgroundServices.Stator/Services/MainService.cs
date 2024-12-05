@@ -854,7 +854,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         public async Task<int> SaveBaseDataWithCommitAsync(StatorSummaryBo summaryBo)
         {
             using var trans = TransactionHelper.GetTransactionScope();
-            return await SaveBaseDataAsync(summaryBo);
+
+            var rows = await SaveBaseDataAsync(summaryBo);
+            trans.Complete();
+
+            return rows;
         }
 
         /// <summary>

@@ -269,36 +269,28 @@ namespace Hymson.MES.Services.Dtos.Report
     {
 
         /// <summary>
-        /// 不合格代码Id
-        /// </summary>
-        [EpplusTableColumn(Header = "不合格代码Id", Order = 1)]
-        public long UnqualifiedId { get; set; }
-
-        /// <summary>
-        /// 汇总数量
-        /// </summary>
-        [EpplusTableColumn(Header = "汇总数量", Order = 2)]
-        public int Num { get; set; }
-
-        /// <summary>
-        /// 百分比
-        /// </summary>
-        [EpplusTableColumn(Header = "百分比", Order = 3)]
-        public decimal Percentage { get; set; }
-
-        /// <summary>
         /// 描述 :不合格代码 
         /// 空值 : false  
         /// </summary>
-        [EpplusTableColumn(Header = "百分比", Order = 4)]
+        [EpplusTableColumn(Header = "不合格代码", Order = 1)]
         public string UnqualifiedCode { get; set; }
 
         /// <summary>
         /// 描述 :不合格代码名称 
         /// 空值 : false  
         /// </summary>
-        [EpplusTableColumn(Header = "不合格代码名称", Order = 5)]
+        [EpplusTableColumn(Header = "不合格代码名称", Order = 2)]
         public string UnqualifiedCodeName { get; set; }
+
+        /// <summary>
+        /// 汇总数量
+        /// </summary>
+        [EpplusTableColumn(Header = "汇总数量", Order = 3)]
+        public int Num { get; set; }
+
+        
+
+
 
     }
 

@@ -86,7 +86,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<NioPushCollectionExportResultDto> ExprotAsync(ReportBoxQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<ReportBoxQueryDto>();
-            pagedQuery.PageSize = 1000;
+            pagedQuery.PageSize = 100000;
             var pagedInfoList = await _manuProductReceiptOrderDetailRepository.GetReportPagedInfoAsync(pagedQueryDto);
             //var dtos = pagedInfoList.Data.Select(a => a.ToModel<ManuRequistionOrderDto>());
             var dtos = pagedInfoList.Data.Select(a => new ReportBoxResultDto
