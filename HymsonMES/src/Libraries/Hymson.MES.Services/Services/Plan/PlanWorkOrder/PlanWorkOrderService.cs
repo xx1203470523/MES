@@ -825,21 +825,53 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             //遍历工单Bom领料的物料列表
             foreach (var procMaterial in procMaterials)
             {
+                //已领料数量初始化
                 var detailQty = 0M;
-                //便利工单领料记录的物料记录
+
+                //领料中数量初始化
+                var detailPickingQty = 0M;
+
+                //遍历工单领料记录的物料记录
                 foreach (var item in manuRequistionOrderDetails)
                 {
-                    //计算
                     var material = procMaterials.FirstOrDefault(x => x.Id == item.MaterialId);
-                    if (material != null && procMaterial.MaterialCode == material.MaterialCode)
+
+                    //计算已领料数量的和【已领料数量：取值工单领料记录中领料状态为“发料完成”的数量】
+                    if (material != null && procMaterial.MaterialCode == material.MaterialCode && procMaterial.Id == item.MaterialId)
                     {
-                        detailQty += item.Qty;
+                        foreach (var requistionOrderEntity in requistionOrderEntities)
+                        {
+                            //计算领料中数量的和，领料状态为：发料完成
+                            if (requistionOrderEntity.Id == item.RequistionOrderId && requistionOrderEntity.Status == WhMaterialPickingStatusEnum.Completed)
+                            {
+                                detailQty += item.Qty;
+                                break;
+                            }
+                        }
+                    }
+
+                    //2024.12.5号，新增的需求：计算领料中数量的和【领料中数量：取值工单领料记录中领料状态为“申请成功待发料” + “发料中”的数量】
+                    if (material != null && procMaterial.MaterialCode == material.MaterialCode && procMaterial.Id == item.MaterialId)
+                    {
+                        foreach (var requistionOrderEntity in requistionOrderEntities)
+                        {
+                            //计算领料中数量的和，领料状态为：“申请成功待发料” + “发料中”
+                            if (requistionOrderEntity.Id == item.RequistionOrderId 
+                                && (requistionOrderEntity.Status == WhMaterialPickingStatusEnum.ApplicationSuccessful 
+                                || requistionOrderEntity.Status == WhMaterialPickingStatusEnum.Inspectioning))
+                            {
+                                detailPickingQty += item.Qty;
+                                break;
+                            }
+                        }
                     }
                 }
+
                 details.Add(new ManuRequistionOrderDetailByScwDto
                 {
                     MaterialCode = procMaterial.MaterialCode,
                     Qty = detailQty,
+                    PickingQty = detailPickingQty
                 });
             }
             return details;

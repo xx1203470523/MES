@@ -259,7 +259,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
 
         const string GetByCodeSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND ReqOrderCode = @ReqOrderCode and SiteId=@SiteId ";
         const string GetByOrderIdSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId and SiteId=@SiteId ";
-        const string GetByOrderIdByScwSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND Status != 5 AND WorkOrderId = @WorkOrderId and SiteId=@SiteId ";
+        const string GetByOrderIdByScwSql = @"SELECT t1.*  FROM `manu_requistion_order` t1 WHERE t1.IsDeleted = 0 AND t1.Status != 5 AND t1.WorkOrderId = @WorkOrderId and t1.SiteId=@SiteId ";
         #endregion
     }
 }

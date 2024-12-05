@@ -35,7 +35,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public ManuRequistionTypeEnum Type { get; set; }
 
         /// <summary>
-        /// 状态
+        /// 领料状态
         /// </summary>
         public WhMaterialPickingStatusEnum Status { get; set; }
 

@@ -79,9 +79,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string MaterialCode { get; set; }
 
         /// <summary>
-        /// 领料数量
+        /// 已领料数量
         /// </summary>
         public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 领料中数量
+        /// </summary>
+        public decimal PickingQty { get; set; }
 
     }
 
