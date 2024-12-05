@@ -97,7 +97,7 @@ spec:
         app: stator-back
     spec:
       containers:
-      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks.stator:20241028182630
+      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks.stator:20241205180146
         name: stator-back
         volumeMounts:
           - mountPath: /logs
