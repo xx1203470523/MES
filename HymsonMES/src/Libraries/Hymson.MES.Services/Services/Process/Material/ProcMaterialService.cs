@@ -621,7 +621,7 @@ namespace Hymson.MES.Services.Services.Process
                     item.QuantityResidue = 0;
                 }
 
-                //2024.11.21确认：1.待领料数量 = 需求数量 - 已领料数量。【工单列表，点击领料按钮，进入工单Bom领料页面，新增一行后，点击物料后的弹出框加载物料列表，所调方法】
+                //2024.11.21确认：1.可领料数量 = 需求数量 - 已领料数量。【工单列表，点击领料按钮，进入工单Bom领料页面，新增一行后，点击物料后的弹出框加载物料列表，所调方法】
                 //2.需求数量 = 子件单件用量 *（1 + 子件损耗 / 100）*生产工单数量。
                 //3.已领料数量 = 根据当前工单和当前物料计算已领料数量之和，领料状态需除去申请取消的
 
@@ -639,7 +639,6 @@ namespace Hymson.MES.Services.Services.Process
                 }
 
                 //赋值物料的已领料数量【已领料数量 = 根据当前工单和当前物料计算已领料数量之和，领料状态需除去申请取消的】
-
                 var havePickingQty = 0M;
                 if (materialHavePickings != null && materialHavePickings.Any())
                 {
@@ -653,14 +652,30 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 }
 
-                //赋值物料的待领料数量【待领料数量 = 需求数量 - 已领料数量】
+                //赋值物料的可领料数量【可领料数量 = 需求数量 - 已领料数量】
                 var waitPickingQty = materialNeedQty - havePickingQty;
                 if (waitPickingQty < 0)
                 {
                     waitPickingQty = 0;
                 }
 
+                //2024.12.5号，新增的需求：赋值物料的领料中数量【取值工单领料记录中领料状态为“申请成功待发料”的数量之和】
+                var pickingQty = 0M;
+                if (materialHavePickings != null && materialHavePickings.Any())
+                {
+                    foreach (var materialHavePicking in materialHavePickings)
+                    {
+                        if (materialHavePicking.MaterialCode == procMaterialEntity.MaterialCode)
+                        {
+                            pickingQty = materialHavePicking.PickingQty;
+                            break;
+                        }
+                    }
+                }
+
                 item.WaitPickingQty = waitPickingQty;
+
+                item.PickingQty = pickingQty;
 
                 item.HavePickingQty = havePickingQty;
 

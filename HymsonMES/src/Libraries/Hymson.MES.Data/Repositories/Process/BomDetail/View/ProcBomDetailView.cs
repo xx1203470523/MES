@@ -125,9 +125,14 @@ namespace Hymson.MES.Data.Repositories.Process
         public string QuantityResidue { get; set; }
 
         /// <summary>
-        /// 待领料数量
+        /// 可领料数量
         /// </summary>
         public decimal WaitPickingQty { get; set; }
+
+        /// <summary>
+        /// 领料中数量
+        /// </summary>
+        public decimal PickingQty { get; set; }
 
         /// <summary>
         /// 已领料数量
