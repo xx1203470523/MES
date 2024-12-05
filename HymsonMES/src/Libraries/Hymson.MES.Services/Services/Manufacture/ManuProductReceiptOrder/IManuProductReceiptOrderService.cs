@@ -62,6 +62,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="workOrderId"></param>
         /// <returns></returns>
-        Task<decimal> QueryByWorkIdByScwAsync(long workOrderId);
+        Task<ManuProductReceiptOrderByScwDto?> QueryByWorkIdByScwAsync(long workOrderId);
     }
 }

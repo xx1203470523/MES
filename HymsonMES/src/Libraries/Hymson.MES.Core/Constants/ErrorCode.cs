@@ -502,7 +502,7 @@
         public const string MES11750 = "工序编码{Code}不存在";
         public const string MES11751 = "资源编码{Code}不存在";
         public const string MES11752 = "条码{SFC}已检验，请刷新后重试！";
-        public const string MES11753 = "条码{SFC}不存在";
+        public const string MES11753 = "条码{Code}不存在";
 
         #endregion
 

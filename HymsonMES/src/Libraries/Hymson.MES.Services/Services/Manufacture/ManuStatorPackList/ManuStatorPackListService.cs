@@ -158,6 +158,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES17521)).WithData("BoxNum", firstStator.BoxNum);
                 }
+                
+                // 检验不能混装
+                foreach (var packEntity in statorList)
+                {
+                    if (!string.Equals(firstStator.QualStatus,packEntity.QualStatus))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES10247)).WithData("Status", firstStator.QualStatus);
+                    }
+                }
+                
             }
             //查询成品码是否已经装箱
             var dbSfc = await _manuStatorPackListRepository.GetBySfcAsync(saveDto.ProductCode);

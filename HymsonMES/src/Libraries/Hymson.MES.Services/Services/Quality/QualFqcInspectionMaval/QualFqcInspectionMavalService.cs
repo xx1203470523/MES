@@ -95,7 +95,7 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
              ?? throw new CustomerValidationException(nameof(ErrorCode.MES11751)).WithData("Code", qualFqcInspectionMavalCreateDto.ResourceCode);
 
             var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery { SFC = qualFqcInspectionMavalCreateDto.SFC, SiteId = siteId }) 
-                                ?? throw new CustomerValidationException(nameof(ErrorCode.MES11753)).WithData("SFC", qualFqcInspectionMavalCreateDto.SFC);
+                                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15320)).WithData("sfcs", qualFqcInspectionMavalCreateDto.SFC);
 
             var qualFqcInspectionMaval = await _qualFqcInspectionMavalRepository.GetBySFCAsync(new QualFqcInspectionMavalQuery { SFC = qualFqcInspectionMavalCreateDto.SFC, SiteId = siteId });
             if (qualFqcInspectionMaval != null)
@@ -106,6 +106,7 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
                 qualFqcInspectionMaval.UpdatedBy = _currentUser.UserName;
                 qualFqcInspectionMaval.UpdatedOn = HymsonClock.Now();
                 qualFqcInspectionMaval.Remark = qualFqcInspectionMavalCreateDto.Remark;
+                qualFqcInspectionMaval.TestType = qualFqcInspectionMavalCreateDto.TestType;
                 await _qualFqcInspectionMavalRepository.UpdateAsync(qualFqcInspectionMaval);
                 //var row = await _qualFqcInspectionMavalRepository.DeleteAsync(qualFqcInspectionMaval.Id);
                 //if (row <= 0)
@@ -124,6 +125,7 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
                 qualFqcInspectionMavalEntity.Qty = qualFqcInspectionMavalCreateDto.Qty;
                 qualFqcInspectionMavalEntity.JudgmentResults = qualFqcInspectionMavalCreateDto.JudgmentResults;
                 qualFqcInspectionMavalEntity.Remark = qualFqcInspectionMavalCreateDto.Remark;
+                qualFqcInspectionMavalEntity.TestType = qualFqcInspectionMavalCreateDto.TestType;
 
                 qualFqcInspectionMavalEntity.Id = qualFqcInspectionMavalCreateDto.Id != 0 ? qualFqcInspectionMavalCreateDto.Id : IdGenProvider.Instance.CreateId();
                 qualFqcInspectionMavalEntity.CreatedBy = _currentUser.UserName;

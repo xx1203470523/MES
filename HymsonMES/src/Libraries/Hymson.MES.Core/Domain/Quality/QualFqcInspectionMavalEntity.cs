@@ -52,5 +52,10 @@ namespace Hymson.MES.Core.Domain.QualFqcInspectionMaval
         /// 不合格原因
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 检验类型
+        /// </summary>
+        public string? TestType { get; set; }
     }
 }
