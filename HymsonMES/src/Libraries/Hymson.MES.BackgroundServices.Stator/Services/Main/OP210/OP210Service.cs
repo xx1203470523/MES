@@ -58,17 +58,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         public async Task<int> ExecuteAsync(int limitCount)
         {
             var producreCode = $"{typeof(OP210).Name}";
+            var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
+            var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
-            // 读取未赋值的条码（外定子）
-            var innerIds = await _mainService.GetInnerIdsByNullColumnAsync("OuterBarCode");
-            if (innerIds == null || !innerIds.Any())
+            // 根据水位读取数据
+            var entities = await _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
             {
-                _logger.LogDebug($"【 {producreCode} 】没有要填充的数据！");
-                return 0;
-            }
-
-            // 读取需要填充的记录
-            var entities = await _opRepository.GetListByIdsAsync(innerIds);
+                StartWaterMarkId = waterMarkId,
+                Rows = limitCount
+            });
             if (entities == null || !entities.Any())
             {
                 _logger.LogDebug($"【 {producreCode} 】没有要拉取的数据！");
@@ -82,7 +80,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var summaryBo = await ConvertDataListAsync(entities, barCodes, _parameterCodes);
 
             // 保存数据
-            return await _mainService.SaveBaseDataWithCommitAsync(summaryBo);
+            return await _mainService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
         }
 
         /// <summary>
@@ -117,22 +115,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 SiteId = statorBo.SiteId,
                 InnerIds = entities.Select(s => s.ID).Distinct()
             });
-
-            // 物料信息（外定子）
-            var outerMaterialEntity = await _mainService.GetMaterialEntityAsync(new EntityByCodeQuery
-            {
-                Site = statorBo.SiteId,
-                Code = _outerBarCode
-            });
-            var outerStatorId = outerMaterialEntity?.Id ?? 0;
-
-            // 物料信息（内定子）
-            var innerMaterialEntity = await _mainService.GetMaterialEntityAsync(new EntityByCodeQuery
-            {
-                Site = statorBo.SiteId,
-                Code = _innerStatorCode
-            });
-            var innerStatorId = innerMaterialEntity?.Id ?? 0;
 
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
@@ -257,15 +239,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
                 {
                     WorkOrderId = statorBo.WorkOrderId,
-                    ProductId = innerStatorId,// 51558094067523584,
+                    ProductId = 51558094155608064,//TODO materialId,
                     ProcedureId = statorBo.ProcedureId,
                     ResourceId = null,
-                    SFC = statorSFCEntity.InnerBarCode,
+                    SFC = barCode,
 
-                    CirculationBarCode = barCode,
+                    CirculationBarCode = statorSFCEntity.InnerBarCode,
                     CirculationWorkOrderId = statorBo.WorkOrderId,
-                    CirculationProductId = outerStatorId,//51558094155608064,
-                    CirculationMainProductId = outerStatorId,//51558094155608064,
+                    CirculationProductId = 51558094067523584,//TODO statorBo.ProductId,
+                    CirculationMainProductId = 51558094067523584,//TODOstatorBo.ProductId,
                     CirculationQty = StatorConst.QTY,
                     CirculationType = SfcCirculationTypeEnum.Consume,
 
@@ -400,16 +382,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// </summary>
     public partial class OP210Service
     {
-        /// <summary>
-        /// 编码（外定子铁芯-NIO4.8量产φ188x122）
-        /// </summary>
-        private const string _outerBarCode = "030102000002";
-
-        /// <summary>
-        /// 编码（內定子铁芯-NIO4.8量产φ154x121.5）
-        /// </summary>
-        private const string _innerStatorCode = "030101000002";
-
         /// <summary>
         /// 参数编码集合
         /// </summary>

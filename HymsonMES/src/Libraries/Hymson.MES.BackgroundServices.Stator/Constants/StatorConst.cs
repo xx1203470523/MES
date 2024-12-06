@@ -31,16 +31,6 @@
         public const string USER = "LMS";
 
         /// <summary>
-        /// 只更新几个月内的数据
-        /// </summary>
-        public const int MONTHLIMIT = 2;
-
-        /// <summary>
-        /// 最大数量
-        /// </summary>
-        public const int MAXLIMIT = 200;
-
-        /// <summary>
         /// 数量
         /// </summary>
         public const decimal QTY = 1;

@@ -10,24 +10,24 @@ namespace Hymson.MES.BackgroundTasks.Stator
     /// 工序
     /// </summary>
     [DisallowConcurrentExecution]
-    internal class OP160Job : IJob
+    internal class OP060Job : IJob
     {
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<OP160Job> _logger;
-        private readonly IOP160Service _op160Service;
+        private readonly ILogger<OP060Job> _logger;
+        private readonly IOP060Service _op060Service;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="op160Service"></param>
-        public OP160Job(ILogger<OP160Job> logger,
-            IOP160Service op160Service)
+        /// <param name="op060Service"></param>
+        public OP060Job(ILogger<OP060Job> logger,
+            IOP060Service op060Service)
         {
             _logger = logger;
-            _op160Service = op160Service;
+            _op060Service = op060Service;
         }
 
         /// <summary>
@@ -37,23 +37,22 @@ namespace Hymson.MES.BackgroundTasks.Stator
         /// <returns></returns>
         public async Task Execute(IJobExecutionContext context)
         {
-            _logger.LogDebug($"【OP160Job】启动");
-
             // 创建计时器实例
-            Stopwatch stopwatch = new();
+            Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
             try
             {
-                await _op160Service.ExecuteAsync(StatorConst.MAXLIMIT);
+                await Task.CompletedTask;
+                //await _op060Service.ExecuteAsync(50);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "OP160Job :");
+                _logger.LogError(ex, "OP060Job :");
             }
 
             stopwatch.Stop();
-            _logger.LogDebug($"【OP160Job】执行完毕，耗时：{stopwatch.ElapsedMilliseconds}毫秒");
+            _logger.LogDebug($"【{typeof(OP060).Name}】执行完毕，耗时：{stopwatch.ElapsedMilliseconds}毫秒");
         }
 
     }

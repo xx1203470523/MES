@@ -124,31 +124,37 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
 
                 // 如果条码1有效
                 List<WireBarCodeEntity> wireBarCodeEntities = new();
-                if (!StatorConst.IgnoreString.Contains(barCode1) && !string.IsNullOrWhiteSpace(barCode1) && !wireEntities.Any(a => a.WireBarCode == barCode1))
+                if (!StatorConst.IgnoreString.Contains(barCode1) && !string.IsNullOrWhiteSpace(barCode1))
                 {
-                    wireBarCodeEntities.Add(new WireBarCodeEntity
+                    if (wireEntities.Any() || !wireEntities.Any(a => a.WireBarCode == barCode1))
                     {
-                        Id = $"{id}{barCode1}".ToLongID(),
-                        WireId = id,
-                        WireBarCode = barCode1,
-                        SiteId = statorBo.SiteId,
-                        CreatedOn = statorBo.Time,
-                        UpdatedOn = time
-                    });
+                        wireBarCodeEntities.Add(new WireBarCodeEntity
+                        {
+                            Id = $"{id}{barCode1}".ToLongID(),
+                            WireId = id,
+                            WireBarCode = barCode1,
+                            SiteId = statorBo.SiteId,
+                            CreatedOn = statorBo.Time,
+                            UpdatedOn = time
+                        });
+                    }
                 }
 
                 // 如果条码2有效
-                if (!StatorConst.IgnoreString.Contains(barCode2) && !string.IsNullOrWhiteSpace(barCode2) && !wireEntities.Any(a => a.WireBarCode == barCode2))
+                if (!StatorConst.IgnoreString.Contains(barCode2) && !string.IsNullOrWhiteSpace(barCode2))
                 {
-                    wireBarCodeEntities.Add(new WireBarCodeEntity
+                    if (wireEntities.Any() || !wireEntities.Any(a => a.WireBarCode == barCode2))
                     {
-                        Id = $"{id}{barCode2}".ToLongID(),
-                        WireId = id,
-                        WireBarCode = barCode2,
-                        SiteId = statorBo.SiteId,
-                        CreatedOn = statorBo.Time,
-                        UpdatedOn = time
-                    });
+                        wireBarCodeEntities.Add(new WireBarCodeEntity
+                        {
+                            Id = $"{id}{barCode2}".ToLongID(),
+                            WireId = id,
+                            WireBarCode = barCode2,
+                            SiteId = statorBo.SiteId,
+                            CreatedOn = statorBo.Time,
+                            UpdatedOn = time
+                        });
+                    }
                 }
                 summaryBo.AddWireBarCodeEntities.AddRange(wireBarCodeEntities);
 

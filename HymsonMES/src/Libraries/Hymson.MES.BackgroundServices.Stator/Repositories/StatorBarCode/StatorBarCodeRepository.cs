@@ -97,52 +97,6 @@ namespace Hymson.MES.Data.Repositories.Stator
             return await conn.QueryAsync<StatorBarCodeEntity>(template.RawSql, query);
         }
 
-        /// <summary>
-        /// 查询List（未赋值的列）
-        /// </summary>
-        /// <param name="columnName"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<long>> GetInnerIdsByNullColumnAsync(string columnName)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            sqlBuilder.Select("InnerId");
-
-            if (columnName != null && !string.IsNullOrWhiteSpace(columnName))
-            {
-                sqlBuilder.Where($"`{columnName}` IS NULL");
-            }
-
-            // 只读取创建时间两个月内的
-            sqlBuilder.Where($"CreatedOn >= (CURDATE() - INTERVAL {StatorConst.MONTHLIMIT} MONTH)");
-
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<long>(template.RawSql);
-        }
-
-        /// <summary>
-        /// 查询List（已赋值的列）
-        /// </summary>
-        /// <param name="columnName"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<long>> GetInnerIdsByNonNullColumnAsync(string columnName)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            sqlBuilder.Select("InnerId");
-
-            if (columnName != null && !string.IsNullOrWhiteSpace(columnName))
-            {
-                sqlBuilder.Where($"`{columnName}` IS NOT NULL");
-            }
-
-            // 只读取创建时间两个月内的
-            sqlBuilder.Where($"CreatedOn >= (CURDATE() - INTERVAL {StatorConst.MONTHLIMIT} MONTH)");
-
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<long>(template.RawSql);
-        }
-
     }
 
 

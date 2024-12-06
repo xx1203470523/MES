@@ -58,17 +58,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         public async Task<int> ExecuteAsync(int limitCount)
         {
             var producreCode = $"{typeof(OP340).Name}";
+            var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
+            var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
-            // 读取未赋值的条码（BusBar）
-            var ids = await _mainService.GetInnerIdsByNullColumnAsync("BusBarCode");
-            if (ids == null || !ids.Any())
+            // 根据水位读取数据
+            var entities = await _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
             {
-                _logger.LogDebug($"【 {producreCode} 】没有要填充的数据！");
-                return 0;
-            }
-
-            // 读取需要填充的记录
-            var entities = await _opRepository.GetListByIdsAsync(ids);
+                StartWaterMarkId = waterMarkId,
+                Rows = limitCount
+            });
             if (entities == null || !entities.Any())
             {
                 _logger.LogDebug($"【 {producreCode} 】没有要拉取的数据！");
@@ -82,7 +80,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var summaryBo = await ConvertDataListAsync(entities, barCodes);
 
             // 保存数据
-            return await _mainService.SaveBaseDataWithCommitAsync(summaryBo);
+            return await _mainService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
         }
 
         /// <summary>
@@ -262,15 +260,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
                 {
                     WorkOrderId = statorBo.WorkOrderId,
-                    ProductId = innerStatorId,// 51558094067523584
+                    ProductId = materialId,// 51558094361128960
                     ProcedureId = statorBo.ProcedureId,
                     ResourceId = null,
-                    SFC = statorSFCEntity.InnerBarCode,
+                    SFC = barCode,
 
-                    CirculationBarCode = barCode,
+                    CirculationBarCode = statorSFCEntity.InnerBarCode,
                     CirculationWorkOrderId = statorBo.WorkOrderId,
-                    CirculationProductId = materialId,// 51558094361128960
-                    CirculationMainProductId = materialId,// 51558094361128960
+                    CirculationProductId = innerStatorId,// 51558094067523584
+                    CirculationMainProductId = innerStatorId,// 51558094067523584
                     CirculationQty = StatorConst.QTY,
                     CirculationType = SfcCirculationTypeEnum.Consume,
 

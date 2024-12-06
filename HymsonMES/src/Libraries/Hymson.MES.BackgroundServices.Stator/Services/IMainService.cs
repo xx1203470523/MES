@@ -62,13 +62,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <summary>
         /// 保存数据
         /// </summary>
-        /// <param name="summaryBo"></param>
-        /// <returns></returns>
-        Task<int> SaveBaseDataWithCommitAsync(StatorSummaryBo summaryBo);
-
-        /// <summary>
-        /// 保存数据
-        /// </summary>
         /// <param name="buzKey"></param>
         /// <param name="waterLevel"></param>
         /// <param name="summaryBo"></param>
@@ -129,13 +122,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<StatorBarCodeEntity>> GetStatorBarCodeEntitiesAsync(StatorBarCodeQuery query);
-
-        /// <summary>
-        /// 批量获取（定子条码）
-        /// </summary>
-        /// <param name="columnName"></param>
-        /// <returns></returns>
-        Task<IEnumerable<long>> GetInnerIdsByNullColumnAsync(string columnName);
 
         /// <summary>
         /// 批量获取（定子铜线关系）
