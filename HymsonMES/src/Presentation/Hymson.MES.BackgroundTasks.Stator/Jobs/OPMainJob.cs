@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Quartz;
 using System.Diagnostics;
+using Hymson.Utils;
 
 namespace Hymson.MES.BackgroundTasks.Stator
 {
@@ -98,24 +99,50 @@ namespace Hymson.MES.BackgroundTasks.Stator
                 var mainLimit = 50;
                 var defaultLimit = 50;
 
+                _logger.LogInformation($"OP010 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op010Service.ExecuteAsync(mainLimit), "OP010");
+                _logger.LogInformation($"OP010 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                _logger.LogInformation($"OP020 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op020Service.ExecuteAsync(mainLimit), "OP020");
+                _logger.LogInformation($"OP020 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 //await LoopExecuteAsync(() => _op060Service.ExecuteAsync(defaultLimit), "OP060");
+                _logger.LogInformation($"op070_1 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op070Service.ExecuteAsync(mainLimit, "op070_1"), "OP070");
+                _logger.LogInformation($"op070_1 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
+                _logger.LogInformation($"OP030 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op030Service.ExecuteAsync(defaultLimit), "OP030");
+                _logger.LogInformation($"OP030 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 //await LoopExecuteAsync(() => _op050Service.ExecuteAsync(defaultLimit), "OP050");
+                _logger.LogInformation($"OP080 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op080Service.ExecuteAsync(mainLimit), "OP080");
+                _logger.LogInformation($"OP080 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                _logger.LogInformation($"OP090 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op090Service.ExecuteAsync(defaultLimit), "OP090");
+                _logger.LogInformation($"OP090 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                _logger.LogInformation($"OP100 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op100Service.ExecuteAsync(defaultLimit), "OP100");
+                _logger.LogInformation($"OP100 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                _logger.LogInformation($"OP120 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op120Service.ExecuteAsync(mainLimit), "OP120");
+                _logger.LogInformation($"OP120 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                _logger.LogInformation($"OP160 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op160Service.ExecuteAsync(mainLimit), "OP160");
+                _logger.LogInformation($"OP160 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                _logger.LogInformation($"OP190 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op190Service.ExecuteAsync(mainLimit), "OP190");
+                _logger.LogInformation($"OP190 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                _logger.LogInformation($"OP210 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
                 await LoopExecuteAsync(() => _op210Service.ExecuteAsync(mainLimit), "OP210");
+                _logger.LogInformation($"OP210 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                _logger.LogInformation($"OP340 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 await LoopExecuteAsync(() => _op340Service.ExecuteAsync(mainLimit), "OP340");
+                _logger.LogInformation($"OP340 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+                _logger.LogInformation($"OP490 开始同步了；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
                 await LoopExecuteAsync(() => _op490Service.ExecuteAsync(mainLimit), "OP490");
+                _logger.LogInformation($"OP490 同步完成；时间： {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
             }
             catch (Exception ex)

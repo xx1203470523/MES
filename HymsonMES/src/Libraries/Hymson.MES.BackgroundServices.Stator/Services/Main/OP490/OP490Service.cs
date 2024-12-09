@@ -59,6 +59,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var producreCode = $"{typeof(OP490).Name}";
             var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
+            _logger.LogInformation($"OP490 水位线；时间： {waterMarkId.ToString()}");
 
             // 根据水位读取数据
             var entities = await _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
