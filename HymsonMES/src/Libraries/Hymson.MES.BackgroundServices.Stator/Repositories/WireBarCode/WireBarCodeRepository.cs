@@ -87,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Stator
     {
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_wire_barcode /**where**/  ";
 
-        const string InsertSql = "REPLACE INTO manu_wire_barcode(ID, WireId, WireBarCode, Remark, CreatedOn, UpdatedOn, SiteId) VALUES (@ID, @WireId, @WireBarCode, @Remark, @CreatedOn, @UpdatedOn, @SiteId) ";
+        const string InsertSql = "INSERT IGNORE manu_wire_barcode(ID, WireId, WireBarCode, Remark, CreatedOn, UpdatedOn, SiteId) VALUES (@ID, @WireId, @WireBarCode, @Remark, @CreatedOn, @UpdatedOn, @SiteId) ";
 
         const string UpdateSql = "UPDATE manu_wire_barcode SET WireBarCode = @WireBarCode, Remark = @Remark, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
