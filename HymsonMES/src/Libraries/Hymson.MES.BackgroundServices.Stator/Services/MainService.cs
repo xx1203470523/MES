@@ -859,11 +859,14 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             using var trans = TransactionHelper.GetTransactionScope();
 
             rows += await SaveBaseDataAsync(summaryBo);
-            if (rows > 0)
-            {
-                rows += await _waterMarkService.RecordWaterMarkAsync(buzKey, waterLevel);
-                trans.Complete();
-            }
+            //if (rows > 0)
+            //{
+            //    rows += await _waterMarkService.RecordWaterMarkAsync(buzKey, waterLevel);
+            //    trans.Complete();
+            //}
+
+            rows += await _waterMarkService.RecordWaterMarkAsync(buzKey, waterLevel);
+            trans.Complete();
 
             return rows;
         }
