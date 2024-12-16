@@ -76,8 +76,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
                 SFC = "MODULE20241028004",
                 ModelCode = "",
                 BindSFCs = new CirculationBindDto[] {
-                    new(){Location="0",SFC= "CELL20241028003",Name= null},
-                    new(){ Location="1",SFC="CELL20241028004",Name =null }
+                    new(){Location="0",SFC= "AAA123",Name= null},
+                    new(){ Location="1",SFC="BBBB123",Name =null }
                 },
                 LocalTime = DateTime.Now
             };

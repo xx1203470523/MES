@@ -216,7 +216,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 }
                 else
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", string.Join(',', noIncludeSfcs));
+                    //允许绑定系统不存在的条码
+                    //throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", string.Join(',', noIncludeSfcs));
                 }
             }
 
