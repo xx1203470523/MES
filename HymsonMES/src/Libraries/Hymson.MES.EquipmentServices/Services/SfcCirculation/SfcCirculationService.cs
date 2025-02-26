@@ -224,7 +224,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //SFC有条码信息，但已经没有生产信息不允许出站
             var noProduceSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC).Contains(w.SFC) == false);
             if (noProduceSfcs.Any())
-                throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs.Select(a=>a.SFC)));
 
             //排队中的条码也允许绑定
             //if (sfcProduceList.Any())

@@ -112,9 +112,26 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("pda/bindsfc/del")]
         public async Task<int> DeteleteManuSfcCirculationAsync([FromBody]long Id)
         {
-            return await _manuSfcCirculationService.DeteleteManuSfcCirculationAsync(Id);
+            return await _manuSfcCirculationService.DeleteAsync(Id);
         }
 
+        /// <summary>
+        /// 删除条码所有绑定信息
+        /// </summary>
+        /// <param name="Ids"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("pda/bindsfc/del/all")]
+        public async Task<int> DeteleteManuSfcCirculationAsync([FromBody]long[] Ids)
+        {
+            return await _manuSfcCirculationService.DeleteAsync(Ids);
+        }
+
+        /// <summary>
+        /// 绑定条码
+        /// </summary>
+        /// <param name="createDto"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("pda/bindsfc")]
         public async Task AddManuSfcCirculationAsync([FromBody] ManuSfcCirculationBindDto createDto)

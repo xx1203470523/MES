@@ -102,13 +102,13 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             //string equipmentCode = "YTLPACK01AE022";
 
 
-            //组件安装人工安装(2)
-            string resourceCode = "YTLPACK01ER023";
-            string equipmentCode = "YTLPACK01AE023";
+            ////组件安装人工安装(2)
+            //string resourceCode = "YTLPACK01ER023";
+            //string equipmentCode = "YTLPACK01AE023";
 
-            ////虚拟模组人工固定机
-            //string resourceCode = "YTLPACK01ER027";
-            //string equipmentCode = "YTLPACK01VIR04";
+            //虚拟模组人工固定机
+            string resourceCode = "YTLPACK01ER027";
+            string equipmentCode = "YTLPACK01VIR04";
 
             ////EOL
             //string resourceCode = "YTLPACK01ER033";
@@ -127,7 +127,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             //string prefix = "YTM20240620003";
 
             //BMU进站测试
-            string prefix = "PACK20241126002";
+            string prefix = "PACK20241202001";
             //string prefix = "CELL20241024002";
             //string prefix = "ES01340010000000562411200058";
 
@@ -164,8 +164,6 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             }
             try
             {
-
-
                 await SetEquInfoAsync(equipmentCode);
                 await _outBoundService.OutBoundAsync(new OutBoundDto
                 {

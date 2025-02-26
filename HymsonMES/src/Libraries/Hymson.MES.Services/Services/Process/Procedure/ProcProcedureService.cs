@@ -121,7 +121,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         public async Task<PagedInfo<ProcProcedureViewDto>> GetPageListAsync(ProcProcedurePagedQueryDto procProcedurePagedQueryDto)
         {
             var procProcedurePagedQuery = procProcedurePagedQueryDto.ToQuery<ProcProcedurePagedQuery>();
-            procProcedurePagedQuery.SiteId = _currentSite.SiteId ?? 123456;
+            procProcedurePagedQuery.SiteId = 123456;
             var pagedInfo = await _procProcedureRepository.GetPagedInfoAsync(procProcedurePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -205,7 +205,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <returns></returns>
         public async Task<QueryProcProcedureDto> GetProcProcedureByIdAsync(long id)
         {
-            QueryProcProcedureDto queryProcDto = new QueryProcProcedureDto();
+            QueryProcProcedureDto queryProcDto = new ();
             var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(id);
             if (procProcedureEntity != null)
             {

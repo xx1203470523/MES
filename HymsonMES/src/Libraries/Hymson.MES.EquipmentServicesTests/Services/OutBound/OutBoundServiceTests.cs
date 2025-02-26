@@ -92,9 +92,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
             //string resourceCode = "YTLPACK01ER022";
             //string equipmentCode = "YTLPACK01AE022";
 
-            ////组件安装人工安装(2)
-            //string resourceCode = "YTLPACK01ER023";
-            //string equipmentCode = "YTLPACK01AE023";
+            //组件安装人工安装(2)
+            string resourceCode = "YTLPACK01ER023";
+            string equipmentCode = "YTLPACK01AE023";
 
             ////虚拟模组人工固定机
             //string resourceCode = "YTLPACK01ER027";
@@ -112,9 +112,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
             //string resourceCode = "YTLPACK01ER025";
             //string equipmentCode = "YTLPACK01AE025";
 
-            //Pack下线
-            string resourceCode = "YTLPACK01ER025";
-            string equipmentCode = "YTLPACK01AE025";
+            ////Pack下线
+            //string resourceCode = "YTLPACK01ER025";
+            //string equipmentCode = "YTLPACK01AE025";
 
             List<OutBoundParam> outBoundParams = new List<OutBoundParam>();
             //for (int i = 1; i <= 1; i++)
@@ -133,11 +133,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
                 Passed = 1,
                 LocalTime = HymsonClock.Now(),
                 //SFC = "CELL20241024002",
-                SFC = "ES01340010000000762411270001",
+                SFC = "PACK20241202001",
                 ParamList = outBoundParams.ToArray(),
 
-                //过站测试
-                IsPassingStation = true
+                ////过站测试
+                //IsPassingStation = true
             });
 
             Assert.IsTrue(true);

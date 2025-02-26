@@ -15,6 +15,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using IdGen;
 using System.Globalization;
 using System.Transactions;
 
@@ -130,16 +131,42 @@ namespace Hymson.MES.Services.Services.Manufacture
             return result;
         }
 
-        public async Task<int> DeteleteManuSfcCirculationAsync(long id)
+        /// <summary>
+        /// 删除指定条码绑定关系
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAsync(long id)
         {
             return await _manuSfcCirculationRepository.DeleteRangeAsync(new()
             {
                 Ids = new long[] { id },
                 DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserId?.ToString()
+                UserId = _currentUser.UserId.GetValueOrDefault().ToString()
             });
         }
 
+        /// <summary>
+        /// 解除条码绑定关系（批量）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAsync(IEnumerable<long> ids)
+        {
+            return await _manuSfcCirculationRepository.DeleteRangeAsync(new()
+            {
+                Ids = ids,
+                DeleteOn = HymsonClock.Now(),
+                UserId = _currentUser.UserId.GetValueOrDefault().ToString()
+            });
+        }
+
+        /// <summary>
+        /// 创建条码绑定关系
+        /// </summary>
+        /// <param name="createDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
         public async Task<int> CreateManuSfcCirculationAsync(ManuSfcCirculationCreateDto createDto)
         {
 

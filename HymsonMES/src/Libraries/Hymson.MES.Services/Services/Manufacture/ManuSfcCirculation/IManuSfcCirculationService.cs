@@ -24,7 +24,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<int> DeteleteManuSfcCirculationAsync(long id);
+        Task<int> DeleteAsync(long id);
+
+        /// <summary>
+        /// 解除条码绑定关系（批量）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<int> DeleteAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 创建条码绑定关系
