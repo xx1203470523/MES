@@ -19,7 +19,6 @@ public abstract class BaseService
         entity.CreatedOn = DateTime.Now;
         entity.CreatedBy = entity.CreatedBy;
 
-
         return entity;
     }
 

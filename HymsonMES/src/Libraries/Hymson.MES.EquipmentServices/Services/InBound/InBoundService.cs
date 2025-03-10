@@ -25,6 +25,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
 using IdGen;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.EquipmentServices.Services.InBound
 {
@@ -263,6 +264,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
 
             //#region 先不发布
 
+
             ////尾工序进站不允许Pack段出现不合格记录（出现后需要复测）
             //var LastProcedureEntity = await GetLastProcedureAsync(planWorkOrderEntity.ProcessRouteId);
             //var isLast = !sfcProduceList.Any(a => a.ProcedureId != LastProcedureEntity.ProcedureId);
@@ -328,10 +330,109 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             var sfcBoxInfo = await _inteSFCBoxRepository.GetManuSFCBoxAsync(sfcboxQuery);
 
             decimal firstProcedureQty = 0;//首工序进站数量
-            foreach (var sfc in inBoundMoreDto.SFCs)
+             foreach (var sfc in inBoundMoreDto.SFCs)
             {
                 if (validateBatch)
                 {
+                    //电芯周期管控，4个厂家校验
+                    if (settings.rule1)
+                    {
+                        //校验条码是否符合正则表达式
+                        Regex regex = new Regex(settings.rule1_input1);
+                        if (!regex.Match(sfc).Success)
+                        {
+                            throw new CustomerDataException(nameof(ErrorCode.MES19170)).WithData("sfc", sfc).WithData("regex", settings.rule1_input1);
+                        }
+
+                        try
+                        {
+                            //校验条码生产周期
+                            string CellDateStr = sfc.Substring(14, 3);
+                            DateTime CellDate = ProductionDateParser.ParseProductionDate(CellDateStr);
+                            if ((DateTime.Now - CellDate).TotalDays > settings.rule1_input3)
+                            {
+                                throw new CustomerDataException(nameof(ErrorCode.MES19165)).WithData("day", settings.rule1_input3).WithData("day2", CellDate.ToString("yyyy-MM-dd")).WithData("day3", DateTime.Now);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            throw new CustomerDataException(nameof(ErrorCode.MES19169));
+                        }
+                    }
+                    else if (settings.rule2)
+                    {
+                        //校验条码是否符合正则表达式
+                        Regex regex = new Regex(settings.rule2_input1);
+                        if (!regex.Match(sfc).Success)
+                        {
+                            throw new CustomerDataException(nameof(ErrorCode.MES19171)).WithData("sfc", sfc).WithData("regex", settings.rule2_input1);
+                        }
+
+                        try
+                        {
+                            //校验条码生产周期
+                            string CellDateStr = sfc.Substring(14, 3);
+                            DateTime CellDate = ProductionDateParser.ParseProductionDate(CellDateStr);
+                            if ((DateTime.Now - CellDate).TotalDays > settings.rule2_input3)
+                            {
+                                throw new CustomerDataException(nameof(ErrorCode.MES19166)).WithData("day", settings.rule2_input3).WithData("day2", CellDate.ToString("yyyy-MM-dd")).WithData("day3", DateTime.Now);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            throw new CustomerDataException(nameof(ErrorCode.MES19169));
+                        }
+                    }
+                    else if (settings.rule3)
+                    {
+                        //校验条码是否符合正则表达式
+                        Regex regex = new Regex(settings.rule3_input1);
+                        if (!regex.Match(sfc).Success)
+                        {
+                            throw new CustomerDataException(nameof(ErrorCode.MES19172)).WithData("sfc", sfc).WithData("regex", settings.rule3_input1);
+                        }
+
+                        try
+                        {
+                            //校验条码生产周期
+                            string CellDateStr = sfc.Substring(14, 3);
+                            DateTime CellDate = ProductionDateParser.ParseProductionDate(CellDateStr);
+                            if ((DateTime.Now - CellDate).TotalDays > settings.rule3_input3)
+                            {
+                                throw new CustomerDataException(nameof(ErrorCode.MES19167)).WithData("day", settings.rule3_input3).WithData("day2", CellDate.ToString("yyyy-MM-dd")).WithData("day3", DateTime.Now);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            throw new CustomerDataException(nameof(ErrorCode.MES19169));
+                        }
+                    }
+                    else if (settings.rule4)
+                    {
+                        //校验条码是否符合正则表达式
+                        Regex regex = new Regex(settings.rule4_input1);
+                        if (!regex.Match(sfc).Success)
+                        {
+                            throw new CustomerDataException(nameof(ErrorCode.MES19173)).WithData("sfc", sfc).WithData("regex", settings.rule4_input1);
+                        }
+
+                        try
+                        {
+                            //校验条码生产周期
+                            string CellDateStr = sfc.Substring(14, 3);
+                            DateTime CellDate = ProductionDateParser.ParseProductionDate(CellDateStr);
+                            if ((DateTime.Now - CellDate).TotalDays > settings.rule4_input3)
+                            {
+                                throw new CustomerDataException(nameof(ErrorCode.MES19168)).WithData("day", settings.rule4_input3).WithData("day2", CellDate.ToString("yyyy-MM-dd")).WithData("day3", DateTime.Now);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            throw new CustomerDataException(nameof(ErrorCode.MES19169));
+                        }
+                    }
+                    
+
                     //校验工单是否绑定过电芯批次
                     var currenWorkBatch = bindSFCbox.FirstOrDefault()?.BatchNo;
                     if (currenWorkBatch != null)
@@ -813,6 +914,69 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             planWorkOrderDto.MaterialName = procMaterials?.MaterialName ?? "";
 
             return planWorkOrderDto;
+        }
+
+    }
+
+    /// <summary>
+    /// 电芯码生产日期
+    /// </summary>
+    public class ProductionDateParser
+    {
+        private static readonly Dictionary<char, int> YearMap = new Dictionary<char, int>();
+        private static readonly Dictionary<char, int> MonthMap = new Dictionary<char, int>();
+        private static readonly Dictionary<char, int> DayMap = new Dictionary<char, int>();
+
+        static ProductionDateParser()
+        {
+            // 初始化年份映射
+            for (char c = '1'; c <= '9'; c++)
+                YearMap[c] = 2011 + (c - '1');
+            for (int i = 0; i <= 20; i++) // A(2020) 到 U(2040)
+                YearMap[(char)('A' + i)] = 2020 + i;
+
+            // 初始化月份映射
+            for (char c = '1'; c <= '9'; c++)
+                MonthMap[c] = c - '0';
+            MonthMap['A'] = 10;
+            MonthMap['B'] = 11;
+            MonthMap['C'] = 12;
+
+            // 初始化日期映射
+            for (char c = '1'; c <= '9'; c++)
+                DayMap[c] = c - '0';
+            for (int i = 0; i < 22; i++) // A(10) 到 V(31)
+            {
+                char c = (char)('A' + i);
+                DayMap[c] = 10 + i;
+            }
+            DayMap['O'] = 31; // 特别处理O对应31日
+        }
+
+        public static DateTime ParseProductionDate(string code)
+        {
+            if (code?.Length != 3)
+                throw new ArgumentException("编码必须为3位字符");
+
+            char yearChar = code[0];
+            char monthChar = code[1];
+            char dayChar = code[2];
+
+            if (!YearMap.TryGetValue(yearChar, out int year))
+                throw new ArgumentException("无效的年份编码");
+            if (!MonthMap.TryGetValue(monthChar, out int month))
+                throw new ArgumentException("无效的月份编码");
+            if (!DayMap.TryGetValue(dayChar, out int day))
+                throw new ArgumentException("无效的日期编码");
+
+            try
+            {
+                return new DateTime(year, month, day);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                throw new ArgumentException("无效的日期", ex);
+            }
         }
     }
 }

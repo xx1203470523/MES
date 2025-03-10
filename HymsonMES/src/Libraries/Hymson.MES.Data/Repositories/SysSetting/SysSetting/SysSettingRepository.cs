@@ -172,7 +172,7 @@ namespace Hymson.MES.Data.Repositories.SysSetting
         const string UpdatesSql = "UPDATE sys_setting SET   Name = @Name, Value = @Value, SiteId = @SiteId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE sys_setting SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE sys_setting SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeletesSql = "UPDATE sys_setting SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn";
 
         const string GetByIdSql = @"SELECT * FROM sys_setting WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM sys_setting WHERE Id IN @Ids ";

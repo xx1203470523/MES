@@ -58,7 +58,7 @@ public class CommonService : BaseService, ICommonService
         }
 
         //删除全部配置
-        await _sysSettingRepository.DeletesAsync(new() { Ids = ids });
+        await _sysSettingRepository.DeletesAsync(new() { });
 
         //插入新的配置
         await _sysSettingRepository.InsertRangeAsync(list);

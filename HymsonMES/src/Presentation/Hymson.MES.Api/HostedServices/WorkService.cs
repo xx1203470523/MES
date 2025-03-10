@@ -61,8 +61,8 @@ namespace Hymson.MES.Api
                  ServiceTypeEnum.MES
                 }, stoppingToken);
 #if DEBUG
-                //await _resourceService.InitEnumAsync();
-                //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
+                await _resourceService.InitEnumAsync();
+                await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
                 //await InitExcelDtoAsync();
 #endif
             }

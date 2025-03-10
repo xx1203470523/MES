@@ -1109,6 +1109,20 @@
         public const string MES19162 = "已开启Pack下线校验，条码{SFC}在{procedureName}生成记录为不合格，请复测至合格后下线！";
         public const string MES19163 = "已开启Pack下线校验，条码{SFC}绑定模组码小于2个，请检查Pack码和模组码的绑定关系！";
         public const string MES19164 = "已开启Pack下线校验，条码{SFC}在{procedureName}未找到进出站记录，请检查Pack码生产记录！";
+
+        //电芯生产周期管控
+        public const string MES19165 = "已开启亿纬电芯天数管控，管控周期{day}天，电芯生产日期{day2}距离投产当天时间大于{day3}天，不允许投入生产！";
+        public const string MES19166 = "已开启海辰电芯天数管控，管控周期{day}天，电芯生产日期{day2}距离投产当天时间大于{day3}天，不允许投入生产！";
+        public const string MES19167 = "已开启宁德电芯天数管控，管控周期{day}天，电芯生产日期{day2}距离投产当天时间大于{day3}天，不允许投入生产！";
+        public const string MES19168 = "已开启欣旺达电芯天数管控，管控周期{day}天，电芯生产日期{day2}距离投产当天时间大于{day3}天，不允许投入生产！";
+
+        public const string MES19169 = "已开启电芯天数管控，电芯条码日期获取失败，请检查15-17位编码规则是否符合要求！";
+
+        public const string MES19170 = "已开启亿纬电芯天数管控，电芯条码{sfc}不符合正则表达式规则{regex}！";
+        public const string MES19171 = "已开启海辰电芯天数管控，电芯条码{sfc}不符合正则表达式规则{regex}！";
+        public const string MES19172 = "已开启宁德电芯天数管控，电芯条码{sfc}不符合正则表达式规则{regex}！";
+        public const string MES19173 = "已开启欣旺达电芯天数管控，电芯条码{sfc}不符合正则表达式规则{regex}！";
+
         #endregion
 
         #region 系统对接 MES19201
