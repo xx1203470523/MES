@@ -2,6 +2,8 @@
 using Hymson.Excel.Abstractions.Attributes;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Manufacture;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Mysqlx.Crud;
 using OfficeOpenXml.Attributes;
 using System;
@@ -64,5 +66,56 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         [EpplusTableColumn(Header = "操作时间", Order = 9)]
         public DateTime CreatedOn { get; set; }
+    }
+
+    /// <summary>
+    /// 条码履历导入模板
+    /// </summary>
+    public record ManuSfcStepImportDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        [EpplusTableColumn(Header = "条码", Order = 1)]
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        [EpplusTableColumn(Header = "工序编码", Order = 2)]
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        [EpplusTableColumn(Header = "资源编码", Order = 3)]
+        public string ResourceCode { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        [EpplusTableColumn(Header = "设备编码", Order = 4)]
+        public string EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 进出/出站
+        /// </summary>
+        [EpplusTableColumn(Header = "进出/出站", Order = 5)]
+        public string Status { get; set; }
+
+        /// <summary>
+        /// 操作时间（默认导入时间）
+        /// </summary>
+        [EpplusTableColumn(Header = "操作时间（默认导入时间）", Order = 6)]
+        public string OpertiaonDate { get; set; }
+    }
+
+    /// <summary>
+    /// 条码履历导入
+    /// </summary>
+    public class UploadManuSfcStepDto
+    {
+        [FromForm(Name = "file")]
+        public IFormFile File { get; set; }
     }
 }

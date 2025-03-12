@@ -55,5 +55,19 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="planWorkOrderPagedQueryDto"></param>
         /// <returns></returns>
         Task<ExportResultDto> ProductTracingReportExportAsync(ProductTracePagedQueryDto planWorkOrderPagedQueryDto);
+
+        /// <summary>
+        /// 条码履历导入模板下载
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 条码履历导入
+        /// </summary>
+        /// <param name="uploadManuSfcStepDto"></param>
+        /// <returns></returns>
+        Task<int> ImportDataAsync(UploadManuSfcStepDto uploadManuSfcStepDto);
     }
 }

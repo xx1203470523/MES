@@ -1,16 +1,23 @@
-﻿using Hymson.Authentication;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
@@ -19,11 +26,13 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Http;
 using System.Globalization;
 
 namespace Hymson.MES.Services.Services.Report
@@ -94,6 +103,8 @@ namespace Hymson.MES.Services.Services.Report
         /// 条码仓储
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
+
+        private readonly ILocalizationService _localizationService;
 
         public ProductTraceReportService(IMinioService minioService, IExcelService excelService, ICurrentSite currentSite,
             ICurrentUser currentUser,
@@ -829,5 +840,132 @@ namespace Hymson.MES.Services.Services.Report
             };
         }
 
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadImportTemplateAsync(Stream stream)
+        {
+            var exportDto = new List<ManuSfcStepImportDto>();
+            await _excelService.ExportAsync(exportDto, stream, "条码履历导入模板");
+        }
+
+        /// <summary>
+        /// 条码履历导入数据（过滤已经导入过的）
+        /// </summary>
+        /// <param name="uploadProductStepDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<int> ImportDataAsync(UploadManuSfcStepDto uploadProductStepDto)
+        {
+            IFormFile formFile = uploadProductStepDto.File;
+
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            IEnumerable<ManuSfcStepImportDto> importDtos;
+            try
+            {
+                importDtos = _excelService.Import<ManuSfcStepImportDto>(memoryStream);
+            }
+            catch (Exception)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19174));
+            }
+
+            ////验证导入数据
+            //var validationFailures = new List<ValidationFailure>();
+
+            //if (validationFailures.Any())
+            //{
+            //    throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            //}
+
+            //校验SFC是否存在
+            string[] sfcs = importDtos.Select(s => s.SFC).ToArray();
+
+            //if (sfcs.Any())
+            //{
+            //    var sfcAny = await _manuSfcRepository.GetBySFCsAsync(sfcs);
+
+            //    //没有Sfcs记录
+            //    var noSfcs = importDtos.Where(a => !sfcAny.Any(b => b.SFC.Equals(a.SFC)));
+            //    if (noSfcs.Any()) throw new CustomerDataException(nameof(ErrorCode.MES19175)).WithData("codes", string.Join(",", noCodes));
+            //}
+
+            //校验工序是否正确
+            var codes = importDtos.Select(a => a.ProcedureCode).ToArray();
+            var procProcedureEntities = await _procProcedureRepository.GetByCodesAsync(codes, _currentSite.SiteId ?? 123456);
+            var hasCodes = procProcedureEntities.Select(a => a.Code).ToArray();
+            var noCodes = codes.Where(a => !hasCodes.Any(b => b == a));
+            if (noCodes.Any()) throw new CustomerDataException(nameof(ErrorCode.MES19175)).WithData("codes", string.Join(",", noCodes));
+
+            //进站
+            var status = importDtos.Select(a => a.Status).ToArray();
+            string[] vaildateStatus = new string[] { "进站", "出站" };
+            var noStatus = status.Where(a => !vaildateStatus.Any(b => b == a));
+            if (noStatus.Any()) throw new CustomerDataException(nameof(ErrorCode.MES19175)).WithData("status", string.Join(",", noStatus));
+
+            //设备编码检测
+            var equipmentCodes = importDtos.Select(a => a.EquipmentCode).ToArray();
+            var equipmentEntities = await _equipmentRepository.GetEntitiesAsync(new() { EquipmentCodes = equipmentCodes, SiteId = 123456 });
+            var validateEquipmentCodes = equipmentEntities.Select(a => a.EquipmentCode).ToArray();
+            var noEquipmentCodes = equipmentCodes.Where(a => !validateEquipmentCodes.Any(b => b == a));
+            if (noEquipmentCodes.Any()) throw new CustomerDataException(nameof(ErrorCode.MES19175)).WithData("codes", string.Join(",", noEquipmentCodes));
+
+            //获取当前最新激活工单信息
+            var planWorkOrderEntities = await _planWorkOrderRepository.GetPlanWorkOrderEntitiesAsync(new() { SiteId = 123456 });
+            var planWorkOrderEntity = planWorkOrderEntities.Where(a => a.Status == PlanWorkOrderStatusEnum.InProduction).OrderByDescending(a => a.CreatedOn).First()
+                ?? throw new CustomerDataException(nameof(ErrorCode.MES19178));
+
+            var resourceEntities = await _procResourceRepository.GetListAsync(new() { PageIndex = 1, PageSize = 9999, SiteId = 123456 });
+
+            //组装数据
+            var insert = new List<ManuSfcStepEntity>();
+
+            foreach (var item in importDtos)
+            {
+                var procedure = procProcedureEntities.FirstOrDefault(a => a.Code == item.ProcedureCode);
+                var equipment = equipmentEntities.FirstOrDefault(a => a.EquipmentCode == item.EquipmentCode);
+                var resource = resourceEntities.Data.FirstOrDefault(a => a.ResTypeId == procedure?.ResourceTypeId);
+
+                if (!DateTime.TryParse(item.OpertiaonDate, out DateTime operationDate)) operationDate = HymsonClock.Now();
+
+                var add = new ManuSfcStepEntity()
+                {
+                    SFC = item.SFC,
+                    ProcedureId = procedure?.Id,
+                    EquipmentId = equipment?.Id,
+                    IsPassingStation = false,
+                    RepeatedCount = 0,
+                    IsRepair = false,
+                    IsReplenish = false,
+                    Qty = 1,
+                    Passed = 1,
+                    Remark = "Excel导入",
+                    ProductId = planWorkOrderEntity!.ProductId,
+                    ProductBOMId = planWorkOrderEntity?.ProductBOMId,
+                    CurrentStatus = SfcProduceStatusEnum.Activity,
+                    WorkCenterId = planWorkOrderEntity!.WorkCenterId,
+                    Operatetype = item.Status == "进站" ? ManuSfcStepTypeEnum.InStock : ManuSfcStepTypeEnum.OutStock,
+                    SiteId = planWorkOrderEntity!.SiteId,
+                    WorkOrderId = planWorkOrderEntity.Id,
+                    ResourceId = resource.Id,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedOn = operationDate,
+                    CreatedBy = _currentUser.UserName,
+                    IsDeleted = 0,
+                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+                };
+
+
+                insert.Add(add);
+            }
+
+            return await _manuSfcStepRepository.InsertRangeAsync(insert);
+
+        }
     }
 }

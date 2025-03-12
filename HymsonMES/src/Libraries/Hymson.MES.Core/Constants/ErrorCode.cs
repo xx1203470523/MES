@@ -1123,6 +1123,13 @@
         public const string MES19172 = "已开启宁德电芯天数管控，电芯条码{sfc}不符合正则表达式规则{regex}！";
         public const string MES19173 = "已开启欣旺达电芯天数管控，电芯条码{sfc}不符合正则表达式规则{regex}！";
 
+        public const string MES19174 = "导入文件格式不正确，请检查！";
+        public const string MES19175 = "{codes}工序编码不存在，请检查！";
+        public const string MES19176 = "{status}进出站状态不存在，请检查！";
+        public const string MES19177 = "{codes}设备编码不存在，请检查！";
+        public const string MES19178 = "未找到生产中的工单，请激活工单后在导入条码履历！";
+
+
         #endregion
 
         #region 系统对接 MES19201
