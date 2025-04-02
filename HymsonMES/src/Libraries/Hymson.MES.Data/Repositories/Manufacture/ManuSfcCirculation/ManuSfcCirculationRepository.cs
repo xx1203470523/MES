@@ -432,6 +432,47 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
         var totalCount = await totalCountTask;
         return new PagedInfo<ManuSfcCirculationEntity>(manuSfcCirculationEntities, queryParam.PageIndex, queryParam.PageSize, totalCount);
     }
+
+    /// <summary>
+    /// 条码绑定关系扭矩参数查询
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<PagedInfo<SfcBindParameterPageData>> GetSfcBindParameterPagedDataAsync(SfcBindParameterPagedQuery queryParam)
+    {
+        var sqlBuilder = new SqlBuilder();
+        var templateData = sqlBuilder.AddTemplate(GetSfcBindParameterPagedSqlTemplate);
+        var templateCount = sqlBuilder.AddTemplate(GetSfcBindParameterPagedCountSqlTemplate);
+
+        var offSet = (queryParam.PageIndex - 1) * queryParam.PageSize;
+        sqlBuilder.AddParameters(new { OffSet = offSet });
+        sqlBuilder.AddParameters(new { Rows = queryParam.PageSize });
+        sqlBuilder.AddParameters(queryParam);
+
+        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        var pageData = await conn.QueryAsync<SfcBindParameterPageData>(templateData.RawSql, templateData.Parameters);
+        var count = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+        return new PagedInfo<SfcBindParameterPageData>(pageData, queryParam.PageIndex, queryParam.PageSize, count);
+    }
+
+    /// <summary>
+    /// 条码绑定关系扭矩参数导出
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<List<SfcBindParameterPageData>> GetSfcBindParameterExportAsync(SfcBindParameterPagedQuery query)
+    {
+        var sqlBuilder = new SqlBuilder();
+        var templateData = sqlBuilder.AddTemplate(GetSfcBindParameterPagedSqlTemplate);
+
+        sqlBuilder.AddParameters(new { OffSet = 0 });
+        sqlBuilder.AddParameters(new { Rows = 99999 });
+        sqlBuilder.AddParameters(query);
+
+        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        var result = await conn.QueryAsync<SfcBindParameterPageData>(templateData.RawSql, templateData.Parameters);
+        return result.ToList();
+    }
 }
 
 /// <summary>
@@ -500,6 +541,119 @@ public partial class ManuSfcCirculationRepository
             /*主查询*/
             SELECT count(1) FROM recursion T";
 
+    const string GetSfcBindParameterPagedSqlTemplate = @"WITH RECURSIVE CirculationCTE AS (
+    -- 初始层级0
+    SELECT DISTINCT pwo.OrderCode ,CirculationBarCode, SFC,pp.Code procedureCode, pp.Name procedureName,pm.MaterialCode,pm.MaterialName,mss.CreatedOn ,mss.CreatedBy , 0 AS lv
+    FROM manu_sfc_circulation mss
+    LEFT JOIN plan_work_order pwo ON pwo.id = mss.workOrderId
+    LEFT JOIN proc_procedure pp on pp.id = mss.ProcedureId
+    left join proc_material pm  on pm.id = pwo.ProductId
+    WHERE  pwo.OrderCode  =@OrderCode AND CirculationBarCode  LIKE 'ES%'  AND sfc LIKE 'YT%'
+    UNION ALL
+    -- 递归部分，查询每一层的CirculationBarCode与其相关联的SFC
+    SELECT pwo.OrderCode ,m.CirculationBarCode, m.SFC,pp.Code procedureCode, pp.Name procedureName,pm.MaterialCode,pm.MaterialName,m.CreatedOn ,m.CreatedBy , c.lv + 1
+    FROM manu_sfc_circulation m
+    LEFT JOIN plan_work_order pwo ON pwo.id = m.workOrderId
+    LEFT JOIN proc_procedure pp on pp.id = m.ProcedureId
+    left join proc_material pm  on pm.id = pwo.ProductId
+    JOIN CirculationCTE c ON c.SFC = m.CirculationBarCode
+    WHERE c.lv < 2  -- 限制递归深度，总层级数为3
+    AND m.isdeleted = 0
+),
+LatestParameters AS (
+    SELECT 
+        SFC,
+        ParameterId,
+        ParamValue,
+        ROW_NUMBER() OVER (PARTITION BY SFC, ParameterId ORDER BY CreatedOn DESC) AS rn
+    FROM manu_product_parameter
+    WHERE SFC IN (SELECT DISTINCT CirculationBarCode FROM CirculationCTE)  
+),
+FilteredParameters AS (
+    SELECT SFC, ParameterId, ParamValue
+    FROM LatestParameters
+    WHERE rn = 1
+)
+SELECT DISTINCT 
+cte.ordercode ,
+    cte.circulationBarcode ,
+    cte.Sfc ,
+    cte.procedureCode,
+    cte.procedureName,
+    cte.MaterialCode productCode,
+    cte.MaterialName productName,
+    MAX(CASE WHEN fp.ParameterId = 22324930363162624 THEN fp.ParamValue else 0 END) AS column1,
+    MAX(CASE WHEN fp.ParameterId = 22324930363162625 THEN fp.ParamValue else 0 END) AS column2,
+    MAX(CASE WHEN fp.ParameterId = 22324930363162626 THEN fp.ParamValue else 0 END) AS column3,
+    MAX(CASE WHEN fp.ParameterId = 22324930363162627 THEN fp.ParamValue else 0 END) AS column4,
+    MAX(CASE WHEN fp.ParameterId = 22324930363162628 THEN fp.ParamValue else 0 END) AS column5,
+    MAX(CASE WHEN fp.ParameterId = 22324930363162629 THEN fp.ParamValue else 0 END) AS column6,
+    MAX(CASE WHEN fp.ParameterId = 22324930363162630 THEN fp.ParamValue else 0 END) AS column7,
+    MAX(CASE WHEN fp.ParameterId = 22324930363162631 THEN fp.ParamValue else 0 END) AS column8,
+    cte.CreatedBy, 
+    cte.CreatedOn
+FROM CirculationCTE cte
+LEFT JOIN FilteredParameters fp ON cte.circulationbarcode = fp.SFC
+where cte.circulationbarcode <> '' and cte.circulationbarcode <> cte.sfc
+GROUP BY cte.circulationbarcode,cte.SFC,cte.orderCode,cte.procedurecode,cte.procedurename,cte.MaterialCode,cte.MaterialName,cte.CreatedBy,cte.CreatedOn
+ORDER BY cte.circulationbarcode,cte.SFC LIMIT @Offset,@Rows";
+
+    const string GetSfcBindParameterPagedCountSqlTemplate = @"WITH RECURSIVE CirculationCTE AS (
+    SELECT DISTINCT pwo.OrderCode, CirculationBarCode, SFC, pp.Code procedureCode, pp.Name procedureName, pm.MaterialCode, pm.MaterialName, mss.CreatedOn, mss.CreatedBy, 0 AS lv
+    FROM manu_sfc_circulation mss
+    LEFT JOIN plan_work_order pwo ON pwo.id = mss.workOrderId
+    LEFT JOIN proc_procedure pp ON pp.id = mss.ProcedureId
+    LEFT JOIN proc_material pm ON pm.id = pwo.ProductId
+    WHERE pwo.OrderCode = @OrderCode AND CirculationBarCode LIKE 'ES%' AND sfc LIKE 'YT%'
+    UNION ALL
+    SELECT pwo.OrderCode, m.CirculationBarCode, m.SFC, pp.Code procedureCode, pp.Name procedureName, pm.MaterialCode, pm.MaterialName, m.CreatedOn, m.CreatedBy, c.lv + 1
+    FROM manu_sfc_circulation m
+    LEFT JOIN plan_work_order pwo ON pwo.id = m.workOrderId
+    LEFT JOIN proc_procedure pp ON pp.id = m.ProcedureId
+    LEFT JOIN proc_material pm ON pm.id = pwo.ProductId
+    JOIN CirculationCTE c ON c.SFC = m.CirculationBarCode
+    WHERE c.lv < 2 AND m.isdeleted = 0
+),
+LatestParameters AS (
+    SELECT 
+        SFC,
+        ParameterId,
+        ParamValue,
+        ROW_NUMBER() OVER (PARTITION BY SFC, ParameterId ORDER BY CreatedOn DESC) AS rn
+    FROM manu_product_parameter
+    WHERE SFC IN (SELECT DISTINCT CirculationBarCode FROM CirculationCTE)
+),
+FilteredParameters AS (
+    SELECT SFC, ParameterId, ParamValue
+    FROM LatestParameters
+    WHERE rn = 1
+)
+SELECT COUNT(1) AS total
+FROM (
+    SELECT 
+        cte.circulationbarcode,
+        cte.SFC,
+        cte.orderCode,
+        cte.procedurecode,
+        cte.procedurename,
+        cte.MaterialCode,
+        cte.MaterialName,
+        cte.CreatedBy,
+        cte.CreatedOn
+    FROM CirculationCTE cte
+    LEFT JOIN FilteredParameters fp ON cte.circulationbarcode = fp.SFC
+    WHERE cte.circulationbarcode <> '' AND cte.circulationbarcode <> cte.sfc
+    GROUP BY 
+        cte.circulationbarcode,
+        cte.SFC,
+        cte.orderCode,
+        cte.procedurecode,
+        cte.procedurename,
+        cte.MaterialCode,
+        cte.MaterialName,
+        cte.CreatedBy,
+        cte.CreatedOn
+) AS subquery;";
 }
 
 

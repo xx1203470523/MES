@@ -115,5 +115,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="queryParam"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcCirculationEntity>> GetProductTraceReportPagedInfoAsync(ProductTraceReportPagedQuery queryParam);
+
+        /// <summary>
+        /// 条码绑定关系扭矩参数查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<SfcBindParameterPageData>> GetSfcBindParameterPagedDataAsync(SfcBindParameterPagedQuery queryParam);
+
+        /// <summary>
+        /// 条码绑定关系扭矩参数导出
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<List<SfcBindParameterPageData>> GetSfcBindParameterExportAsync(SfcBindParameterPagedQuery query);
     }
 }

@@ -702,6 +702,10 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<PackTraceView, PackTraceExcelDto>();
             CreateMap<PackTestView, PackTestExcelDto>();
+
+            CreateMap<SfcBindParameterPageData, SfcBindParameterReportPagedDataDto>();
+            CreateMap<SfcBindParameterReportPagedDataDto, SfcBindParameterPageData>();
+
         }
 
         /// <summary>

@@ -112,4 +112,107 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// </summary>
         public bool TraceDirection { get; set; } = true;
     }
+
+    /// <summary>
+    /// 条码绑定关系扭矩参数查询
+    /// </summary>
+    public class SfcBindParameterPagedQuery : PagerInfo
+    {
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string OrderCode { get; set; }
+    }
+
+    /// <summary>
+    /// 条码绑定关系扭矩参数结果
+    /// </summary>
+    public class SfcBindParameterPageData : BaseEntity
+    {
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 流转条码
+        /// </summary>
+        public string CirculationBarcode { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string ProductCode { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string ProductName { get; set; }
+
+        /// <summary>
+        /// TORQUE1
+        /// </summary>
+        public decimal Column1 { get; set; }
+
+        /// <summary>
+        /// TORQUE2
+        /// </summary>
+        public decimal Column2 { get; set; }
+
+        /// <summary>
+        /// TORQUE3
+        /// </summary>
+        public decimal Column3 { get; set; }
+
+        /// <summary>
+        /// TORQUE4
+        /// </summary>
+        public decimal Column4 { get; set; }
+
+        /// <summary>
+        /// TORQUE5
+        /// </summary>
+        public decimal Column5 { get; set; }
+
+        /// <summary>
+        /// TORQUE6
+        /// </summary>
+        public decimal Column6 { get; set; }
+
+        /// <summary>
+        /// TORQUE7
+        /// </summary>
+        public decimal Column7 { get; set; }
+
+        /// <summary>
+        /// TORQUE8
+        /// </summary>
+        public decimal Column8 { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public new string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public new DateTime CreatedOn { get; set; }
+    }
 }

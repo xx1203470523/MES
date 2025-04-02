@@ -63,6 +63,7 @@ using Hymson.MES.Services.Services.Report.PackTraceSfc;
 using Hymson.MES.Data.Repositories.Report;
 using Hymson.MES.Services.Services.Common;
 using Hymson.MES.Data.Repositories.SysSetting;
+using Hymson.MES.Services.Services.Report.SfcBindParameter;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -326,6 +327,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             services.AddSingleton<IPlanWorkOrderPackInfoService, PlanWorkOrderPackInfoService>();
+            services.AddSingleton<ISfcBindParameterService, SfcBindParameterService>();
 
             #endregion
 

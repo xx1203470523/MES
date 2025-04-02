@@ -277,6 +277,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IPlanWorkOrderPackInfoRepository, PlanWorkOrderPackInfoRepository>();
 
+
             #endregion
 
             services.AddSingleton<ISysSettingRepository, SysSettingRepository>();

@@ -1129,6 +1129,8 @@
         public const string MES19177 = "{codes}设备编码不存在，请检查！";
         public const string MES19178 = "未找到生产中的工单，请激活工单后在导入条码履历！";
 
+        public const string MES19179 = "请输入工单号查询或导出！";
+
 
         #endregion
 

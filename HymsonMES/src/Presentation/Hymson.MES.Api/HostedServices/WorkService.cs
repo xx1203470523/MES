@@ -63,7 +63,7 @@ namespace Hymson.MES.Api
 #if DEBUG
                 await _resourceService.InitEnumAsync();
                 await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
-                //await InitExcelDtoAsync();
+                await InitExcelDtoAsync();
 #endif
             }
             catch (Exception e)
