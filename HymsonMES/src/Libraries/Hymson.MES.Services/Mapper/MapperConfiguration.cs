@@ -706,6 +706,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<SfcBindParameterPageData, SfcBindParameterReportPagedDataDto>();
             CreateMap<SfcBindParameterReportPagedDataDto, SfcBindParameterPageData>();
 
+            CreateMap<SfcBindParameter2PageData, SfcBindParameterReport2PagedDataDto>();
+            CreateMap<SfcBindParameterReport2PagedDataDto, SfcBindParameter2PageData>();
+
         }
 
         /// <summary>

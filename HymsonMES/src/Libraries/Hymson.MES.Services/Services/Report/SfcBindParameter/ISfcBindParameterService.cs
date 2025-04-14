@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
 using System;
@@ -23,5 +24,19 @@ namespace Hymson.MES.Services.Services.Report.SfcBindParameter
         /// </summary>
         /// <returns></returns>
         Task<ExportResultDto> ReportExportAsync(SfcBindParameterReportPagedQueryDto queryDto);
+
+        /// <summary>
+        /// 条码关系绑定参数查询
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<SfcBindParameterReport2PagedDataDto>> GetPagedData2Async(SfcBindParameterReport2PagedQueryDto queryDto);
+
+        /// <summary>
+        /// 条码关系绑定参数导出
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<ExportResultDto> ReportExport2Async(SfcBindParameterReport2PagedQueryDto queryDto);
     }
 }

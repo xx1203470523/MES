@@ -134,6 +134,17 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 合并时绑定位置
         /// </summary>
         public string? Location { get; set; }
+
+        /// <summary>
+        /// 参数1
+        /// </summary>
+        public string ParameterValue1 { get; set; }
+
+        /// <summary>
+        /// 参数2
+        /// </summary>
+        public string ParameterValue2 { get; set; }
+
         /// <summary>
         /// 创建人
         /// </summary>
@@ -384,10 +395,28 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 产品名称
         /// </summary>
         public string ProductName { get; set; }
+
+        /// <summary>
+        /// 电压
+        /// </summary>
+        public string ParameterValue1 { get; set; }
+
+        /// <summary>
+        /// 内阻
+        /// </summary>
+        public string ParameterValue2 { get; set; }
+
+        /// <summary>
+        /// 批次号
+        /// </summary>
+        public string BatchCode { get; set; }
+
         /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
+
+
         /// <summary>
         /// 创建时间
         /// </summary>

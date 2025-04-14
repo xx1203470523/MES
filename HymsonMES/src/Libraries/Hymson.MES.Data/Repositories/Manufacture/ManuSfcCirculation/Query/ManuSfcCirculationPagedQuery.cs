@@ -215,4 +215,68 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// </summary>
         public new DateTime CreatedOn { get; set; }
     }
+
+    /// <summary>
+    /// 条码绑定关系参数查询
+    /// </summary>
+    public class SfcBindParameter2PagedQuery : PagerInfo 
+    {
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string OrderCode { get; set; }
+    }
+
+    /// <summary>
+    /// 条码绑定关系参数查询结果
+    /// </summary>
+    public class SfcBindParameter2PageData : BaseEntity
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 流转条码
+        /// </summary>
+        public string CirculationBarCode { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+
+        /// <summary>
+        /// 参数编码
+        /// </summary>
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数值
+        /// </summary>
+        public string ParameterValue { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 创建日期
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+    }
+
 }

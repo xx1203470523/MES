@@ -473,6 +473,49 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
         var result = await conn.QueryAsync<SfcBindParameterPageData>(templateData.RawSql, templateData.Parameters);
         return result.ToList();
     }
+
+
+    /// <summary>
+    /// 条码绑定关系参数查询
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<PagedInfo<SfcBindParameter2PageData>> GetSfcBindParameter2PagedDataAsync(SfcBindParameter2PagedQuery queryParam)
+    {
+        var sqlBuilder = new SqlBuilder();
+        var templateData = sqlBuilder.AddTemplate(GetSfcBindParameter2PagedSqlTemplate);
+        var templateCount = sqlBuilder.AddTemplate(GetSfcBindParameter2PagedCountSqlTemplate);
+
+        var offSet = (queryParam.PageIndex - 1) * queryParam.PageSize;
+        sqlBuilder.AddParameters(new { OffSet = offSet });
+        sqlBuilder.AddParameters(new { Rows = queryParam.PageSize });
+        sqlBuilder.AddParameters(queryParam);
+
+        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        var pageData = await conn.QueryAsync<SfcBindParameter2PageData>(templateData.RawSql, templateData.Parameters);
+        var count = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+        return new PagedInfo<SfcBindParameter2PageData>(pageData, queryParam.PageIndex, queryParam.PageSize, count);
+    }
+
+    /// <summary>
+    /// 条码绑定关系参数导出
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<List<SfcBindParameter2PageData>> GetSfcBindParameter2ExportAsync(SfcBindParameter2PagedQuery query)
+    {
+        var sqlBuilder = new SqlBuilder();
+        var templateData = sqlBuilder.AddTemplate(GetSfcBindParameter2PagedSqlTemplate);
+
+        sqlBuilder.AddParameters(new { OffSet = 0 });
+        sqlBuilder.AddParameters(new { Rows = 999999 });
+        sqlBuilder.AddParameters(query);
+
+        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        var result = await conn.QueryAsync<SfcBindParameter2PageData>(templateData.RawSql, templateData.Parameters);
+        return result.ToList();
+    }
+
 }
 
 /// <summary>
@@ -654,6 +697,63 @@ FROM (
         cte.CreatedBy,
         cte.CreatedOn
 ) AS subquery;";
+
+    const string GetSfcBindParameter2PagedSqlTemplate = @"WITH RECURSIVE CirculationCTE AS (
+    -- 初始层级0
+    SELECT DISTINCT  SFC ,CirculationBarCode, 0 AS lv
+    FROM manu_sfc_circulation mss
+    LEFT JOIN plan_work_order pwo ON pwo.id = mss.workOrderId
+    LEFT JOIN proc_procedure pp on pp.id = mss.ProcedureId
+    left join proc_material pm  on pm.id = pwo.ProductId
+    WHERE  pwo.OrderCode = @OrderCode and  mss.sfc like 'ES%'
+    UNION ALL
+    -- 递归部分，查询每一层的CirculationBarCode与其相关联的SFC
+    select   m.SFC ,m.CirculationBarCode, c.lv + 1
+    FROM manu_sfc_circulation m
+    LEFT JOIN plan_work_order pwo ON pwo.id = m.workOrderId
+    LEFT JOIN proc_procedure pp on pp.id = m.ProcedureId
+    left join proc_material pm  on pm.id = pwo.ProductId
+    JOIN CirculationCTE c ON c.SFC = m.CirculationBarCode
+    WHERE c.lv < 2  -- 限制递归深度，总层级数为3
+    AND m.isdeleted = 0
+),
+CirculationCTE2 as (
+select distinct SFC,circulationbarcode,lv  from CirculationCTE where (sfc like '0%' or SFC like 'YT%' or SFC like 'ES%') and SFC <> circulationbarcode 
+)
+select cte.SFC,cte.circulationbarcode,pp.Code procedureCode,pp.Name procedureName,ppa.ParameterCode ,ppa.ParameterName ,mpp.ParamValue ParameterValue,mpp.CreatedBy,mpp.CreatedOn from CirculationCTE2 cte
+left join manu_product_parameter mpp on mpp.SFC  = cte.sfc 
+left join plan_work_order pwo on pwo.id = mpp.WorkOrderId
+left join proc_procedure pp on pp.id = mpp.ProcedureId
+left join proc_parameter ppa on ppa.id = mpp.ParameterId 
+ LIMIT @Offset,@Rows";
+
+    const string GetSfcBindParameter2PagedCountSqlTemplate = @"WITH RECURSIVE CirculationCTE AS (
+    -- 初始层级0
+    SELECT DISTINCT  SFC ,CirculationBarCode, 0 AS lv
+    FROM manu_sfc_circulation mss
+    LEFT JOIN plan_work_order pwo ON pwo.id = mss.workOrderId
+    LEFT JOIN proc_procedure pp on pp.id = mss.ProcedureId
+    left join proc_material pm  on pm.id = pwo.ProductId
+    WHERE  pwo.OrderCode = @OrderCode and  mss.sfc like 'ES%'
+    UNION ALL
+    -- 递归部分，查询每一层的CirculationBarCode与其相关联的SFC
+    select   m.SFC ,m.CirculationBarCode, c.lv + 1
+    FROM manu_sfc_circulation m
+    LEFT JOIN plan_work_order pwo ON pwo.id = m.workOrderId
+    LEFT JOIN proc_procedure pp on pp.id = m.ProcedureId
+    left join proc_material pm  on pm.id = pwo.ProductId
+    JOIN CirculationCTE c ON c.SFC = m.CirculationBarCode
+    WHERE c.lv < 2  -- 限制递归深度，总层级数为3
+    AND m.isdeleted = 0
+),
+CirculationCTE2 as (
+select distinct SFC,circulationbarcode,lv  from CirculationCTE where (sfc like '0%' or SFC like 'YT%' or SFC like 'ES%') and SFC <> circulationbarcode 
+)
+select Count(1) from CirculationCTE2 cte
+left join manu_product_parameter mpp on mpp.SFC  = cte.sfc 
+left join plan_work_order pwo on pwo.id = mpp.WorkOrderId
+left join proc_procedure pp on pp.id = mpp.ProcedureId
+left join proc_parameter ppa on ppa.id = mpp.ParameterId ";
 }
 
 

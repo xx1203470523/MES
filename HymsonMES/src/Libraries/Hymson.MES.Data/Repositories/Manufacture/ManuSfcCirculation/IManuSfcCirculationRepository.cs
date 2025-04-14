@@ -129,5 +129,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<List<SfcBindParameterPageData>> GetSfcBindParameterExportAsync(SfcBindParameterPagedQuery query);
+
+        /// <summary>
+        /// 条码绑定关系参数查询
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        Task<PagedInfo<SfcBindParameter2PageData>> GetSfcBindParameter2PagedDataAsync(SfcBindParameter2PagedQuery queryParam);
+
+        /// <summary>
+        /// 条码绑定关系参数导出
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<List<SfcBindParameter2PageData>> GetSfcBindParameter2ExportAsync(SfcBindParameter2PagedQuery query);
     }
 }

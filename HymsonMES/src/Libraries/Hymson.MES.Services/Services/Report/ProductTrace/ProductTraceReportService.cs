@@ -17,6 +17,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Integrated.InteSFCBox;
 using Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
@@ -32,6 +33,7 @@ using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Http;
 using System.Globalization;
 
@@ -106,6 +108,8 @@ namespace Hymson.MES.Services.Services.Report
 
         private readonly ILocalizationService _localizationService;
 
+        private readonly IInteSFCBoxRepository _inteSFCBoxRepository;
+
         public ProductTraceReportService(IMinioService minioService, IExcelService excelService, ICurrentSite currentSite,
             ICurrentUser currentUser,
         IProcMaterialRepository procMaterialRepository,
@@ -119,8 +123,8 @@ namespace Hymson.MES.Services.Services.Report
          IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
          IManuSfcInfoRepository manuSfcInfoRepository,
          IManuSfcRepository manuSfcRepository,
-         IManuSfcSummaryRepository manuSfcSummaryRepository
-          )
+         IManuSfcSummaryRepository manuSfcSummaryRepository,
+         IInteSFCBoxRepository inteSFCBoxRepository)
         {
             _minioService = minioService;
             _excelService = excelService;
@@ -138,6 +142,7 @@ namespace Hymson.MES.Services.Services.Report
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
+            _inteSFCBoxRepository = inteSFCBoxRepository;
         }
         #endregion
 
@@ -225,7 +230,34 @@ namespace Hymson.MES.Services.Services.Report
                     returnView.EquipentName = equEquipment.EquipmentName;
                 }
                 return returnView;
-            });
+            }).ToList();
+
+            var sfcs = dtos.Select(a => a.SFC).ToArray();
+
+            var parameterEntities = new List<ManuProductParameterEntity>();
+            if (sfcs.Any())
+            {
+                parameterEntities = (await _manuProductParameterRepository.GetManuProductParameterAsync(new()
+                {
+                    SFCs = sfcs,
+                    SiteId = 123456
+                })).ToList();
+            }
+
+            foreach (var item in dtos)
+            {
+                //获取内阻参数
+                var parameterValue1 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.SFC == item.SFC && a.ParameterId == 22207802265960448);
+
+                //获取电压参数
+                var parameterValue2 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.SFC == item.SFC && a.ParameterId == 22207802265960449);
+
+                item.ParameterValue1 = parameterValue1?.ParamValue ?? "";
+                item.ParameterValue2 = parameterValue2?.ParamValue ?? "";
+
+            }
+
+
             return new PagedInfo<ManuSfcCirculationViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -292,12 +324,12 @@ namespace Hymson.MES.Services.Services.Report
         /// <summary>
         /// 查询生产步骤（条码履历）
         /// </summary>
-        /// <param name="manuSfcStepPagedQueryDto"></param>
+        /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcStepViewDto>> GetSfcStepPagedListAsync(ManuSfcStepPagedQueryDto manuSfcStepPagedQueryDto)
+        public async Task<PagedInfo<ManuSfcStepViewDto>> GetSfcStepPagedListAsync(ManuSfcStepPagedQueryDto queryDto)
         {
             //查询条码所有步骤数据
-            var manuSfcStepPagedQuery = manuSfcStepPagedQueryDto.ToQuery<ManuSfcStepPagedQuery>();
+            var manuSfcStepPagedQuery = queryDto.ToQuery<ManuSfcStepPagedQuery>();
             manuSfcStepPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _manuSfcStepRepository.GetPagedInfoAsync(manuSfcStepPagedQuery);
             //工单信息
@@ -370,7 +402,28 @@ namespace Hymson.MES.Services.Services.Report
                 }
 
                 return returnView;
-            });
+            }).ToList();
+
+            //参数
+            var parameterEntities = await _manuProductParameterRepository.GetManuProductParameterAsync(new() { SFC = queryDto.SFC, SiteId = 123456 });
+
+            var inteSfcBoxEntities = await _inteSFCBoxRepository.GetManuSFCBoxAsync(new() { SFC = queryDto.SFC });
+
+            foreach (var item in returnDtos)
+            {
+                //获取内阻参数
+                var parameterValue1 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.ProcedureId == item.ProcedureId && a.ParameterId == 22207802265960448);
+
+                //获取电压参数
+                var parameterValue2 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.ProcedureId == item.ProcedureId && a.ParameterId == 22207802265960449);
+
+                item.ParameterValue1 = parameterValue1?.ParamValue ?? "";
+                item.ParameterValue2 = parameterValue2?.ParamValue ?? "";
+
+                item.BatchCode = inteSfcBoxEntities.FirstOrDefault()?.BatchNo ?? "";
+            }
+
+
             return new PagedInfo<ManuSfcStepViewDto>(returnDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
