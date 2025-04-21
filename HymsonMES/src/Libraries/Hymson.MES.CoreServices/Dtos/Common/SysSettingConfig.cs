@@ -22,6 +22,11 @@ public class SysSettingConfig
     public bool PackOfflineValidation { get; set; } = true;
 
     /// <summary>
+    /// 液冷板码校验
+    /// </summary>
+    public string SfcValidateRule { get; set; } = "CZHC$";
+
+    /// <summary>
     /// 是否开启校验1
     /// </summary>
     public bool rule1 { get; set; } 

@@ -60,9 +60,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
         {
 
             //string request = "{\"SFC\":\"ES01B20020048202309220052\",\"Passed\":1,\"ParamList\":null,\"BindFeedingCodes\":null,\"NG\":null,\"IsPassingStation\":true,\"ResourceCode\":\"YTLPACK01ER025\",\"EquipmentCode\":\"YTLPACK01AE025\",\"LocalTime\":\"2023-09-27T08:37:47\"}";
-            ////电芯OCV
-            //string resourceCode = "YTLPACK01ER004";
-            //string equipmentCode = "YTLPACK01AE004";
+            //电芯OCV
+            string resourceCode = "YTLPACK01ER004";
+            string equipmentCode = "YTLPACK01AE004";
 
             ////激光刻码
             //string resourceCode = "YTLPACK01ER014";
@@ -92,9 +92,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
             //string resourceCode = "YTLPACK01ER022";
             //string equipmentCode = "YTLPACK01AE022";
 
-            //组件安装人工安装(2)
-            string resourceCode = "YTLPACK01ER023";
-            string equipmentCode = "YTLPACK01AE023";
+            ////组件安装人工安装(2)
+            //string resourceCode = "YTLPACK01ER023";
+            //string equipmentCode = "YTLPACK01AE023";
 
             ////虚拟模组人工固定机
             //string resourceCode = "YTLPACK01ER027";
@@ -133,7 +133,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
                 Passed = 1,
                 LocalTime = HymsonClock.Now(),
                 //SFC = "CELL20241024002",
-                SFC = "PACK20241202001",
+                SFC = "TEST33333",
                 ParamList = outBoundParams.ToArray(),
 
                 ////过站测试

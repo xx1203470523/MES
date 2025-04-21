@@ -975,6 +975,8 @@ namespace Hymson.MES.Services.Services.Report
 
             //组装数据
             var insert = new List<ManuSfcStepEntity>();
+            var insertSfcs = new List<ManuSfcEntity>();
+            var insertSfcInfos = new List<ManuSfcInfoEntity>();
 
             foreach (var item in importDtos)
             {
@@ -1013,9 +1015,46 @@ namespace Hymson.MES.Services.Services.Report
                     UpdatedBy = _currentUser.UserName,
                 };
 
+                var addSfc = new ManuSfcEntity()
+                {
+                    SFC = item.SFC,
+                    SiteId = planWorkOrderEntity.SiteId,
+                    Qty = 1,
+                    IsUsed = YesOrNoEnum.Yes,
+                    Status = SfcStatusEnum.InProcess,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedOn = operationDate,
+                    CreatedBy = _currentUser.UserName,
+                    IsDeleted = 0,
+                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+                };
+
+                var addSfcInfo = new ManuSfcInfoEntity()
+                {
+                    SiteId = planWorkOrderEntity.SiteId,
+                    SfcId = addSfc.Id,
+                    WorkOrderId = planWorkOrderEntity.Id,
+                    ProductId = planWorkOrderEntity.ProductId,
+                    IsUsed = true,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedOn = operationDate,
+                    CreatedBy = _currentUser.UserName,
+                    IsDeleted = 0,
+                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+                };
 
                 insert.Add(add);
+                insertSfcs.Add(addSfc);
+                insertSfcInfos.Add(addSfcInfo);
             }
+
+            await _manuSfcRepository.InsertRangeAsync(insertSfcs);
+
+            await _manuSfcInfoRepository.InsertsAsync(insertSfcInfos);
 
             return await _manuSfcStepRepository.InsertRangeAsync(insert);
 

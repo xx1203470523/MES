@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Services.SysSetting;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -22,6 +23,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 {
@@ -51,6 +53,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
 
+        private readonly ISysSettingService _sysSettingService;
+
         public SfcCirculationService(
             ICurrentEquipment currentEquipment,
             AbstractValidator<SfcCirculationBindDto> validationSfcCirculationBindDtoRules,
@@ -67,7 +71,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             IManuSfcCcsNgRecordRepository manuSfcCcsNgRecordRepository,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
             ICurrentSite currentSite,
-            IProcProcedureRepository procProcedureRepository)
+            IProcProcedureRepository procProcedureRepository,
+            ISysSettingService sysSettingService)
         {
             _currentEquipment = currentEquipment;
             _validationSfcCirculationBindDtoRules = validationSfcCirculationBindDtoRules;
@@ -85,6 +90,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _currentSite = currentSite;
             _procProcedureRepository = procProcedureRepository;
+            _sysSettingService = sysSettingService;
         }
         /// <summary>
         /// CCS绑定的Location
@@ -141,22 +147,40 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <returns></returns>
         private async Task VerifyDuplicate(SfcCirculationBindDto sfcCirculationBindDto, SfcCirculationTypeEnum bindType = SfcCirculationTypeEnum.Merge)
         {
+            var settings = await _sysSettingService.GetSettingsAsync();
+            var regEx = new Regex(settings.SfcValidateRule);
+
+            var sfcs = sfcCirculationBindDto.BindSFCs.Select(c => c.SFC).ToArray();
+
             //查找当前已有的绑定记录
             var sfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
             {
                 SiteId = _currentEquipment.SiteId,
-                Sfcs = sfcCirculationBindDto.BindSFCs.Select(c => c.SFC).ToArray(),
+                //Sfcs = sfcs,
                 IsDisassemble = TrueOrFalseEnum.No,
                 CirculationBarCode = sfcCirculationBindDto.SFC,
                 CirculationType = bindType
             });
 
-            if (sfcCirculationEntities.Any())
+            if (sfcCirculationEntities.Any(a => sfcs.Contains(a.SFC)))
             {
                 //条码：{SFCS}已经存在绑定记录
                 throw new CustomerValidationException(nameof(ErrorCode.MES19155))
                     .WithData("SFC", sfcCirculationBindDto.SFC)
                     .WithData("SFCs", string.Join(",", sfcCirculationEntities.Select(c => c.SFC)));
+            }
+
+            //增加校验逻辑，液冷板码只能绑定一个
+            if (sfcs.Any(a => regEx.IsMatch(a) && sfcCirculationEntities.Any(a => regEx.IsMatch(a.SFC))))
+            {
+                var sfc2 = sfcCirculationEntities.FirstOrDefault(a => regEx.IsMatch(a.SFC))?.SFC ?? "";
+                var sfc3 = sfcs.FirstOrDefault(a => regEx.IsMatch(a)) ?? "";
+
+                //条码：{SFCS}已经存在绑定记录
+                throw new CustomerValidationException(nameof(ErrorCode.MES19180))
+                    .WithData("sfc", sfcCirculationBindDto.SFC)
+                    .WithData("sfc2", sfc2)
+                    .WithData("sfc3", sfc3);
             }
 
             ////查找当前已有的绑定记录
@@ -224,7 +248,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //SFC有条码信息，但已经没有生产信息不允许出站
             var noProduceSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC).Contains(w.SFC) == false);
             if (noProduceSfcs.Any())
-                throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs.Select(a=>a.SFC)));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs.Select(a => a.SFC)));
 
             //排队中的条码也允许绑定
             //if (sfcProduceList.Any())
@@ -328,7 +352,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             if (mpManuSfc == null && sfcCirculationBindDto.IsVirtualSFC != true)
             {
                 //根据条码排序，确保BMU板码在前，获取BMU板码在制生成Pack码信息
-                var sfcProduceEntity = sfcProduceList.OrderBy(a=>a.SFC).First();
+                var sfcProduceEntity = sfcProduceList.OrderBy(a => a.SFC).First();
                 manuSfc = new ManuSfcEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),

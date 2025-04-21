@@ -87,7 +87,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// OCVB数采时间
         /// </summary>
-        public DateTime OcvbDate { get; set; }
+        public DateTime? OcvbDate { get; set; }
 
         /// <summary>
         /// 二次注液注液后重量
@@ -102,7 +102,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// DC容量数采时间
         /// </summary>
-        public DateTime DcDate { get; set; }
+        public DateTime? DcDate { get; set; }
 
         /// <summary>
         /// IMPB
@@ -181,7 +181,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// DC容量数采时间
         /// </summary>
         [EpplusTableColumn(Header = "DC容量数采时间", Order = 6)]
-        public string DCDate { get; set; }
+        public string? DCDate { get; set; }
 
         /// <summary>
         /// OCVB
@@ -193,7 +193,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// OCVB数采时间
         /// </summary>
         [EpplusTableColumn(Header = "OCVB数采时间", Order = 8)]
-        public string OCVBDate { get; set; }
+        public string? OCVBDate { get; set; }
 
         /// <summary>
         /// IMPB

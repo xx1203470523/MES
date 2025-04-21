@@ -32,6 +32,7 @@ public class SysSettingService : ISysSettingService
         {
             StrictProductionFollowingTheProcessRoute = true,
             PackOfflineValidation = true,
+            SfcValidateRule = "CZHC$",
             rule1 = false,
             rule1_input1 = "",
             rule1_input2 = "",
@@ -64,42 +65,44 @@ public class SysSettingService : ISysSettingService
 
         settingsDict.TryGetValue("strictproductionfollowingtheprocessroute", out var setting1);
         settingsDict.TryGetValue("packofflinevalidation", out var setting2);
-        settingsDict.TryGetValue("rule1",out var setting3);
-        settingsDict.TryGetValue("rule1_input1", out var setting4);
-        settingsDict.TryGetValue("rule1_input2", out var setting5);
-        settingsDict.TryGetValue("rule1_input3", out var setting6);
-        settingsDict.TryGetValue("rule2", out var setting7);
-        settingsDict.TryGetValue("rule2_input1", out var setting8);
-        settingsDict.TryGetValue("rule2_input2", out var setting9);
-        settingsDict.TryGetValue("rule2_input3", out var setting10);
-        settingsDict.TryGetValue("rule3", out var setting11);
-        settingsDict.TryGetValue("rule3_input1", out var setting12);
-        settingsDict.TryGetValue("rule3_input2", out var setting13);
-        settingsDict.TryGetValue("rule3_input3", out var setting14);
-        settingsDict.TryGetValue("rule4", out var setting15);
-        settingsDict.TryGetValue("rule4_input1", out var setting16);
-        settingsDict.TryGetValue("rule4_input2", out var setting17);
-        settingsDict.TryGetValue("rule4_input3", out var setting18);
+        settingsDict.TryGetValue("sfcValidateRule", out var setting3);
+        settingsDict.TryGetValue("rule1",out var setting4);
+        settingsDict.TryGetValue("rule1_input1", out var setting5);
+        settingsDict.TryGetValue("rule1_input2", out var setting6);
+        settingsDict.TryGetValue("rule1_input3", out var setting7);
+        settingsDict.TryGetValue("rule2", out var setting8);
+        settingsDict.TryGetValue("rule2_input1", out var setting9);
+        settingsDict.TryGetValue("rule2_input2", out var setting10);
+        settingsDict.TryGetValue("rule2_input3", out var setting11);
+        settingsDict.TryGetValue("rule3", out var setting12);
+        settingsDict.TryGetValue("rule3_input1", out var setting13);
+        settingsDict.TryGetValue("rule3_input2", out var setting14);
+        settingsDict.TryGetValue("rule3_input3", out var setting15);
+        settingsDict.TryGetValue("rule4", out var setting16);
+        settingsDict.TryGetValue("rule4_input1", out var setting17);
+        settingsDict.TryGetValue("rule4_input2", out var setting18);
+        settingsDict.TryGetValue("rule4_input3", out var setting19);
 
 
         result.StrictProductionFollowingTheProcessRoute = setting1 == "1" ? true : false;
         result.PackOfflineValidation = setting2 == "1" ? true : false;
-        result.rule1 = setting3 == "0" ? true : false;
-        result.rule1_input1 = setting4;
-        result.rule1_input2 = setting5;
-        result.rule1_input3 = Convert.ToInt32(setting6);
-        result.rule2 = setting7 == "0" ? true : false;
-        result.rule2_input1 = setting8;
-        result.rule2_input2 = setting9;
-        result.rule2_input3 = Convert.ToInt32(setting10);
-        result.rule3 = setting11 == "0" ? true : false;
-        result.rule3_input1 = setting12;
-        result.rule3_input2 = setting13;
-        result.rule3_input3 = Convert.ToInt32(setting14);
-        result.rule4 = setting15 == "0" ? true : false;
-        result.rule4_input1 = setting16;
-        result.rule4_input2 = setting17;
-        result.rule4_input3 = Convert.ToInt32(setting18);
+        result.SfcValidateRule = setting3 ?? "CZHC$";
+        result.rule1 = setting4 == "0" ? true : false;
+        result.rule1_input1 = setting5;
+        result.rule1_input2 = setting6;
+        result.rule1_input3 = Convert.ToInt32(setting7);
+        result.rule2 = setting8 == "0" ? true : false;
+        result.rule2_input1 = setting9;
+        result.rule2_input2 = setting10;
+        result.rule2_input3 = Convert.ToInt32(setting11);
+        result.rule3 = setting12 == "0" ? true : false;
+        result.rule3_input1 = setting13;
+        result.rule3_input2 = setting14;
+        result.rule3_input3 = Convert.ToInt32(setting15);
+        result.rule4 = setting16 == "0" ? true : false;
+        result.rule4_input1 = setting17;
+        result.rule4_input2 = setting18;
+        result.rule4_input3 = Convert.ToInt32(setting19);
 
         // 尝试解析布尔值，默认值为 false
         return result;

@@ -292,6 +292,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
             else
             {//不混线
+
                 //判断当前线体是否有无激活的工单
                 var hasActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery { LineId = activationWorkOrderDto.LineId, SiteId = _currentSite.SiteId ?? 123456 })).FirstOrDefault();
                 if (hasActivation != null)

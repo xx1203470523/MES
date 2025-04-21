@@ -1131,6 +1131,8 @@
 
         public const string MES19179 = "请输入工单号查询或导出！";
 
+        public const string MES19180 = "Pack码【{sfc}】已经绑定过液冷板码【{sfc2}】，不能绑定液冷板码【{sfc3}】！";
+
 
         #endregion
 

@@ -69,13 +69,13 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
         [TestMethod()]
         public async Task LYPInBoundTestAsync()
         {
-            //电芯OCV
-           string resourceCode = "YTLPACK01ER004";
-            string equipmentCode = "YTLPACK01AE004";
+            // //电芯OCV
+            //string resourceCode = "YTLPACK01ER004";
+            // string equipmentCode = "YTLPACK01AE004";
 
-            ////端板刻码
-            //string resourceCode = "YTLPACK01ER014";
-            //string equipmentCode = "YTLPACK01AE014";
+            //端板刻码
+            string resourceCode = "YTLPACK01ER014";
+            string equipmentCode = "YTLPACK01AE014";
 
             ////CCS安装
             //string resourceCode = "YTLPACK01ER016";
@@ -129,7 +129,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             //BMU进站测试
             //string prefix = "PACK20241202001";
             //string prefix = "CELL20241024002";
-            string prefix = "02QZB76712700JF210001234";
+            string prefix = "TEST444444444";
             //string prefix = "ES01340010000000562411200058";
 
             await SetEquInfoAsync(equipmentCode);

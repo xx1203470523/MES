@@ -465,7 +465,11 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 //当前条码
                 var sfcEntity = sfclist.FirstOrDefault(x => x.SFC == sfc);
                 //当前条码生产信息，兼容多段工序，根据工单和条码确认
-                var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc && x.WorkOrderId == planWorkOrder.Id);
+                //TODO 需要确认逻辑
+                //var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc && x.WorkOrderId == planWorkOrder.Id);
+                var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc);
+
+
                 if (sfcProduceEntity != null)
                 {
 
@@ -480,7 +484,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     // 校验设备资源对应的工序和在制工序是否一直
                     if (settings.StrictProductionFollowingTheProcessRoute && isCheck && procedureEntity.Id != sfcProduceEntity.ProcedureId)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19161)).WithData("SFC", string.Join(",", inBoundMoreDto.SFCs));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19161)).WithData("SFC", sfc);
                     }
 
                     #endregion
