@@ -116,7 +116,7 @@ namespace Hymson.MES.Services.Services.Report.SfcBindParameter
             {
                 OrderCode = queryDto.OrderCode,
                 PageIndex = 1,
-                PageSize = 99999,
+                PageSize = 9999999,
             });
 
             //性能太差
@@ -175,7 +175,7 @@ namespace Hymson.MES.Services.Services.Report.SfcBindParameter
                 pagedData,
                 queryDto.PageIndex,
                 queryDto.PageSize,
-                pageData.TotalCount);
+                list.Count);
         }
 
         /// <summary>

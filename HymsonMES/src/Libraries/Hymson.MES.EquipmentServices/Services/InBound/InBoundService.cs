@@ -463,11 +463,11 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 //汇总信息
                 var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == sfc).FirstOrDefault();
                 //当前条码
-                var sfcEntity = sfclist.FirstOrDefault(x => x.SFC == sfc);
+                var sfcEntity = sfclist.FirstOrDefault(x => x.SFC.ToUpper() == sfc.ToUpper());
                 //当前条码生产信息，兼容多段工序，根据工单和条码确认
                 //TODO 需要确认逻辑
                 //var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc && x.WorkOrderId == planWorkOrder.Id);
-                var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc);
+                var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC.ToUpper() == sfc.ToUpper());
 
 
                 if (sfcProduceEntity != null)
