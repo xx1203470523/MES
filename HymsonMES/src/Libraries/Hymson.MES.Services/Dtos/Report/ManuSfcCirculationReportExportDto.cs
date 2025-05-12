@@ -38,14 +38,24 @@ namespace Hymson.MES.Services.Dtos.Report
         [EpplusTableColumn(Header = "流转后条码", Order = 4)]
         public string CirculationBarCode { get; set; }
         /// <summary>
+        /// 流转后条码信息
+        /// </summary>
+        [EpplusTableColumn(Header = "内阻", Order = 5)]
+        public string ParameterValue1 { get; set; }
+        /// <summary>
+        /// 流转后条码信息
+        /// </summary>
+        [EpplusTableColumn(Header = "电压", Order = 6)]
+        public string ParameterValue2 { get; set; }
+        /// <summary>
         /// 创建人
         /// </summary>
-        [EpplusTableColumn(Header = "操作人", Order = 5)]
+        [EpplusTableColumn(Header = "操作人", Order = 7)]
         public string CreatedBy { get; set; }
         /// <summary>
         /// 创建时间
         /// </summary>
-        [EpplusTableColumn(Header = "操作时间", Order = 6)]
+        [EpplusTableColumn(Header = "操作时间", Order = 8)]
         public DateTime? CreatedOn { get; set; }
     }
 }

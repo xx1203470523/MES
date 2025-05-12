@@ -50,6 +50,11 @@ public class ProductionDetailsReportDto
     public TrueOrFalseEnum? QualityStatus { get; set; }
 
     /// <summary>
+    /// 复投次数
+    /// </summary>
+    public string? RepeatedCount { get; set; }
+
+    /// <summary>
     /// 进站时间
     /// </summary>
     public string? BeginTime { get; set; }

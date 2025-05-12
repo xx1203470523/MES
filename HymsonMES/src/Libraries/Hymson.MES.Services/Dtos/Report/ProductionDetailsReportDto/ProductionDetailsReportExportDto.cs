@@ -64,8 +64,14 @@ public record ProductionDetailsReportExportDto : BaseExcelDto
     public TrueOrFalseEnum? Passed { get; set; }
 
     /// <summary>
+    /// 复投次数
+    /// </summary>
+    [EpplusTableColumn(Header = "复投次数", Order = 9)]
+    public string? RepeatedCount { get; set; }
+
+    /// <summary>
     /// 过站时间
     /// </summary>
-    [EpplusTableColumn(Header = "过站时间", Order = 9)]
+    [EpplusTableColumn(Header = "过站时间", Order = 10)]
     public string? CreatedOn { get; set; }
 }

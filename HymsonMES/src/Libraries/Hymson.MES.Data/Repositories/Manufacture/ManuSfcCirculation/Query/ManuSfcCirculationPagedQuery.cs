@@ -206,6 +206,46 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         public decimal Column8 { get; set; }
 
         /// <summary>
+        /// TORQUE9
+        /// </summary>
+        public decimal Column9 { get; set; }
+
+        /// <summary>
+        /// TORQUE10
+        /// </summary>
+        public decimal Column10 { get; set; }
+
+        /// <summary>
+        /// TORQUE11
+        /// </summary>
+        public decimal Column11 { get; set; }
+
+        /// <summary>
+        /// TORQUE12
+        /// </summary>
+        public decimal Column12 { get; set; }
+
+        /// <summary>
+        /// TORQUE13
+        /// </summary>
+        public decimal Column13 { get; set; }
+
+        /// <summary>
+        /// TORQUE14
+        /// </summary>
+        public decimal Column14 { get; set; }
+
+        /// <summary>
+        /// TORQUE15
+        /// </summary>
+        public decimal Column15 { get; set; }
+
+        /// <summary>
+        /// TORQUE16
+        /// </summary>
+        public decimal Column16 { get; set; }
+
+        /// <summary>
         /// 创建人
         /// </summary>
         public new string CreatedBy { get; set; }

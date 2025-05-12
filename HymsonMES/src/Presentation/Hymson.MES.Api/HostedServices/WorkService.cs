@@ -60,11 +60,11 @@ namespace Hymson.MES.Api
                  ServiceTypeEnum.User,
                  ServiceTypeEnum.MES
                 }, stoppingToken);
-#if DEBUG
+//#if DEBUG
                 await _resourceService.InitEnumAsync();
                 await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
                 await InitExcelDtoAsync();
-#endif
+//#endif
             }
             catch (Exception e)
             {

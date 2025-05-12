@@ -55,16 +55,31 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         [EpplusTableColumn(Header = "设备名称", Order = 7)]
         public string EquipmentName { get; set; }
-        // <summary>
+        /// <summary>
+        /// 内阻
+        /// </summary>
+        [EpplusTableColumn(Header = "内阻", Order = 7)]
+        public string ParameterValue1 { get; set; }
+        /// <summary>
+        /// 电压
+        /// </summary>
+        [EpplusTableColumn(Header = "电压", Order = 8)]
+        public string ParameterValue2 { get; set; }
+        /// <summary>
+        /// 批次号
+        /// </summary>
+        [EpplusTableColumn(Header = "批次号", Order = 9)]
+        public string BatchNo { get; set; }
+        /// <summary>
         /// 步骤类型
         /// </summary>
-        [EpplusTableColumn(Header = "操作类型", Order = 8)]
+        [EpplusTableColumn(Header = "操作类型", Order = 10)]
         public string OperatetypeStr { get; set; }
 
         /// <summary>
         /// 操作时间
         /// </summary>
-        [EpplusTableColumn(Header = "操作时间", Order = 9)]
+        [EpplusTableColumn(Header = "操作时间", Order = 11)]
         public DateTime CreatedOn { get; set; }
     }
 

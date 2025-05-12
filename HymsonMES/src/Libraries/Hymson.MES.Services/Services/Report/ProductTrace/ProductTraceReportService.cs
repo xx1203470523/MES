@@ -35,6 +35,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Http;
+using Minio.DataModel;
 using System.Globalization;
 
 namespace Hymson.MES.Services.Services.Report
@@ -247,10 +248,10 @@ namespace Hymson.MES.Services.Services.Report
             foreach (var item in dtos)
             {
                 //获取内阻参数
-                var parameterValue1 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.SFC == item.SFC && a.ParameterId == 22207802265960448);
+                var parameterValue1 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.SFC == item.SFC && (a.ParameterId == 22207802265960448 || a.ParameterId == 13598223492837376));
 
                 //获取电压参数
-                var parameterValue2 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.SFC == item.SFC && a.ParameterId == 22207802265960449);
+                var parameterValue2 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.SFC == item.SFC && (a.ParameterId == 22207802265960449 || a.ParameterId == 13598208638709760));
 
                 item.ParameterValue1 = parameterValue1?.ParamValue ?? "";
                 item.ParameterValue2 = parameterValue2?.ParamValue ?? "";
@@ -787,6 +788,20 @@ namespace Hymson.MES.Services.Services.Report
             {
                 manuSfcprocProcedures = await _procProcedureRepository.GetByIdsAsync(manuSfcprocProcedureIds);
             }
+
+
+            var sfcs = manuSfcCirculationPagedInfo.Data.Select(a => a.SFC).ToArray();
+
+            var parameterEntities = new List<ManuProductParameterEntity>();
+            if (sfcs.Any())
+            {
+                parameterEntities = (await _manuProductParameterRepository.GetManuProductParameterAsync(new()
+                {
+                    SFCs = sfcs,
+                    SiteId = 123456
+                })).ToList();
+            }
+
             var manuSfcCirculationReportExportDtos = new List<ManuSfcCirculationReportExportDto>();
             foreach (var productParameterView in manuSfcCirculationPagedInfo.Data)
             {
@@ -802,6 +817,16 @@ namespace Hymson.MES.Services.Services.Report
                 returnView.CirculationBarCode = productParameterView.CirculationBarCode;
                 returnView.CreatedBy = productParameterView.CreatedBy;
                 returnView.CreatedOn = productParameterView.CreatedOn;
+
+                //获取内阻参数
+                var parameterValue1 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.SFC == returnView.SFC && (a.ParameterId == 22207802265960448 || a.ParameterId == 13598223492837376));
+
+                //获取电压参数
+                var parameterValue2 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.SFC == returnView.SFC && (a.ParameterId == 22207802265960449 || a.ParameterId == 13598208638709760));
+
+                returnView.ParameterValue1 = parameterValue1?.ParamValue ?? "";
+                returnView.ParameterValue2 = parameterValue2?.ParamValue ?? "";
+
                 manuSfcCirculationReportExportDtos.Add(returnView);
             }
             #endregion
@@ -832,6 +857,12 @@ namespace Hymson.MES.Services.Services.Report
             {
                 manuSfcStepEquEquipments = await _equipmentRepository.GetByIdsAsync(manuSfcStepEquEquipmentIds);
             }
+
+            //参数
+            var parameter2Entities = await _manuProductParameterRepository.GetManuProductParameterAsync(new() { SFC = planWorkOrderPagedQueryDto.SFC, SiteId = 123456 });
+
+            var inteSfcBoxEntities = await _inteSFCBoxRepository.GetManuSFCBoxAsync(new() { SFC = planWorkOrderPagedQueryDto.SFC });
+
             var productTracePagedReportExportDtos = new List<ProductTracePagedReportExportDto>();
             foreach (var manuSfcStep in manuSfcStepPagedInfo.Data)
             {
@@ -878,6 +909,18 @@ namespace Hymson.MES.Services.Services.Report
                         break;
                 }
                 returnView.CreatedOn = manuSfcStep.CreatedOn;
+
+                //获取内阻参数
+                var parameterValue1 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.ProcedureId == manuSfcStep.ProcedureId && a.ParameterId == 22207802265960448);
+
+                //获取电压参数
+                var parameterValue2 = parameterEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault(a => a.ProcedureId == manuSfcStep.ProcedureId && a.ParameterId == 22207802265960449);
+
+                returnView.ParameterValue1 = parameterValue1?.ParamValue ?? "";
+                returnView.ParameterValue2 = parameterValue2?.ParamValue ?? "";
+
+                returnView.BatchNo = inteSfcBoxEntities.FirstOrDefault()?.BatchNo ?? "";
+
                 productTracePagedReportExportDtos.Add(returnView);
             }
             #endregion

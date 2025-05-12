@@ -106,6 +106,46 @@ namespace Hymson.MES.Services.Dtos.Report
         public decimal Column8 { get; set; }
 
         /// <summary>
+        /// TORQUE9
+        /// </summary>
+        public decimal Column9 { get; set; }
+
+        /// <summary>
+        /// TORQUE10
+        /// </summary>
+        public decimal Column10 { get; set; }
+
+        /// <summary>
+        /// TORQUE11
+        /// </summary>
+        public decimal Column11 { get; set; }
+
+        /// <summary>
+        /// TORQUE12
+        /// </summary>
+        public decimal Column12 { get; set; }
+
+        /// <summary>
+        /// TORQUE13
+        /// </summary>
+        public decimal Column13 { get; set; }
+
+        /// <summary>
+        /// TORQUE14
+        /// </summary>
+        public decimal Column14 { get; set; }
+
+        /// <summary>
+        /// TORQUE15
+        /// </summary>
+        public decimal Column15 { get; set; }
+
+        /// <summary>
+        /// TORQUE16
+        /// </summary>
+        public decimal Column16 { get; set; }
+
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
@@ -213,15 +253,63 @@ namespace Hymson.MES.Services.Dtos.Report
         public decimal Column8 { get; set; }
 
         /// <summary>
+        /// TORQUE9
+        /// </summary>
+        [EpplusTableColumn(Header = "TORQUE9", Order = 15)]
+        public decimal Column9 { get; set; }
+
+        /// <summary>
+        /// TORQUE10
+        /// </summary>
+        [EpplusTableColumn(Header = "TORQUE10", Order = 16)]
+        public decimal Column10 { get; set; }
+
+        /// <summary>
+        /// TORQUE11
+        /// </summary>
+        [EpplusTableColumn(Header = "TORQUE11", Order = 17)]
+        public decimal Column11 { get; set; }
+
+        /// <summary>
+        /// TORQUE12
+        /// </summary>
+        [EpplusTableColumn(Header = "TORQUE12", Order = 18)]
+        public decimal Column12 { get; set; }
+
+        /// <summary>
+        /// TORQUE13
+        /// </summary>
+        [EpplusTableColumn(Header = "TORQUE13", Order = 19)]
+        public decimal Column13 { get; set; }
+
+        /// <summary>
+        /// TORQUE14
+        /// </summary>
+        [EpplusTableColumn(Header = "TORQUE14", Order = 20)]
+        public decimal Column14 { get; set; }
+
+        /// <summary>
+        /// TORQUE15
+        /// </summary>
+        [EpplusTableColumn(Header = "TORQUE15", Order = 21)]
+        public decimal Column15 { get; set; }
+
+        /// <summary>
+        /// TORQUE16
+        /// </summary>
+        [EpplusTableColumn(Header = "TORQUE16", Order = 22)]
+        public decimal Column16 { get; set; }
+
+        /// <summary>
         /// 创建人
         /// </summary>
-        [EpplusTableColumn(Header = "创建人", Order = 15)]
+        [EpplusTableColumn(Header = "创建人", Order = 23)]
         public string CreatedBy { get; set; }
 
         /// <summary>
         /// 创建时间
         /// </summary>
-        [EpplusTableColumn(Header = "创建时间", Order = 16)]
+        [EpplusTableColumn(Header = "创建时间", Order = 24)]
         public DateTime CreatedOn { get; set; }
     }
 

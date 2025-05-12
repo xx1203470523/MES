@@ -297,13 +297,13 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
 
                     if (procedureEntity.Code == "OP16" && manuSfcCirculationEntities?.Count() < 12) result = true;
                     if (procedureEntity.Code == "OP26" && manuSfcCirculationEntities?.Count() < 4) result = true;
-                    //if (procedureEntity.Code == "OP28" && manuSfcCirculationEntities?.Count() < 4) result = true;
+                    //if (procedureEntity.Code == "OP28" && manuSfcCirculationEntities?.Count() < 2) result = true;
 
                     if (result)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES19159))
                             .WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)))
-                            .WithData("Count", manuSfcCirculationEntities.Count());
+                            .WithData("Count", manuSfcCirculationEntities?.Count());
                     }
                 }
             }

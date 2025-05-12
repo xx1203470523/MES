@@ -171,7 +171,7 @@ public class ProductionDetailsReportService : IProductionDetailsReportService
             var procedure = procedureEntities.FirstOrDefault(a => a.Id == item.ProcedureId);
             var resource = ResourceEntities.FirstOrDefault(a => a.Id == item.ResourceId);
 
-            ProductionDetailsReportDto detailData = new ProductionDetailsReportDto()
+            ProductionDetailsReportDto detailData = new()
             {
                 SFC = item?.SFC,
                 EndTime = item?.EndTime,
@@ -183,6 +183,7 @@ public class ProductionDetailsReportService : IProductionDetailsReportService
                 ProcedureName = procedure?.Name,
                 ResourceCode = resource?.ResCode,
                 ResourceName = resource?.ResName,
+                RepeatedCount = item?.RepeatedCount
             };
 
             result.Add(detailData);
@@ -214,7 +215,8 @@ public class ProductionDetailsReportService : IProductionDetailsReportService
                 ProcedureCode = item?.ProcedureCode,
                 ProcedureName = item?.ProcedureName,
                 ResourceCode = item?.ResourceCode,
-                ResourceName = item?.ResourceName
+                ResourceName = item?.ResourceName,
+                RepeatedCount = item?.RepeatedCount
             };
 
             exportExcels.Add(exportExcel);
