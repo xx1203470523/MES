@@ -1195,6 +1195,7 @@
         #region 系统执行出错 业务逻辑出错
         //public const string MES20001 = "MES20001";
 
+        public const string MES20001 = "【sfc】条码重复进站，不允许进站！";
         #endregion
 
         #region 调用第三方服务出错

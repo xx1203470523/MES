@@ -765,7 +765,16 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             {
                 await _manuSfcSummaryRepository.InsertsAsync(manuSfcSummaryList);
             }
-            await _manuSfcRepository.InsertRangeAsync(manuSfcList);
+
+            try
+            {
+                await _manuSfcRepository.InsertRangeAsync(manuSfcList);
+            }
+            catch (Exception)
+            {
+                throw new CustomerDataException(nameof(ErrorCode.MES20001)).WithData("sfc", string.Join(",",manuSfcList.Select(a=>a.SFC)));
+            }
+
             await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
             await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
             //if (await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList) == 0)

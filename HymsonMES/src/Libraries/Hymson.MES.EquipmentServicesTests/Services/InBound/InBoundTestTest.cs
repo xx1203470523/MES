@@ -129,8 +129,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             //BMU进站测试
             //string prefix = "PACK20241202001";
             //string prefix = "CELL20241024002";
-            //string prefix = "TEST9";
-            string prefix = "0IJCBA09011111D7E0002107";
+            string prefix = "TEST12222222";
+            //string prefix = "0IJCBA09011111D7E0002107";
+            //string prefix = "53572110000011241018-0541CZHC";
 
             await SetEquInfoAsync(equipmentCode);
             await _inBoundService.InBoundAsync(new InBoundDto
